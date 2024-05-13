@@ -463,6 +463,17 @@ void() worldspawn =
 
 	precache_model ("progs/v_light.mdl");
 
+	//ALEX PRECACHE
+	precache_model ("progs/g_shotgu.mdl");
+	precache_model ("progs/g_nail.mdl");
+	precache_model ("progs/g_nail2.mdl");
+	precache_model ("progs/g_shot.mdl"); 
+	precache_model ("progs/g_rock2.mdl"); 
+	precache_model ("progs/g_rock.mdl");
+	precache_model ("progs/g_light.mdl");
+	precache_model ("progs/e_mdls/e_plas.mdl");
+	precache_model ("progs/e_mdls/e_coin.mdl");
+
 	precache_model ("progs/w_s_key.mdl"); // dumptruck_ds needed for DropStuff
 	precache_model ("progs/w_g_key.mdl"); //
 	precache_sound ("misc/medkey.wav");

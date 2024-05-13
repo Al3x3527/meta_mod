@@ -687,6 +687,80 @@ void() item_armorInv =
 };
 
 /*
+=================================================================
+Coins
+=================================================================
+*/
+
+//void() coin_touch;
+
+void() coin_touch =
+{
+	if (!CheckValidTouch()) return;
+
+		if (other.health < 20) {
+			if (other.health < 15) {
+				other.health = other.health + 5;
+			} else other.health = 20;
+		} 
+		else if (other.armorvalue < 100) {
+			if (other.armorvalue < 95)
+				other.armorvalue = other.armorvalue + 5;
+			else other.armorvalue = 100;
+		}
+	
+	self.solid = SOLID_NOT;
+	self.model = string_null;
+
+	// Supa, SP respawning items support
+	if (!deathmatch)
+	CheckItemRespawn(self, 30);
+	else if (deathmatch == 1)  // doesn't respawn in "deathmatch 2"
+	self.nextthink = time + 20;
+	self.think = SUB_regen;
+
+	if (self.obit_name != "")
+	{
+		sprint(other, "You got ");
+		sprint(other, self.obit_name); // custom armor name
+		sprint(other, "\n");
+	} else
+	sprint(other, "You got coin\n");
+	// armor touch sound
+	// sound(other, CHAN_ITEM, "items/armor1.wav", 1, ATTN_NORM); // dumptruck_ds custom models and sounds START
+	if (self.snd_misc != "")
+	sound_misc(other, CHAN_AUTO, self.snd_misc, 1, ATTN_NORM);
+	else
+	sound_misc(other, CHAN_AUTO, "dump/armsh1.wav", 1, ATTN_NORM); // dumptruck_ds custom models and sounds END
+	stuffcmd(other, "bf\n");
+
+	activator = other;
+	SUB_UseTargets();				// fire all targets / killtargets
+}
+
+void() item_coin =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+	if (!self.mdl_body && world.e_coin_mdl)
+	{
+	  self.mdl_body = world.e_coin_mdl;
+	}
+
+	self.touch = coin_touch;
+	// precache_model ("progs/armor.mdl"); // dumptruck_ds custom models and sounds START
+	precache_body_model("progs/e_mdls/e_coin.mdl");
+	// setmodel (self, "progs/armor.mdl");
+	body_model("progs/e_mdls/e_coin.mdl");
+	precache_sound_misc("dump/armsh1.wav");
+	if !(self.skin) // dumptruck_ds custom models and sounds END
+	self.skin = 0;
+	setsize(self, '-16 -16 0', '16 16 56');
+	StartItem();
+};
+
+/*
 ===============================================================================
 
 WEAPONS
@@ -2382,10 +2456,35 @@ void() DropShard = //
 	StartItem ();
 };
 
+void() DropCoin = //
+{
+	local entity	item;
+
+	item = spawn();
+	item.origin = self.origin - '0 0 24';
+
+	item.velocity_z = 300;
+	item.velocity_x = -100 + (random() * 200);
+	item.velocity_y = -100 + (random() * 200);
+
+	setmodel(item, "progs/e_mdls/e_coin.mdl");
+	item.solid = SOLID_TRIGGER;
+	item.movetype = MOVETYPE_TOSS;
+	setsize(item, '-16 -16 0', '16 16 56');
+	item.touch = coin_touch;
+	item.snd_misc = "dump/armsh1.wav";
+
+	StartItem();
+};
+
 void() DropStuff =
 {
 	local float	rand_drop;
 
+if (!self.drop_item)
+{
+	DropCoin();
+	}
 	if (self.drop_item == 1)
 		{
 			DropKey1();

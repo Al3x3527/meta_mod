@@ -714,7 +714,7 @@ void()	enf_die2	=[	$death2,	enf_die3	] {};
 void()	enf_die3	=[	$death3,	enf_die4	]
 {
 	self.solid = SOLID_NOT;
-
+	/*
 	if (self.style == 1) // style ammotype check -- dumptruck_ds
 		{
 			self.ammo_rockets = 2;
@@ -732,6 +732,7 @@ void()	enf_die3	=[	$death3,	enf_die4	]
 			self.ammo_cells = 5;
 		}
 	if(!self.keep_ammo)DropBackpack();
+	*/
 };
 void()	enf_die4	=[	$death4,	enf_die5	] {ai_forward(14);};
 void()	enf_die5	=[	$death5,	enf_die6	] {ai_forward(2);};
@@ -752,8 +753,21 @@ void()	enf_fdie2	=[	$fdeath2,	enf_fdie3	] {};
 void()	enf_fdie3	=[	$fdeath3,	enf_fdie4	]
 {
 	self.solid = SOLID_NOT;
+};
+void()	enf_fdie4	=[	$fdeath4,	enf_fdie5	] {};
+void()	enf_fdie5	=[	$fdeath5,	enf_fdie6	] {};
+void()	enf_fdie6	=[	$fdeath6,	enf_fdie7	] {};
+void()	enf_fdie7	=[	$fdeath7,	enf_fdie8	] {};
+void()	enf_fdie8	=[	$fdeath8,	enf_fdie9	] {};
+void()	enf_fdie9	=[	$fdeath9,	enf_fdie10	] {};
+void()	enf_fdie10	=[	$fdeath10,	enf_fdie11	] {};
+void()	enf_fdie11	=[	$fdeath11,	enf_fdie11	] {};
 
- 	if (self.style == 1) // style ammotype check -- dumptruck_ds
+
+void() enf_die =
+{
+//OTHER IS NOT PLAYER.
+		if (self.style == 1) // style ammotype check -- dumptruck_ds
 		{
 			self.ammo_rockets = 2;
 		}
@@ -771,22 +785,10 @@ void()	enf_fdie3	=[	$fdeath3,	enf_fdie4	]
 			self.ammo_cells = 5;
 			self.items = self.items | IT_LIGHTNING;
 		}
-	if(!self.keep_ammo)DropBackpack();
-};
-void()	enf_fdie4	=[	$fdeath4,	enf_fdie5	] {};
-void()	enf_fdie5	=[	$fdeath5,	enf_fdie6	] {};
-void()	enf_fdie6	=[	$fdeath6,	enf_fdie7	] {};
-void()	enf_fdie7	=[	$fdeath7,	enf_fdie8	] {};
-void()	enf_fdie8	=[	$fdeath8,	enf_fdie9	] {};
-void()	enf_fdie9	=[	$fdeath9,	enf_fdie10	] {};
-void()	enf_fdie10	=[	$fdeath10,	enf_fdie11	] {};
-void()	enf_fdie11	=[	$fdeath11,	enf_fdie11	] {};
-
-
-void() enf_die =
-{
-//OTHER IS NOT PLAYER.
-// check for gib
+	if (!self.keep_ammo) DropBackpack();
+	DropStuff();
+	
+	// check for gib
 	if (self.health < -35)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
@@ -825,13 +827,14 @@ void() enf_die =
 		{
 			ThrowGib ("progs/gib3.mdl", self.health);
 		}
-		DropStuff();
+		
+		//DropStuff();
 		return;
 	}
 
 // regular death
 	sound_death (self, CHAN_VOICE, "enforcer/death1.wav", 1, ATTN_NORM); //dumptruck_ds
-	DropStuff();
+	//DropStuff();
 	if (random() > 0.5)
 		enf_die1 ();
 	else

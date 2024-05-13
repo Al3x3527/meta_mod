@@ -87,7 +87,8 @@ void(entity targ, entity inflictor, entity attacker) Killed =
 	monster_death_use();
 	self.th_die ();
 
-//ALEX -- Giving attacker health here.
+	/*
+	//ALEX -- Giving attacker health here.
 	if (attacker.health < 100) {
 		if (attacker.health < 95) {
 			attacker.health = attacker.health + 5;}
@@ -97,6 +98,7 @@ void(entity targ, entity inflictor, entity attacker) Killed =
 			attacker.armorvalue = attacker.armorvalue + 5;
 		else attacker.armorvalue = 100;}
 	self = oself;
+	*/
 };
 
 
@@ -161,13 +163,16 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 	}
 	else
 	{
-	save = ceil(targ.armortype*damage);
-	if (save >= targ.armorvalue)
+		//DAMAGE REDUCTION DUE TO ARMOR TYPES. CHANGE FOR PROJECT -ALEX
+		//SAVE IS THE DAMAGE TO THE ARMOR.
+	//save = ceil(targ.armortype*damage);
+	if (damage >= targ.armorvalue) //SAVE TO DAMAGE
 	{
 		save = targ.armorvalue;
 		targ.armortype = 0;	// lost all armor
 		targ.items = targ.items - (targ.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3));
 	}
+	else save = damage; //ALL DAMAGE TO ARMOR -ALEX
 }
 // // 1998-08-12 Drowning doesn't hurt armor by Maddes/Athos  start
 // 	}
@@ -175,6 +180,7 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 // 		save = 0;
 // 	// 1998-08-12 Drowning doesn't hurt armor by Maddes/Athos  end
 	targ.armorvalue = targ.armorvalue - save;
+	//TAKE IS THE DAMAGE TO THE HEALTH.
 	take = ceil(damage-save);
 
 // add to the damage total for clients, which will be sent as a single

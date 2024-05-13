@@ -1056,5 +1056,6 @@ void(entity client, float density, vector color) csf_set;
 .string a_grn_mdl;
 .string a_ylw_mdl;
 .string a_red_mdl;
+.string e_coin_mdl; //ALEX
 
 .entity infight_activator;
