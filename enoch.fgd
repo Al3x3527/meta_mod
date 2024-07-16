@@ -3498,3 +3498,24 @@ spawnflags(Flags) =
 		1: "Not in coop" : 0
 	]
 ]
+
+// @PointClass base(Monster, Berserk, CustomMdls) size(-16 -16 -24, 16 16 40) model({ "path": ":progs/e_mdls/human.mdl" }) = monster_human : "Human
+@PointClass base(Monster, Berserk, CustomMdls, Turret) size(-16 -16 -40, 16 16 40) model(
+	{{
+		mdl_body -> {"path" : mdl_body, "skin" : skin}, {"path": "progs/e_mdls/human.mdl" , "skin" : skin}
+	}}
+) = monster_human 
+: "Human
+Default health = 80" [
+keep_ammo(integer) : "Don't drop backpack" : : "Don't drop backpack upon death"
+style(Choices) : "Attack type" =
+[
+	0:"Default (lasers)"
+	1 : "rockets"
+	2 : "grenades"
+	3 : "nails (single fire)"
+	4 : "lightning"
+	5 : "nails (rapid fire)"
+]
+//snd here
+]
