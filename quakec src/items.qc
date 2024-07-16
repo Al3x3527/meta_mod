@@ -696,8 +696,9 @@ Coins
 
 void() coin_touch =
 {
+	local string s;
+float amount = 1;
 	if (!CheckValidTouch()) return;
-
 		if (other.health < 20) {
 			if (other.health < 15) {
 				other.health = other.health + 5;
@@ -725,7 +726,13 @@ void() coin_touch =
 		sprint(other, self.obit_name); // custom armor name
 		sprint(other, "\n");
 	} else
-	sprint(other, "You got coin\n");
+		other.coin = other.coin + amount;
+	if (other.coin > 0) {
+		sprint(other, "You have ");
+		s = ftos(other.coin);
+		sprint(other, s);
+		sprint(other, " coin\n");
+	}
 	// armor touch sound
 	// sound(other, CHAN_ITEM, "items/armor1.wav", 1, ATTN_NORM); // dumptruck_ds custom models and sounds START
 	if (self.snd_misc != "")

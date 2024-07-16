@@ -139,6 +139,7 @@ void		end_sys_globals;		// flag for structure dumping
 .float		weaponframe;
 .float		currentammo;
 .float		ammo_shells, ammo_nails, ammo_rockets, ammo_cells;
+.float		coin;			//ALEX
 
 .float		items;			// bit flags
 
@@ -191,6 +192,7 @@ void		end_sys_globals;		// flag for structure dumping
 .string		target;
 .string		targetname;
 
+
 // damage is accumulated through a frame. and sent as one single
 // message, so the super shotgun doesn't generate huge messages
 .float		dmg_take;
@@ -218,7 +220,7 @@ void		end_sys_fields;			// flag for structure dumping
 ==============================================================================
 */
 
-string version = "\nprogs_dump devkit\nversion 3.0.0"; // inspired by Copper
+string version = "\nprogs_dump devkit\nversion x.0.0"; // inspired by Copper
 
 //
 // constants
