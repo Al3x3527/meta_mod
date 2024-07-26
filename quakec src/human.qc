@@ -11,7 +11,7 @@ SOLDIER --ALEX
 //$base base
 //$skin skin
 
-$frame stand1
+$frame stand1 walk1 walk2
 
 //============================================================================
 
@@ -19,19 +19,19 @@ void()	man_stand1 = [$stand1, man_stand2] {ai_stand(); };
 void()	man_stand2 = [$stand1, man_stand1] {ai_stand(); };
 
 
-void()	man_walk1 = [$stand1, man_walk2] {
+void()	man_walk1 = [$walk1, man_walk2] {
 	//if (random() < 0.2)
 		//sound_idle(self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE); //dumptruck_ds
 	ai_walk(2); };
-void()	man_walk2 = [$stand1, man_walk3] {ai_walk(4); };
-void()	man_walk3 = [$stand1, man_walk4] {ai_walk(4); };
-void()	man_walk4 = [$stand1, man_walk1] {ai_walk(3); };
+void()	man_walk2 = [$walk2, man_walk3] {ai_walk(4); };
+void()	man_walk3 = [$walk1, man_walk4] {ai_walk(4); };
+void()	man_walk4 = [$walk2, man_walk1] {ai_walk(3); };
 
-void()	man_run1 = [$stand1, man_run2] {
+void()	man_run1 = [$walk1, man_run2] {
 //	if (random() < 0.2)
 	//	sound_idle(self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE); //dumptruck_ds
 	ai_run(18); };
-void()	man_run2 = [$run2, man_run1] {ai_run(14); }; /*
+void()	man_run2 = [$walk2, man_run1] {ai_run(14); }; /*
 void()	enf_run3 = [$run3, enf_run4] {ai_run(7); };
 void()	enf_run4 = [$run4, enf_run5] {ai_run(12); };
 void()	enf_run5 = [$run5, enf_run6] {ai_run(14); };
