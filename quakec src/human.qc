@@ -75,6 +75,7 @@ void() man_die =
 
 
 void() monster_human =
+//int team, squad, squadnumber;
 {
 	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
 		return;

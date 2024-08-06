@@ -330,28 +330,38 @@ void() SightSound =
 		sound_sight (self, CHAN_VOICE, "boss2/sight.wav", 1, ATTN_NONE);
 };
 
-void() FoundTarget =
+//old foundtarget behaviors
+void() GotTarget =
 {
-	if (self.enemy.classname == "player")
-	{	// let other monsters see this monster for a while
+	// let other monsters see this monster for a while
 		sight_entity = self;
 		sight_entity_time = time;
-	}
 
-	self.show_hostile = time + 1;		// wake up other monsters
+		self.show_hostile = time + 1;		// wake up other monsters
 
-	if !(self.spawnflags & NO_SIGHT_SOUND || self.spawnflags & PASSIVE_ALWAYS || self.spawnflags & PASSIVE_UNTIL_ATTACKED)
-	{
-		SightSound ();
-	}
-	HuntTarget ();
+		if !(self.spawnflags & NO_SIGHT_SOUND || self.spawnflags & PASSIVE_ALWAYS || self.spawnflags & PASSIVE_UNTIL_ATTACKED)
+		{
+			SightSound();
+		}
+		HuntTarget();
 
-	if (self.sight_trigger == 1) //thanks RennyC -- dumptruck_ds
-	{
-		activator = self.enemy;
-		SUB_UseAndForgetTargets ();
-	}
+		if (self.sight_trigger == 1) //thanks RennyC -- dumptruck_ds
+		{
+			activator = self.enemy;
+			SUB_UseAndForgetTargets();
+		}
 };
+
+//re-purpose this function to request enemies for squad.
+void() FoundTarget =
+{
+	//create new memory entity
+	new entity		target;
+	//assign to squad
+	//pass information from client to memory
+	request_target(target); //ask utility AI to process target
+};
+
 
 /*
 ===========
@@ -370,6 +380,9 @@ checked each frame.  This means multi player games will have slightly
 slower noticing monsters.
 ============
 */
+//this function is looking for an entity to set as self.enemy -- FindTarget is called in AI_run (during coop) and AI_stand
+//vanilla function notices other ai so they can alert self to player.
+
 float() FindTarget =
 {
 	local entity	client;
@@ -381,7 +394,7 @@ float() FindTarget =
 // spawnflags & 3 is a big hack, because zombie crucified used the first
 // spawn flag prior to the ambush flag, and I forgot about it, so the second
 // spawn flag works as well
-	if (sight_entity_time >= time - 0.1 && !(self.spawnflags & 3) )
+	if (sight_entity_time >= time - 0.1 && !(self.spawnflags & 3) ) //sight entity global variable used in ai.qc --Alex
 	{
 		client = sight_entity;
 		if (client.enemy == self.enemy)
@@ -389,15 +402,19 @@ float() FindTarget =
 	}
 	else
 	{
-		client = checkclient ();
+		client = checkclient (); //PF_checkclient -- does not run through whole list each frame, only iterates once
+		//should utilize this call for all indirect ai interactions --ALEX
 		if (!client)
 			return FALSE;	// current check entity isn't in PVS
 	}
 
-	if ((self.spawnflags & PASSIVE_UNTIL_ATTACKED) || (self.spawnflags & PASSIVE_ALWAYS))
+	if ((self.spawnflags & PASSIVE_UNTIL_ATTACKED) || (self.spawnflags & PASSIVE_ALWAYS)) //passives don't do anything. -Alex
 		return FALSE;
 
 	if (client.flags & FL_NOTARGET || client.movetype == MOVETYPE_NOCLIP) // from Copper -- dumptruck_ds
+		return FALSE;
+
+	if (client.team = self.team) //-ALEX
 		return FALSE;
 
 	if (client.health <= 0)
@@ -424,7 +441,7 @@ float() FindTarget =
 
 	if (r == RANGE_NEAR)
 	{
-		if (client.show_hostile < time && !infront (client))
+		if (client.show_hostile < time && !infront (client)) //figure out what is client.show_hostile
 			return FALSE;
 	}
 	else if (r == RANGE_MID)
@@ -436,6 +453,9 @@ float() FindTarget =
 //
 // got one
 //
+
+	/*
+	//ordinarily "player" is the enemy team
 	self.enemy = client;
 	if (self.enemy.classname != "player")
 	{
@@ -446,9 +466,10 @@ float() FindTarget =
 			return FALSE;
 		}
 	}
+	*/
 
 	FoundTarget ();
-
+	//do something more generic with target. let squad AI determine what to do.
 	return TRUE;
 };
 
@@ -761,7 +782,8 @@ void(float dist) ai_run =
 		self.search_time = time + 5;
 
 // look for other coop players
-	if (coop && self.search_time < time)
+	//we can also look for coop ai now. always call FindTarger --ALEX
+	if (/*coop && */self.search_time < time) //not really sure how self.search_time works
 	{
 		if (FindTarget ())
 			return;
