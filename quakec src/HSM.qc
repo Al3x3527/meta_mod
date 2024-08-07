@@ -23,14 +23,18 @@ int i; float c_factor, h_factor, w_factor;
 			return;
 	//multiply normalized factors: class*health*weapon
 	//what's more important, finishing off a weak enemy or fighting a strong one?
+		//assign higher danger to hero classes and vehicles
+		//work out a tree when enemies and vehicles are more implemented
 		if (other.target == monster_human) //target represents a monster_human class. different ways to handle this.
 			c_factor = 0.5;
 		else c_factor = 1;
-		other.danger = c_factor * h_factor*w_factor;
-		i++;
+		h_factor = TargetHealthPercent; //a qc division function exists but I've not seen it used. only need one decimal point.
+		if (other.weapon == weapon_rocket)
+			w_factor = 1;
+		else w_factor = 0.8;
+		other.danger = c_factor * h_factor * w_factor;
+		i = i + 1;
 	}
-
-	SortTargets(); //sorting numbers belongs in C code.
 };
 
 //monsters request enemies to squad
@@ -41,12 +45,20 @@ void(target) request_target =
 {
 	self.memory = self.memory + 1; //how many entities are we tracking?
 prioritize_targets();
+//apply previous priority to danger
+	//+.7; .6; .5; .4; .3; .2; .1; 0; 0;
+	//then sort priorities
+SortTargets(); //sorting numbers belongs in C code.
+
 if (self.memory > 8)
 {
 	//cull lowest priority
-	self.enemy[memory] = 0;
+	self.enemy[self.memory] = 0;
 	self.memory = self.memory - 1;
 }
+
+//get a target for the requester. not neccessarily the highest priority enemy.
+
 }
 //squad gives enemies to monsters
 //squad gives additional instructions based on context from encounter

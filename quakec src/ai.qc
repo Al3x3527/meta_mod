@@ -358,8 +358,13 @@ void() FoundTarget =
 	//create new memory entity
 	new entity		target;
 	//assign to squad
-	//pass information from client to memory
-	request_target(target); //ask utility AI to process target
+//copying "a lot" of data, can just clone the entity in C code and make adjustments.
+MakeTarget(target, client, self);
+//pass information from client to memory
+//target.team = client.team;
+//target.target = client.classname;
+	//ask utility AI to process target
+	request_target(target); 
 };
 
 
@@ -468,7 +473,7 @@ float() FindTarget =
 	}
 	*/
 
-	FoundTarget ();
+	FoundTarget (client);
 	//do something more generic with target. let squad AI determine what to do.
 	return TRUE;
 };
