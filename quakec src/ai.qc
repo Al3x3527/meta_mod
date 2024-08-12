@@ -353,18 +353,15 @@ void() GotTarget =
 };
 
 //re-purpose this function to request enemies for squad.
-void() FoundTarget =
+void(target) FoundTarget =
 {
-	//create new memory entity
-	new entity		target;
-	//assign to squad
-//copying "a lot" of data, can just clone the entity in C code and make adjustments.
-MakeTarget(target, client, self);
-//pass information from client to memory
-//target.team = client.team;
-//target.target = client.classname;
-	//ask utility AI to process target
-	request_target(target); 
+	//create new memory entity, may be better to do this in SV program.
+	new entity		memory;
+memory = target;
+memory.classname = ai_memory;
+memory.squad = self.squad;
+	//ask utility AI to process target and issue a response
+	sight_update(memory); 
 };
 
 
@@ -422,6 +419,26 @@ float() FindTarget =
 	if (client.team = self.team) //-ALEX
 		return FALSE;
 
+	//need a check here for if client is associated with a memory in squad already
+	//preferably not by making 8 more if statements but here we go
+	if (client == self.squad.enemy)
+		return FALSE;
+	if (client == self.squad.enemy1)
+		return FALSE;
+	if (client == self.squad.enemy2)
+		return FALSE;
+	if (client == self.squad.enemy3)
+		return FALSE;
+	if (client == self.squad.enemy4)
+		return FALSE;
+	if (client == self.squad.enemy5)
+		return FALSE;
+	if (client == self.squad.enemy6)
+		return FALSE;
+	if (client == self.squad.enemy7)
+		return FALSE;
+
+
 	if (client.health <= 0)
 		return FALSE;
 
@@ -429,8 +446,8 @@ float() FindTarget =
 		if (client.enemy.health <= 0)
 			return FALSE;
 
-	if (client == self.enemy)
-		return FALSE;
+	/*if (client == self.enemy)
+		return FALSE; */
 
 	if (client.flags & FL_NOTARGET)
 		return FALSE;
