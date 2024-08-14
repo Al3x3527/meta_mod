@@ -1,270 +1,115 @@
 /*
-potentially temporary
-AI behavoir tree
+potentially temporary document (combine with ai.qc)
+AI behavior tree
 --Alex
 */
 
-//last action is complete, decide what to do next
-//assuming self = a monster
-void(state_winning, state_full, state_leader) squad_action = 
+//squad actions called every ai think
+void() squad_fight =
 {
-	if (self.squad.encounter) {
-		if (self.squad.attack_state == sleep) {
-			self.squad.attack_state == alert;
-		} //sleep
-		if (self.squad.attack_state == alert) {
-			if (winning) {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full	
-				else {
-					if (state_leader) {
-						self.squad.attack_state = fight;
-					} //no leader
-					else {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else
-							self.squad.attack_state = guard;
-					}
-				}
-			} //not winning
+	local entity waypoint;
+	self.waypoint = waypoint;
+	self.squad.attack_state = fight
+		//modify squad action
+			//push or flank?
+				//look for a place near self.enemy which the target can't see
+	//apply offset to squad dest
+		//turn monster dest into waypoint entity
+	if (self.squad.squad == self)
+		self.waypoint.origin = self.enemy.origin; //squad leader
+	else if (self.squad.squad1 == self)
+		self.waypoint.origin = waypoint_offset(48, self.squad.squad);
+	else if (self.squad.squad2 == self)
+		self.waypoint.origin = waypoint_offset(-48, self.squad.squad1);
+	else if (self.squad.squad3 == self)
+		self.waypoint.origin = waypoint_offset(48, self.squad.squad2);
+	else if (self.squad.squad4 == self)
+		self.waypoint.origin = waypoint_offset(-48, self.squad.squad3);
+//run towards waypoint while attacking self.enemy
+	self.th_run();
+};
+
+//something has changed, decide what to do next
+//assuming self = a monster
+void(state_winning, state_full, state_leader) squad_action =
+{
+	if (self.squad.attack_state = 0)
+	return; //no state = do nothing/play dead
+	else {
+		if (self.squad.encounter) {
+			if (self.squad.attack_state == sleep) {
+				self.squad.attack_state == alert;
+			} //sleep
+			else if (self.squad.attack_state == guard) {
+				if (!(state_winning))
+					if (!(state_leader))
+						squad.attack_state = flee;
+			} //guard
+			else if (self.squad.attack_state == vehicle) {
+				//handle vehicle/combined combat in its own way
+				;
+			} //vehicle
+			else if (self.squad.attack_state == obey) {
+				//when scripted movement overrides combat loop
+				;
+			} //obey
+			//generic tree
 			else {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full
-				else {
-					if (state_leader) {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else {
-							self.squad.attack_state = guard;
-						}
-					} //no leader
-					else
-						self.squad.attack_state = flee; //modify to retreat or scram
-				} //not full
-			} //not winning
-		} //alert
-		if (self.squad.attack_state == fight) {
-			if (winning) {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full	
-				else {
-					if (state_leader) {
-						self.squad.attack_state = fight;
-					} //no leader
+				if (state_winning) {
+					if (state_full) {
+						squad_fight();
+					} //not full	
 					else {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else
-							self.squad.attack_state = guard;
-					}
-				}
-			} //not winning
-			else {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full
-				else {
-					if (state_leader) {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} 
+						if (state_leader) {
+							self.squad.attack_state = fight;
+						} //no leader
 						else {
-							self.squad.attack_state = guard;
+							if (self.squad.frustration > 2) {
+								self.squad.attack_state = charge;
+							} else
+								self.squad.attack_state = avoid;
 						}
-					} //no leader
-					else
-						self.squad.attack_state = flee; //modify to retreat or scram
-				} //not full
-			} //not winning
-		} //state = fight
-		if (self.squad.attack_state == flee) {
-			if (winning) {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full	
-				else {
-					if (state_leader) {
-						self.squad.attack_state = fight;
-					} //no leader
-					else {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else
-							self.squad.attack_state = guard;
 					}
-				}
-			} //not winning
-			else {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full
+				} //not winning
 				else {
-					if (state_leader) {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else {
-							self.squad.attack_state = guard;
-						}
-					} //no leader
-					else
-						self.squad.attack_state = flee; //modify to retreat or scram
-				} //not full
-			} //not winning
-		} //flee
-		if (self.squad.attack_state == uncover) {
-			if (winning) {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full	
-				else {
-					if (state_leader) {
+					if (state_full) {
 						self.squad.attack_state = fight;
-					} //no leader
+					} //not full
 					else {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else
-							self.squad.attack_state = guard;
-					}
-				}
-			} //not winning
-			else {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full
-				else {
-					if (state_leader) {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else {
-							self.squad.attack_state = guard;
-						}
-					} //no leader
-					else
-						self.squad.attack_state = flee; //modify to retreat or scram
-				} //not full
-			} //not winning
-		} //uncover
-		if (self.squad.attack_state == guard) {
-			;
-		} //guard
-		if (self.squad.attack_state == search) {
-			if (winning) {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full	
-				else {
-					if (state_leader) {
-						self.squad.attack_state = fight;
-					} //no leader
-					else {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else
-							self.squad.attack_state = guard;
-					}
-				}
-			} //not winning
-			else {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full
-				else {
-					if (state_leader) {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else {
-							self.squad.attack_state = guard;
-						}
-					} //no leader
-					else
-						self.squad.attack_state = flee; //modify to retreat or scram
-				} //not full
-			} //not winning
-		} //search
-		if (self.squad.attack_state == wait) {
-			;
-		} //wait
-		if (self.squad.attack_state == vehicle) {
-			;
-		} //vehicle
-		if (self.squad.attack_state == charge) {
-			if (winning) {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full	
-				else {
-					if (state_leader) {
-						self.squad.attack_state = fight;
-					} //no leader
-					else {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else
-							self.squad.attack_state = guard;
-					}
-				}
-			} //not winning
-			else {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full
-				else {
-					if (state_leader) {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else {
-							self.squad.attack_state = guard;
-						}
-					} //no leader
-					else
-						self.squad.attack_state = flee; //modify to retreat or scram
-				} //not full
-			} //not winning
-		} //charge
-		if (self.squad.attack_state == obey) {
-			;
-		} //obey
-		if (self.squad.attack_state == converse) {
-			;
-		} //converse
-		if (self.squad.attack_state == avoid) {
-			if (winning) {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full	
-				else {
-					if (state_leader) {
-						self.squad.attack_state = fight;
-					} //no leader
-					else {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else
-							self.squad.attack_state = guard;
-					}
-				}
-			} //not winning
-			else {
-				if (state_full) {
-					self.squad.attack_state = fight;
-				} //not full
-				else {
-					if (state_leader) {
-						if (self.squad.frustration > 2) {
-							self.squad.attack_state = charge;
-						} else {
-							self.squad.attack_state = guard;
-						}
-					} //no leader
-					else
-						self.squad.attack_state = flee; //modify to retreat or scram
-				} //not full
-			} //not winning
-		} //avoid
-	} //encounter -can this function be called outside an encounter?
+						if (state_leader) {
+							if (self.squad.frustration > 2) {
+								self.squad.attack_state = charge;
+							} else {
+								self.squad.attack_state = avoid;
+							}
+						} //no leader
+						else
+							self.squad.attack_state = flee; //modify to retreat or scram
+					} //not full
+				} //not winning
+			} //generic tree
+		} //encounter -can this function be called outside an encounter?
+	} //there is an attack state
 }
+
+/*
+//set monster state and dest for each monster in squad
+	if (self.classname == human)
+		human_fight(yaw);
+	else if (self.classname == hero)
+		hero_fight(yaw);
+	else if (self.classname == elite)
+		elite_fight(yaw);
+	else if (self.classname == drake)
+		drake_fight(yaw);
+	else if (self.classname == toad)
+		toad_fight(yaw);
+	else if (self.classname == robot)
+		robot_fight(yaw);
+	else if (self.classname == zombie)
+		zombie_fight(yaw);
+	else if (self.classname == hornet)
+		hornet_fight(yaw);
+	else if (self.classname == beast)
+		beast_fight(yaw);
+		*/

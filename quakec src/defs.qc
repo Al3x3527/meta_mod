@@ -140,6 +140,7 @@ void		end_sys_globals;		// flag for structure dumping
 .float		currentammo;
 .float		ammo_shells, ammo_nails, ammo_rockets, ammo_cells;
 .float		coin;			//ALEX
+.float		danger;
 
 .float		items;			// bit flags
 
@@ -164,6 +165,24 @@ void		end_sys_globals;		// flag for structure dumping
 .string		netname;
 
 .entity 	enemy;
+.entity 	enemy1;
+.entity 	enemy2;
+.entity 	enemy3;
+.entity 	enemy4;
+.entity 	enemy5;
+.entity 	enemy6;
+.entity 	enemy7;
+.entity 	enemy8;
+.entity		squad; //ALEX
+.entity		squad1;
+.entity		squad2;
+.entity		squad3;
+.entity		squad4;
+.entity		squad5;
+.entity		squad6;
+.entity		squad7;
+.entity		waypoint;
+.entity		encounter;
 
 .float		flags;
 
@@ -208,9 +227,8 @@ void		end_sys_globals;		// flag for structure dumping
 
 .string		noise, noise1, noise2, noise3;	// contains names of wavs to play
 
-.string		team;	//for tactical --ALEX
-.string		squad;
-.float		squadnumber;
+.string		team;	//ALEX
+
 
 //================================================
 void		end_sys_fields;			// flag for structure dumping

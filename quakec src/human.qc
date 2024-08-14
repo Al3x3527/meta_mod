@@ -28,38 +28,37 @@ void()	man_walk3 = [$walk1, man_walk4] {ai_walk(4); };
 void()	man_walk4 = [$walk2, man_walk1] {ai_walk(3); };
 
 void()	man_run1 = [$walk1, man_run2] {
-//	if (random() < 0.2)
-	//	sound_idle(self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE); //dumptruck_ds
-	ai_run(18); };
-void()	man_run2 = [$walk2, man_run1] {ai_run(14); }; /*
-void()	enf_run3 = [$run3, enf_run4] {ai_run(7); };
-void()	enf_run4 = [$run4, enf_run5] {ai_run(12); };
-void()	enf_run5 = [$run5, enf_run6] {ai_run(14); };
-void()	enf_run6 = [$run6, enf_run7] {ai_run(14); };
-void()	enf_run7 = [$run7, enf_run8] {ai_run(7); };
-void()	enf_run8 = [$run8, enf_run1] {ai_run(11); };
+		ai_run(6); //move to waypoint, face enemy
+};
+void()	man_run2 = [$walk2, man_run1] {ai_run(6);	};
 
-void()	enf_atk1 = [$attack1, enf_atk2] {ai_face(); };
-void()	enf_atk2 = [$attack2, enf_atk3] {ai_face(); };
-void()	enf_atk3 = [$attack3, enf_atk4] {ai_face(); };
-void()	enf_atk4 = [$attack4, enf_atk5] {ai_face(); };
-void()	enf_atk5 = [$attack5, enf_atk6] {ai_face(); };
-void()	enf_atk6 = [$attack6, enf_atk7] {enforcer_fire(); };
-void()	enf_atk7 = [$attack7, enf_atk8] {ai_face(); };
-void()	enf_atk8 = [$attack8, enf_atk9] {ai_face(); };
-void()	enf_atk9 = [$attack5, enf_atk10] {ai_face(); };
-void()	enf_atk10 = [$attack6, enf_atk11] {enforcer_fire(); };
-void()	enf_atk11 = [$attack7, enf_atk12] {ai_face(); };
-void()	enf_atk12 = [$attack8, enf_atk13] {ai_face(); };
-void()	enf_atk13 = [$attack9, enf_atk14] {ai_face(); };
-void()	enf_atk14 = [$attack10, enf_run1] {ai_face(); SUB_CheckRefire(enf_atk1);
-}; */
+void()	man_fire1 = [$fire1, man_fire2] {ai_face(); };
+void()	man_fire2 = [$fire2, man_fire3] {ai_face(); };
+void()	man_fire3 = [$fire3, man_fire4] {ai_face(); };
+void()	man_fire4 = [$fire4, man_fire5] {ai_face(); };
+void()	man_fire5 = [$fire5, man_fire6] {ai_face(); };
+void()	man_fire6 = [$fire6, man_fire7] {ai_fire(); };//
+void()	man_fire7 = [$fire7, man_fire8] {ai_face(); };
+void()	man_fire8 = [$fire8, man_fire9] {ai_face(); };
+void()	man_fire9 = [$fire5, man_fire10] {ai_face(); };
+void()	man_fire10 = [$fire6, man_fire11] {ai_fire(); };//
+void()	man_fire11 = [$fire7, man_fire12] {ai_face(); };
+void()	man_fire12 = [$fire8, man_fire13] {ai_face(); };
+void()	man_fire13 = [$fire9, man_fire14] {ai_face(); };
+void()	man_fire14 = [$fire10, man_fire1] {ai_face(); SUB_CheckRefire(man_fire1);
+}; 
 
 void() man_pain = {}
 
+void()	man_hit1 = [$walk1, man_hit2] {ai_melee(6);	};
+void()	man_hit2 = [$walk2, man_hit1] {ai_melee(6);	};
+
 void() human_melee =
 {
-
+	//if (random() > 0.5)
+		man_hit1();
+	//else
+	//	man_smack1();
 }
 
 void() h_death1 =
@@ -121,6 +120,8 @@ void() monster_human =
 	self.th_stand = man_stand1;
 	self.th_walk = man_walk1;
 	self.th_run = man_run1;
+	self.th_melee = man_melee1;
+	self.th_missile = man_fire1; //placeholder until weapon system for AI implemented
 	if !(self.berserk) //Berserk test from http://celephais.net/board/view_thread.php?id=4&start=3465 -- dumptruck_ds
 		self.th_pain = man_pain;
 	else
@@ -150,7 +151,7 @@ void() monster_dead_human =
 		}
 	} else
 	{
-		//self.frame = $death14; //frame must have original name?
+		//self.frame = $death14;
 		if (self.spawnflags & 1)
 		{
 			self.solid = SOLID_BBOX;
