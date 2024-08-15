@@ -331,7 +331,7 @@ void() SightSound =
 };
 
 //old foundtarget behaviors
-void() GotTarget =
+void() FoundTarget =
 {
 	// let other monsters see this monster for a while
 		sight_entity = self;
@@ -351,19 +351,6 @@ void() GotTarget =
 			SUB_UseAndForgetTargets();
 		}
 };
-
-//re-purpose this function to request enemies for squad.
-void(target) FoundTarget =
-{
-	//create new memory entity, may be better to do this in SV program.
-	new entity		memory;
-memory = target;
-memory.classname = ai_memory;
-memory.squad = self.squad;
-	//ask utility AI to process target and issue a response
-	sight_update(memory); 
-};
-
 
 /*
 ===========
@@ -416,29 +403,6 @@ float() FindTarget =
 	if (client.flags & FL_NOTARGET || client.movetype == MOVETYPE_NOCLIP) // from Copper -- dumptruck_ds
 		return FALSE;
 
-	if (client.team = self.team) //-ALEX
-		return FALSE;
-
-	//need a check here for if client is associated with a memory in squad already
-	//preferably not by making 8 more if statements but here we go
-	if (client == self.squad.enemy)
-		return FALSE;
-	if (client == self.squad.enemy1)
-		return FALSE;
-	if (client == self.squad.enemy2)
-		return FALSE;
-	if (client == self.squad.enemy3)
-		return FALSE;
-	if (client == self.squad.enemy4)
-		return FALSE;
-	if (client == self.squad.enemy5)
-		return FALSE;
-	if (client == self.squad.enemy6)
-		return FALSE;
-	if (client == self.squad.enemy7)
-		return FALSE;
-
-
 	if (client.health <= 0)
 		return FALSE;
 
@@ -461,6 +425,11 @@ float() FindTarget =
 	if (!visible (client))
 		return FALSE;
 
+	if (client.team = self.team) {//-ALEX
+		squad_check_merge(client);
+		return FALSE;
+	}
+
 	if (r == RANGE_NEAR)
 	{
 		if (client.show_hostile < time && !infront (client)) //figure out what is client.show_hostile
@@ -471,7 +440,24 @@ float() FindTarget =
 		if ( /* client.show_hostile < time || */ !infront (client))
 			return FALSE;
 	}
-
+	//need a check here for if client is associated with a memory in squad already
+	//preferably not by making 8 more if statements but here we go
+	if (client == self.squad.enemy)
+		return FALSE;
+	if (client == self.squad.enemy1)
+		return FALSE;
+	if (client == self.squad.enemy2)
+		return FALSE;
+	if (client == self.squad.enemy3)
+		return FALSE;
+	if (client == self.squad.enemy4)
+		return FALSE;
+	if (client == self.squad.enemy5)
+		return FALSE;
+	if (client == self.squad.enemy6)
+		return FALSE;
+	if (client == self.squad.enemy7)
+		return FALSE;
 //
 // got one
 //
@@ -490,7 +476,7 @@ float() FindTarget =
 	}
 	*/
 
-	FoundTarget (client);
+	update_memory(client);
 	//do something more generic with target. let squad AI determine what to do.
 	return TRUE;
 };
@@ -760,7 +746,6 @@ void() ai_run_slide =
 	walkmove (self.ideal_yaw - ofs, movedist);
 };
 
-
 /*
 =============
 ai_run
@@ -772,6 +757,8 @@ void(float dist) ai_run =
 {
 	// dprint("ai_run\n");
 	movedist = dist;
+//update memory of
+update_memory(self.enemy.enemy);
 // see if the enemy is dead
 	if ((self.enemy.health <= 0) || (self.spawnflags & PASSIVE_ALWAYS))
 	{
@@ -799,13 +786,13 @@ void(float dist) ai_run =
 	self.show_hostile = time + 1;		// wake up other monsters
 
 // check knowledge of enemy
-	enemy_vis = visible(self.enemy);
+	enemy_vis = visible(self.enemy.enemy); //real target visibility --Alex
 	if (enemy_vis)
 		self.search_time = time + 5;
 
 // look for other coop players
 	//we can also look for coop ai now. always call FindTarger --ALEX
-	if (/*coop && */self.search_time < time) //not really sure how self.search_time works
+	if (/*coop && */self.search_time < time)
 	{
 		if (FindTarget ())
 			return;

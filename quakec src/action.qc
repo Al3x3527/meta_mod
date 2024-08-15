@@ -7,7 +7,9 @@ AI behavior tree
 //squad actions called every ai think
 void() squad_fight =
 {
-	local entity waypoint;
+	new entity waypoint;
+	waypoint.classname = ai_waypoint;
+	if (self.waypoint) {remove(self.waypoint);}
 	self.waypoint = waypoint;
 	self.squad.attack_state = fight
 		//modify squad action
@@ -26,7 +28,7 @@ void() squad_fight =
 	else if (self.squad.squad4 == self)
 		self.waypoint.origin = waypoint_offset(-48, self.squad.squad3);
 //run towards waypoint while attacking self.enemy
-	self.th_run();
+	//let ai complete their last think. ai will check squad.attack_state.
 };
 
 //something has changed, decide what to do next
