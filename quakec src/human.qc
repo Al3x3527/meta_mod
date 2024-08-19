@@ -31,7 +31,7 @@ void()	man_run1 = [$walk1, man_run2] {
 		ai_run(6); //move to waypoint, face enemy
 };
 void()	man_run2 = [$walk2, man_run1] {ai_run(6);	};
-
+/*
 void()	man_fire1 = [$fire1, man_fire2] {ai_face(); };
 void()	man_fire2 = [$fire2, man_fire3] {ai_face(); };
 void()	man_fire3 = [$fire3, man_fire4] {ai_face(); };
@@ -46,7 +46,7 @@ void()	man_fire11 = [$fire7, man_fire12] {ai_face(); };
 void()	man_fire12 = [$fire8, man_fire13] {ai_face(); };
 void()	man_fire13 = [$fire9, man_fire14] {ai_face(); };
 void()	man_fire14 = [$fire10, man_fire1] {ai_face(); SUB_CheckRefire(man_fire1);
-}; 
+}; */
 
 void() man_pain = {}
 

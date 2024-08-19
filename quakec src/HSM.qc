@@ -395,14 +395,15 @@ void() ai_memory =
 
 void(offset, target) waypoint_offset =
 {
-	local vector vec, d;
+	local vector vec, d, b;
 vec = target.origin - self.origin;
 d = normalize(vec) * offset;
+b = makevectors((vectoyaw(vec) - 90), 0, 0);
 //offset waypoint.origin by offset normal to vector, abs of offset along vector from target.origin
 if (offset > 0)
-self.waypoint.origin = target.origin + d + transpose(d);
+self.waypoint.origin = target.origin + d + b;
 else
-self.waypoint.origin = target.origin - d + transpose(d); //I think
+self.waypoint.origin = target.origin - d + b;
 };
 
 /*Waypoint Point Entity (.5 .5 .5) (-8 -8 -8) (8 8 8) X X X X X X X X NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER X NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
@@ -457,7 +458,7 @@ if (other.squad.squad2) other_count = other_count + 1;
 if (other.squad.squad3) other_count = other_count + 1;
 if (other.squad.squad4) other_count = other_count + 1;
 //can squads merge?
-if ((self_count + other_count) < 6) {
+if ((self_count + other_count) <= 5) {
 	if ((self_count + other_count) == 5) self.squad.squad_state_full = 0;
 	squad_fit(other.squad.squad);
 	squad_fit(other.squad.squad1);
