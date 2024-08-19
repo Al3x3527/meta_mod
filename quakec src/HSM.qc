@@ -193,7 +193,7 @@ if (!(tsquad.squad4.enemy)) tsquad.squad4.enemy = FindClosest(other_qside, tsqua
 
 void() start_encounter =
 {
-	entity n_encounter;
+	entity n_encounter = spawn();
 n_encounter.classname = "ai_encounter";
 self.squad.encounter = n_encounter;
 /*
@@ -375,7 +375,7 @@ squad_action(encounter_update(memory));
 //at the beginning of an action. memories are shared in sqaud.
 void(entity target) update_memory =
 {
- entity memory;
+ entity memory = spawn () ;
 memory = target; //real target
 memory.classname = "ai_memory";
 memory.squad = self.squad;
@@ -421,7 +421,7 @@ void() ai_waypoint =
 //start squad called in walkmonster_start
 void() start_squad =
 {
-	entity tsquad;
+	entity tsquad = spawn();
 tsquad.classname = "ai_squad";
 tsquad.squad_state_full = 0;
 self.squad = tsquad;
