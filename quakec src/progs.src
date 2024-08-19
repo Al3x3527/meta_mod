@@ -69,4 +69,6 @@ func_fall2.qc //Renny's improved version.
 mobot.qc // Using "bot" creation code for func_monster_spawner
 
 human.qc //Alex monster_human
+HSM.qc
+action.qc
 

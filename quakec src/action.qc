@@ -7,11 +7,11 @@ AI behavior tree
 //squad actions called every ai think
 void() squad_fight =
 {
-	new entity waypoint;
-	waypoint.classname = ai_waypoint;
+	entity twaypoint;
+	twaypoint.classname = "ai_waypoint";
 	if (self.waypoint) {remove(self.waypoint);}
-	self.waypoint = waypoint;
-	self.squad.attack_state = fight
+	self.waypoint = twaypoint;
+	self.squad.attack_state = fight;
 		//modify squad action
 			//push or flank?
 				//look for a place near self.enemy which the target can't see
@@ -33,19 +33,19 @@ void() squad_fight =
 
 //something has changed, decide what to do next
 //assuming self = a monster
-void(state_winning, state_full, state_leader) squad_action =
+void(float state_winning) squad_action =
 {
 	if (self.squad.attack_state = 0)
 	return; //no state = do nothing/play dead
 	else {
 		if (self.squad.encounter) {
 			if (self.squad.attack_state == sleep) {
-				self.squad.attack_state == alert;
+				self.squad.attack_state = alert;
 			} //sleep
 			else if (self.squad.attack_state == guard) {
 				if (!(state_winning))
-					if (!(state_leader))
-						squad.attack_state = flee;
+					if (squad_state_leader == 0)
+						self.squad.attack_state = flee;
 			} //guard
 			else if (self.squad.attack_state == vehicle) {
 				//handle vehicle/combined combat in its own way
@@ -58,11 +58,11 @@ void(state_winning, state_full, state_leader) squad_action =
 			//generic tree
 			else {
 				if (state_winning) {
-					if (state_full) {
+					if (squad_state_full) {
 						squad_fight();
 					} //not full	
 					else {
-						if (state_leader) {
+						if (squad_state_leader) {
 							self.squad.attack_state = fight;
 						} //no leader
 						else {
@@ -74,11 +74,11 @@ void(state_winning, state_full, state_leader) squad_action =
 					}
 				} //not winning
 				else {
-					if (state_full) {
+					if (squad_state_full) {
 						self.squad.attack_state = fight;
 					} //not full
 					else {
-						if (state_leader) {
+						if (squad_state_leader) {
 							if (self.squad.frustration > 2) {
 								self.squad.attack_state = charge;
 							} else {

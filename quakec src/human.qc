@@ -50,8 +50,8 @@ void()	man_fire14 = [$fire10, man_fire1] {ai_face(); SUB_CheckRefire(man_fire1);
 
 void() man_pain = {}
 
-void()	man_hit1 = [$walk1, man_hit2] {ai_melee(6);	};
-void()	man_hit2 = [$walk2, man_hit1] {ai_melee(6);	};
+void()	man_hit1 = [$walk1, man_hit2] {ai_melee();	};
+void()	man_hit2 = [$walk2, man_hit1] {ai_melee();	};
 
 void() human_melee =
 {
@@ -120,8 +120,8 @@ void() monster_human =
 	self.th_stand = man_stand1;
 	self.th_walk = man_walk1;
 	self.th_run = man_run1;
-	self.th_melee = man_melee1;
-	self.th_missile = man_fire1; //placeholder until weapon system for AI implemented
+	self.th_melee = human_melee;
+	//self.th_missile = man_fire1; //placeholder until weapon system for AI implemented
 	if !(self.berserk) //Berserk test from http://celephais.net/board/view_thread.php?id=4&start=3465 -- dumptruck_ds
 		self.th_pain = man_pain;
 	else

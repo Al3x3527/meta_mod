@@ -141,6 +141,7 @@ void		end_sys_globals;		// flag for structure dumping
 .float		ammo_shells, ammo_nails, ammo_rockets, ammo_cells;
 .float		coin;			//ALEX
 .float		danger;
+.float		squad_state_full;
 
 .float		items;			// bit flags
 
@@ -165,24 +166,7 @@ void		end_sys_globals;		// flag for structure dumping
 .string		netname;
 
 .entity 	enemy;
-.entity 	enemy1;
-.entity 	enemy2;
-.entity 	enemy3;
-.entity 	enemy4;
-.entity 	enemy5;
-.entity 	enemy6;
-.entity 	enemy7;
-.entity 	enemy8;
-.entity		squad; //ALEX
-.entity		squad1;
-.entity		squad2;
-.entity		squad3;
-.entity		squad4;
-.entity		squad5;
-.entity		squad6;
-.entity		squad7;
-.entity		waypoint;
-.entity		encounter;
+
 
 .float		flags;
 
@@ -227,7 +211,7 @@ void		end_sys_globals;		// flag for structure dumping
 
 .string		noise, noise1, noise2, noise3;	// contains names of wavs to play
 
-.string		team;	//ALEX
+//.string		team;	//team is already used
 
 
 //================================================
@@ -504,6 +488,44 @@ float	AS_SLIDING		= 2;
 float	AS_MELEE		= 3;
 float	AS_MISSILE		= 4;
 float	AS_TURRET		= 5;
+
+//HSM
+.float		squad_state_full;
+.float		squad_state_leader;
+.float		frustration;
+
+.entity 	enemy1;
+.entity 	enemy2;
+.entity 	enemy3;
+.entity 	enemy4;
+.entity 	enemy5;
+.entity 	enemy6;
+.entity 	enemy7;
+.entity 	enemy8;
+.entity		squad; //ALEX
+.entity		squad1;
+.entity		squad2;
+.entity		squad3;
+.entity		squad4;
+.entity		squad5;
+.entity		squad6;
+.entity		squad7;
+.entity		waypoint;
+.entity		encounter;
+
+float	sleep = 6;
+float	alert = 7;
+float	fight = 8;
+float	flee = 9;
+float	uncover = 10;
+float	guard = 11;
+float	search = 12;
+float	pause = 13; //wait taken
+float	vehicle = 14;
+float	charge = 15;
+float	obey = 16;
+float	converse = 17;
+float	avoid = 18;
 
 //
 // player only fields
