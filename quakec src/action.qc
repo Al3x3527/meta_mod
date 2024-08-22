@@ -7,7 +7,7 @@ AI behavior tree
 //squad actions called every ai think
 void() squad_fight =
 {
-	entity twaypoint;
+	entity twaypoint = spawn();
 	twaypoint.classname = "ai_waypoint";
 	if (self.waypoint) {remove(self.waypoint);}
 	self.waypoint = twaypoint;
@@ -30,11 +30,13 @@ void() squad_fight =
 //run towards waypoint while attacking self.enemy
 	//let ai complete their last think. ai will check squad.attack_state.*/
 };
-/*
+
 //something has changed, decide what to do next
 //assuming self = a monster
+/*
 void(float state_winning) squad_action =
 {
+
 	if (self.squad.attack_state = 0)
 	return; //no state = do nothing/play dead
 	else {

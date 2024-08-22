@@ -367,22 +367,23 @@ if (self.enemy1 == self.enemy)
 self.enemy1 = null;
 };
 */
-/*
+
 //monster senses a change that demands new priorities
 void(entity memory) sight_update =
 {
-prioritize_targets();
+//prioritize_targets();
 	
 //sort enemies by danger, kill off entities after 8 (remove(self.enemy8)).
-SortEnemies(); //SV sort fields containing pointers
+//SortEnemies(); //SV sort fields containing pointers
 
 //get a target for the requester. not neccessarily the highest priority enemy.
 //then jump into behavior tree
-squad_action(encounter_update(memory));
+	squad_fight(); //test
+//squad_action(encounter_update(memory));
 };
 //squad gives enemies to monsters
 //squad gives additional instructions based on context from encounter
-*/
+
 
 
 //at the beginning of an action. memories are shared in sqaud.
@@ -403,7 +404,7 @@ memory.movetype = MOVETYPE_NONE;
 if (/*self.enemy.enemy == target && */self.enemy.classname == "ai_memory") { //cleanup for ai_run
 	remove(self.enemy); //old memory
 }
-//sight_update(memory);
+sight_update(memory);
 self.enemy = target; //test
 };
 
