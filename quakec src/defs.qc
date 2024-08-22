@@ -504,14 +504,14 @@ float	AS_TURRET		= 5;
 .entity 	enemy7;
 .entity 	enemy8;*/
 .entity		squad;
-/* //ALEX
+ //ALEX
 .entity		squad1;
 .entity		squad2;
 .entity		squad3;
 .entity		squad4;
 .entity		squad5;
 .entity		squad6;
-.entity		squad7;*/
+.entity		squad7;
 .entity		waypoint;
 //.entity		encounter;
 

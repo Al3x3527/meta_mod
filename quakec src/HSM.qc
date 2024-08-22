@@ -454,7 +454,7 @@ tsquad.solid = SOLID_NOT;
 tsquad.movetype = MOVETYPE_NONE;
 }
 
-/*
+
 void (entity tother) squad_fit =
 {
 if (tother.squad.squad) {
@@ -468,7 +468,7 @@ if (tother.squad.squad) {
 	else if (!(self.squad.squad4)) self.squad.squad4 = tother;
 	}
 };
-*/
+
 /*
 //squad check merge. self = seer, other = seen, team checked
 void(entity tother) squad_check_merge =
