@@ -115,6 +115,8 @@ void()	player_stand1 =[	$axstnd1,	player_stand1	]
 
 void()	player_run =[	$rockrun1,	player_run	]
 {
+	if (self.flags == FL_ONGROUND) sprint(self, "FL_ONGROUND ==============================");
+	//else sprint(self, "NOT FL_ONGROUND\n");
 	self.weaponframe=0;
 	if (!self.velocity_x && !self.velocity_y)
 	{

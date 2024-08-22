@@ -374,7 +374,7 @@ slower noticing monsters.
 
 float() FindTarget =
 {
-	local entity	client;
+	local entity	target;
 	local float		r;
 
 // if the first spawnflag bit is set, the monster will only wake up on
@@ -383,101 +383,105 @@ float() FindTarget =
 // spawnflags & 3 is a big hack, because zombie crucified used the first
 // spawn flag prior to the ambush flag, and I forgot about it, so the second
 // spawn flag works as well
+
 	if (sight_entity_time >= time - 0.1 && !(self.spawnflags & 3) ) //sight entity global variable used in ai.qc --Alex
 	{
-		client = sight_entity;
-		if (client.enemy == self.enemy)
+		target = sight_entity;
+		if (target.enemy == self.enemy)
 			return TRUE;
 	}
 	else
 	{
-		client = checkclient (); //PF_checkclient -- does not run through whole list each frame, only iterates once
+		target = checkclient (); //PF_checkclient -- does not run through whole list each frame, only iterates once
 		//should utilize this call for all indirect ai interactions --ALEX
-		if (!client)
+		if (!target)
 			return FALSE;	// current check entity isn't in PVS
 	}
+
+	if (target.classname != "player") return FALSE; //stop targeting the world
 
 	if ((self.spawnflags & PASSIVE_UNTIL_ATTACKED) || (self.spawnflags & PASSIVE_ALWAYS)) //passives don't do anything. -Alex
 		return FALSE;
 
-	if (client.flags & FL_NOTARGET || client.movetype == MOVETYPE_NOCLIP) // from Copper -- dumptruck_ds
+	if (target.flags & FL_NOTARGET || target.movetype == MOVETYPE_NOCLIP) // from Copper -- dumptruck_ds
 		return FALSE;
 
-	if (client.health <= 0)
+	if (target.health <= 0)
 		return FALSE;
 
-	if (client.classname != "player")
-		if (client.enemy.health <= 0)
+	if (target.classname != "player")
+		if (target.enemy.health <= 0)
 			return FALSE;
 
 	/*if (client == self.enemy)
 		return FALSE; */
 
-	if (client.flags & FL_NOTARGET)
+	if (target.flags & FL_NOTARGET)
 		return FALSE;
-	if (client.items & IT_INVISIBILITY)
+	if (target.items & IT_INVISIBILITY)
 		return FALSE;
 
-	r = range (client);
+	r = range (target);
 	if (r == RANGE_FAR)
 		return FALSE;
 
-	if (!visible (client))
+	if (!visible (target))
 		return FALSE;
 
-	if (client.team = self.team) {//-ALEX
-		squad_check_merge(client);
+	/*if (target.team = self.team) {//-ALEX
+		squad_check_merge(target);
 		return FALSE;
-	}
+	}*/
 
 	if (r == RANGE_NEAR)
 	{
-		if (client.show_hostile < time && !infront (client)) //figure out what is client.show_hostile
+		if (target.show_hostile < time && !infront (target)) //figure out what is client.show_hostile
 			return FALSE;
 	}
 	else if (r == RANGE_MID)
 	{
-		if ( /* client.show_hostile < time || */ !infront (client))
+		if ( /* client.show_hostile < time || */ !infront (target))
 			return FALSE;
 	}
 	//need a check here for if client is associated with a memory in squad already
 	//preferably not by making 8 more if statements but here we go
-	if (client == self.squad.enemy)
+	/*if (target == self.squad.enemy)
 		return FALSE;
-	if (client == self.squad.enemy1)
+	if (target == self.squad.enemy1)
 		return FALSE;
-	if (client == self.squad.enemy2)
+	if (target == self.squad.enemy2)
 		return FALSE;
-	if (client == self.squad.enemy3)
+	if (target == self.squad.enemy3)
 		return FALSE;
-	if (client == self.squad.enemy4)
+	if (target == self.squad.enemy4)
 		return FALSE;
-	if (client == self.squad.enemy5)
+	if (target == self.squad.enemy5)
 		return FALSE;
-	if (client == self.squad.enemy6)
+	if (target == self.squad.enemy6)
 		return FALSE;
-	if (client == self.squad.enemy7)
-		return FALSE;
+	if (target == self.squad.enemy7)
+		return FALSE;*/
 //
 // got one
 //
 
-	/*
+	
 	//ordinarily "player" is the enemy team
-	self.enemy = client;
-	if (self.enemy.classname != "player")
+	//self.enemy = target;
+	if (target.classname != "player")
 	{
-		self.enemy = self.enemy.enemy;
-		if (self.enemy.classname != "player")
+		target = target.enemy;
+		if (target.classname != "player")
 		{
 			self.enemy = world;
 			return FALSE;
 		}
 	}
-	*/
-
-	update_memory(client);
+	
+	
+	update_memory(target);
 	//do something more generic with target. let squad AI determine what to do.
+	FoundTarget();
 	return TRUE;
 };
 
@@ -758,15 +762,15 @@ void(float dist) ai_run =
 	// dprint("ai_run\n");
 	movedist = dist;
 //update memory of
-update_memory(self.enemy.enemy);
+update_memory(self.enemy);
 // see if the enemy is dead
 	if ((self.enemy.health <= 0) || (self.spawnflags & PASSIVE_ALWAYS))
 	{
 		self.enemy = world;
 	// FIXME: look all around for other targets
-		if (self.oldenemy.health > 0)
+		if (self.enemy.health > 0) //oldenemy?
 		{
-			self.enemy = self.oldenemy;
+			//self.enemy = self.oldenemy;
 			HuntTarget ();
 		}
 		else
@@ -786,7 +790,7 @@ update_memory(self.enemy.enemy);
 	self.show_hostile = time + 1;		// wake up other monsters
 
 // check knowledge of enemy
-	enemy_vis = visible(self.enemy.enemy); //real target visibility --Alex
+	enemy_vis = visible(self.enemy); //real target visibility --Alex
 	if (enemy_vis)
 		self.search_time = time + 5;
 
@@ -800,7 +804,7 @@ update_memory(self.enemy.enemy);
 
 	enemy_infront = infront(self.enemy);
 	enemy_range = range(self.enemy);
-	enemy_yaw = vectoyaw(self.enemy.origin - self.origin);
+	enemy_yaw = vectoyaw(self.enemy.origin - self.origin);//should be memory
 
 	if (self.spawnflags & I_AM_TURRET)
 		{

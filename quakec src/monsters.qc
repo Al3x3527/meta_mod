@@ -327,9 +327,11 @@ void() walkmonster_start =
 		return;
 	}
 //squad up --Alex
+
 if (!(self.squad)) {
 	start_squad();
 }
+
 
 	if(monster_teleport(walkmonster_start_go))
     	return;

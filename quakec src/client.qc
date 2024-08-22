@@ -571,7 +571,7 @@ void() PlayerJump =
 {
 
 	if (self.flags & FL_WATERJUMP)
-		return;
+		sprint(self, "FL_WATERJUMP\n");
 
 	if (self.waterlevel >= 2)
 	{
@@ -598,7 +598,7 @@ void() PlayerJump =
 	// refactoring from Copper -- dumptruck_ds
 	if (self.movetype != MOVETYPE_NOCLIP)
 	{
-		if (!(self.flags & FL_ONGROUND)) return;
+		if (!(self.flags & FL_ONGROUND)) sprint(self, "!FL_ONGROUND\n");
 		if ( !(self.flags & FL_JUMPRELEASED) ) return;		// don't pogo stick
 		// player jumping sound
 		sound (self, CHAN_BODY, "player/plyrjmp8.wav", 1, ATTN_NORM);	// h00rt

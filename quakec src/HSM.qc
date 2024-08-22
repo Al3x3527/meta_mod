@@ -11,6 +11,8 @@ Senses, priority reactions, animations, mechanics
 
 //make the monsters search for a squad when they spawn. same method as searching for encounters.
 
+/*
+
 //temp
 float (entity target) TargetHealthPercent =
 {
@@ -61,7 +63,9 @@ assign_danger(self.enemy7,0);
 if (self.enemy8)
 assign_danger(self.enemy8,0);
 };
+*/
 
+/*
 float(entity other_qside, entity self_qside) CompareDanger =
 {
 	local float other_danger, self_danger;
@@ -103,6 +107,8 @@ return TRUE;
 else return FALSE;
 };
 
+*/
+/*
 //should find closest enemy.
 entity (entity tother, entity assign) FindClosest =
 {
@@ -202,9 +208,11 @@ if (self.squad.squad1) self.squad.squad1.encounter = encounter;
 if (self.squad.squad2) self.squad.squad2.encounter = encounter;
 if (self.squad.squad3) self.squad.squad3.encounter = encounter;
 if (self.squad.squad4) self.squad.squad4.encounter = encounter;
-*/
-};
 
+};
+*/
+
+/*
 float(entity memory) encounter_update =
 {
 	local entity	other_qside, self_qside, tencounter;
@@ -244,7 +252,8 @@ AssignTargets(other_qside, memory.squad); //remember memories are associated wit
 //return the encounter state to the squad for action processing.
 return state_winning;
 };
-
+*/
+/*
 void(entity enemy, entity  temp, entity  temp1, entity  temp2, entity  temp3, entity  temp4, entity  temp5, entity  temp6, entity  temp7, entity  temp8) SortEnemy =
 {
 	local entity null;
@@ -284,7 +293,8 @@ temp7 = null;
 else if (temp8 == enemy)
 temp8 = null;
 };
-
+*/
+/*
 void() SortEnemies =
 {
 	local entity temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8, null;
@@ -356,7 +366,8 @@ self.enemy2 = null;
 if (self.enemy1 == self.enemy) 
 self.enemy1 = null;
 };
-
+*/
+/*
 //monster senses a change that demands new priorities
 void(entity memory) sight_update =
 {
@@ -371,19 +382,31 @@ squad_action(encounter_update(memory));
 };
 //squad gives enemies to monsters
 //squad gives additional instructions based on context from encounter
+*/
+
 
 //at the beginning of an action. memories are shared in sqaud.
 void(entity target) update_memory =
 {
+	//local entity temp;
  entity memory = spawn () ;
-memory = target; //real target
+ //temp = target;
+ //temp.classname = "ai_memory";
+//memory = temp; //hack, didn't work
 memory.classname = "ai_memory";
-memory.squad = self.squad;
-if (self.enemy.enemy == target) { //cleanup for ai_run
+memory.origin = target.origin;
+memory.health = target.health;
+//memory.squad = self.squad;
+memory.enemy = target;
+memory.solid = SOLID_NOT;
+memory.movetype = MOVETYPE_NONE;
+if (/*self.enemy.enemy == target && */self.enemy.classname == "ai_memory") { //cleanup for ai_run
 	remove(self.enemy); //old memory
 }
-sight_update(memory);
+//sight_update(memory);
+self.enemy = target; //test
 };
+
 
 /*Memory Point Entity (.5 .5 .5) (-8 -8 -8) (8 8 8) X X X X X X X X NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER X NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
 Memory class for squad knowledge model
@@ -393,7 +416,7 @@ void() ai_memory =
 	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
 		return;
 };
-
+/*
 vector (float dist, entity  target) waypoint_offset =
 {
 	local vector vec, d, b;
@@ -408,6 +431,7 @@ else
 vec = target.origin - d + b;
 return vec;
 };
+*/
 
 /*Waypoint Point Entity (.5 .5 .5) (-8 -8 -8) (8 8 8) X X X X X X X X NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER X NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
 Waypoint class for squad tactics
@@ -423,11 +447,14 @@ void() start_squad =
 {
 	entity tsquad = spawn();
 tsquad.classname = "ai_squad";
-tsquad.squad_state_full = 0;
+//tsquad.squad_state_full = 0;
 self.squad = tsquad;
 tsquad.squad = self;
+tsquad.solid = SOLID_NOT;
+tsquad.movetype = MOVETYPE_NONE;
 }
 
+/*
 void (entity tother) squad_fit =
 {
 if (tother.squad.squad) {
@@ -441,7 +468,8 @@ if (tother.squad.squad) {
 	else if (!(self.squad.squad4)) self.squad.squad4 = tother;
 	}
 };
-
+*/
+/*
 //squad check merge. self = seer, other = seen, team checked
 void(entity tother) squad_check_merge =
 {
@@ -470,7 +498,7 @@ if ((self_count + other_count) <= 5) {
 	squad_fit(other.squad.squad4);
 }
 };
-
+*/
 /*Squad Point Entity (.5 .5 .5) (-8 -8 -8) (8 8 8) X X X X X X X X NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER X NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
 Squad class which monster classes can attach themselves to. Manages memory and waypoint entities and issues actions with modifiers to monsters.
 */

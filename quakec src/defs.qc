@@ -140,8 +140,8 @@ void		end_sys_globals;		// flag for structure dumping
 .float		currentammo;
 .float		ammo_shells, ammo_nails, ammo_rockets, ammo_cells;
 .float		coin;			//ALEX
-.float		danger;
-.float		squad_state_full;
+//.float		danger;
+//.float		squad_state_full;
 
 .float		items;			// bit flags
 
@@ -166,6 +166,7 @@ void		end_sys_globals;		// flag for structure dumping
 .string		netname;
 
 .entity 	enemy;
+//.entity		waypoint; //this breaks things
 
 
 .float		flags;
@@ -490,10 +491,10 @@ float	AS_MISSILE		= 4;
 float	AS_TURRET		= 5;
 
 //HSM
-.float		squad_state_full;
-.float		squad_state_leader;
-.float		frustration;
-
+//.float		squad_state_full;
+//.float		squad_state_leader;
+//.float		frustration;
+/*
 .entity 	enemy1;
 .entity 	enemy2;
 .entity 	enemy3;
@@ -501,17 +502,18 @@ float	AS_TURRET		= 5;
 .entity 	enemy5;
 .entity 	enemy6;
 .entity 	enemy7;
-.entity 	enemy8;
-.entity		squad; //ALEX
+.entity 	enemy8;*/
+.entity		squad;
+/* //ALEX
 .entity		squad1;
 .entity		squad2;
 .entity		squad3;
 .entity		squad4;
 .entity		squad5;
 .entity		squad6;
-.entity		squad7;
+.entity		squad7;*/
 .entity		waypoint;
-.entity		encounter;
+//.entity		encounter;
 
 float	sleep = 6;
 float	alert = 7;
