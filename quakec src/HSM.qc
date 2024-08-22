@@ -469,7 +469,7 @@ if (tother.squad.squad) {
 	}
 };
 
-/*
+
 //squad check merge. self = seer, other = seen, team checked
 void(entity tother) squad_check_merge =
 {
@@ -498,7 +498,7 @@ if ((self_count + other_count) <= 5) {
 	squad_fit(other.squad.squad4);
 }
 };
-*/
+
 /*Squad Point Entity (.5 .5 .5) (-8 -8 -8) (8 8 8) X X X X X X X X NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER X NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
 Squad class which monster classes can attach themselves to. Manages memory and waypoint entities and issues actions with modifiers to monsters.
 */

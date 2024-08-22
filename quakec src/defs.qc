@@ -491,7 +491,7 @@ float	AS_MISSILE		= 4;
 float	AS_TURRET		= 5;
 
 //HSM
-//.float		squad_state_full;
+.float		squad_state_full;
 //.float		squad_state_leader;
 //.float		frustration;
 /*

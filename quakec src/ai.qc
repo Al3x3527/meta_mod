@@ -398,7 +398,7 @@ float() FindTarget =
 			return FALSE;	// current check entity isn't in PVS
 	}
 
-	if (target.classname != "player") return FALSE; //stop targeting the world
+	//if (target.classname != "player") return FALSE; //stop targeting the world
 
 	if ((self.spawnflags & PASSIVE_UNTIL_ATTACKED) || (self.spawnflags & PASSIVE_ALWAYS)) //passives don't do anything. -Alex
 		return FALSE;
@@ -428,10 +428,10 @@ float() FindTarget =
 	if (!visible (target))
 		return FALSE;
 
-	/*if (target.team = self.team) {//-ALEX
+	if (target.team = self.team) {//-ALEX
 		squad_check_merge(target);
 		return FALSE;
-	}*/
+	}
 
 	if (r == RANGE_NEAR)
 	{
