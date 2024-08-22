@@ -17,9 +17,9 @@ void() squad_fight =
 				//look for a place near self.enemy which the target can't see
 	//apply offset to squad dest
 		//turn monster dest into waypoint entity
-	//if (self.squad.squad == self)
+	if (self.squad.squad == self)
 		self.waypoint.origin = self.goalentity.origin; //squad leader
-	/*else if (self.squad.squad1 == self)
+	else if (self.squad.squad1 == self)
 		self.waypoint.origin = waypoint_offset(48, self.squad.squad);
 	else if (self.squad.squad2 == self)
 		self.waypoint.origin = waypoint_offset(-48, self.squad.squad1);
@@ -28,7 +28,7 @@ void() squad_fight =
 	else if (self.squad.squad4 == self)
 		self.waypoint.origin = waypoint_offset(-48, self.squad.squad3);
 //run towards waypoint while attacking self.enemy
-	//let ai complete their last think. ai will check squad.attack_state.*/
+	//let ai complete their last think. ai will check squad.attack_state.
 };
 
 //something has changed, decide what to do next

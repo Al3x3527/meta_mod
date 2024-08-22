@@ -197,6 +197,7 @@ enemy as activator.
 */
 void() monster_death_use =
 {
+	remove(self.waypoint);
 // fall to ground
 	if (self.flags & FL_FLY)
 		self.flags = self.flags - FL_FLY;

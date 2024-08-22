@@ -417,7 +417,7 @@ void() ai_memory =
 	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
 		return;
 };
-/*
+
 vector (float dist, entity  target) waypoint_offset =
 {
 	local vector vec, d, b;
@@ -432,7 +432,7 @@ else
 vec = target.origin - d + b;
 return vec;
 };
-*/
+
 
 /*Waypoint Point Entity (.5 .5 .5) (-8 -8 -8) (8 8 8) X X X X X X X X NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER X NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
 Waypoint class for squad tactics
