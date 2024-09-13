@@ -343,8 +343,8 @@ void() FoundTarget =
 		{
 			SightSound();
 		}
-		HuntTarget();
-
+		//HuntTarget();
+		sprint(self.enemy.enemy, "FoundTarget");
 		if (self.sight_trigger == 1) //thanks RennyC -- dumptruck_ds
 		{
 			activator = self.enemy;
@@ -412,6 +412,7 @@ float() FindTarget =
 	if (target.classname != "player")
 		if (target.enemy.health <= 0)
 			return FALSE;
+	//sprint(target, "I see you\n");
 
 	/*if (client == self.enemy)
 		return FALSE; */
@@ -428,10 +429,13 @@ float() FindTarget =
 	if (!visible (target))
 		return FALSE;
 
-	if (target.team = self.team) {//-ALEX
+	if (target.team == self.team) {//-ALEX
+		sprint(target, self.classname);
+		sprint(target, "\n");
 		squad_check_merge(target);
 		return FALSE;
 	}
+	//else sprint(target, "not my team\n");
 
 	if (r == RANGE_NEAR)
 	{
@@ -445,7 +449,7 @@ float() FindTarget =
 	}
 	//need a check here for if client is associated with a memory in squad already
 	//preferably not by making 8 more if statements but here we go
-	/*if (target == self.squad.enemy)
+	if (target == self.squad.enemy)
 		return FALSE;
 	if (target == self.squad.enemy1)
 		return FALSE;
@@ -460,7 +464,8 @@ float() FindTarget =
 	if (target == self.squad.enemy6)
 		return FALSE;
 	if (target == self.squad.enemy7)
-		return FALSE;*/
+		return FALSE;
+
 //
 // got one
 //
@@ -468,6 +473,7 @@ float() FindTarget =
 	
 	//ordinarily "player" is the enemy team
 	//self.enemy = target;
+	/*
 	if (target.classname != "player")
 	{
 		target = target.enemy;
@@ -477,11 +483,12 @@ float() FindTarget =
 			return FALSE;
 		}
 	}
+	*/
 	
-	
+	sprint(target, "new enemy\n");
 	update_memory(target);
 	//do something more generic with target. let squad AI determine what to do.
-	FoundTarget();
+	//FoundTarget();
 	return TRUE;
 };
 
@@ -759,7 +766,7 @@ The monster has an enemy it is trying to kill
 */
 void(float dist) ai_run =
 {
-	// dprint("ai_run\n");
+	 dprint("ai_run\n");
 	movedist = dist;
 //update memory of
 update_memory(self.enemy);
@@ -767,7 +774,9 @@ update_memory(self.enemy);
 	if ((self.enemy.health <= 0) || (self.spawnflags & PASSIVE_ALWAYS))
 	{
 		self.enemy = world;
+		return;
 	// FIXME: look all around for other targets
+		/*
 		if (self.enemy.health > 0) //oldenemy?
 		{
 			//self.enemy = self.oldenemy;
@@ -785,6 +794,7 @@ update_memory(self.enemy);
 				self.th_stand ();
 			return;
 		}
+		*/
 	}
 
 	self.show_hostile = time + 1;		// wake up other monsters

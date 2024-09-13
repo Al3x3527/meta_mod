@@ -698,6 +698,7 @@ void() coin_touch =
 {
 	local string s;
 float amount = 1;
+if (other.classname != "player") return;
 	if (!CheckValidTouch()) return;
 		if (other.health < 20) {
 			if (other.health < 15) {
@@ -842,6 +843,7 @@ void() weapon_touch =
 	local 	float 	drop, newshells, newnails, newrockets, newcells, playerstuff, last, tlast;
 
 // from Copper -- dumptruck_ds
+	if (other.classname != "player") return;
 	if (!CheckValidTouch()) return;
 
 	if (!(other.flags & FL_CLIENT))
@@ -985,7 +987,7 @@ if (!(playerstuff & new)) {
 			countitems = countitems + 1; }
 // IF INVENTORY FULL --ALEX
 		if (countitems > 2) {
-			sprint (other, "inventory full. \n"); 
+			//sprint (other, "inventory full. \n"); 
 			if (tlast) {
 				last = tlast;
 				drop = last; }
@@ -1056,8 +1058,8 @@ local entity otemp;
 local entity	item;
 item = spawn();
 item.origin = self.origin - '0 0 24';
-if (self.classname == "monster_enforcer") {
-	sprint (other, "monster enforcer"); }
+//if (self.classname == "monster_enforcer") {
+	//sprint (other, "monster enforcer"); } why did I do this?
 otemp = other;
 other = self;
 self = item;

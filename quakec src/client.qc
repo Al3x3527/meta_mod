@@ -274,6 +274,8 @@ void() PutClientInServer =
 	self.onladder = 0;
 	self.customkeys = 0;  // support for item_key_custom -- iw
 
+	if (coop) { self.team = PLAYERS; } //fix encounters
+
 	// Setup cutscene stuff.  Legacy code from Zerstorer. --dumptruck_ds
 	    self.script_count = 2;
 	    self.script_delay = 1;

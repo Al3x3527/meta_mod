@@ -11,7 +11,7 @@ Senses, priority reactions, animations, mechanics
 
 //make the monsters search for a squad when they spawn. same method as searching for encounters.
 
-/*
+
 
 //temp
 float (entity target) TargetHealthPercent =
@@ -21,13 +21,17 @@ percent = target.health / 80;
 return percent;
 };
 
-void(entity tother, float f) assign_danger =
+float(entity tother, float f) assign_danger =
 {
 	 float c_factor, h_factor, w_factor;
 	//multiply normalized factors: class*health*weapon
 	//what's more important, finishing off a weak enemy or fighting a strong one?
 		//assign higher danger to hero classes and vehicles
 		//work out a tree when enemies and vehicles are more implemented
+if (!tother) { //dprint("bad target"); 
+return FALSE; }
+if (tother == world) { //dprint("bad target1"); 
+return FALSE; }
 		if (tother.target == "monster_human") //target represents a monster_human class. 
 			c_factor = 0.5;
 		else c_factor = 1;
@@ -36,42 +40,46 @@ void(entity tother, float f) assign_danger =
 			w_factor = 1;
 		else w_factor = 0.8;
 		tother.danger = c_factor * h_factor * w_factor + f;
+		return TRUE;
 };
 
-void() prioritize_targets =
+float() prioritize_targets =
 {
 //for each self.enemy
 	//what is it's danger rating?
 	//apply previous priority to danger
 //self.enemy.danger = self.enemy.danger + [.7; .6; .5; .4; .3; .2; .1; 0; 0; ]
-	if (self.enemy)
-		assign_danger(self.enemy,.7);
-if (self.enemy1)
-assign_danger(self.enemy1,.6);
-if (self.enemy2)
-assign_danger(self.enemy2,.5);
-if (self.enemy3)
-assign_danger(self.enemy3,.4);
-if (self.enemy4)
-assign_danger(self.enemy4,.3);
-if (self.enemy5)
-assign_danger(self.enemy5,.2);
-if (self.enemy6)
-assign_danger(self.enemy6,.1);
-if (self.enemy7)
-assign_danger(self.enemy7,0);
-if (self.enemy8)
-assign_danger(self.enemy8,0);
+	if (self.squad.enemy)
+		assign_danger(self.squad.enemy,.7);
+if (self.squad.enemy1)
+	if (assign_danger(self.squad.enemy1,.6) == FALSE) return FALSE;
+if (self.squad.enemy2)
+	if (assign_danger(self.squad.enemy2,.5) == FALSE) return FALSE;
+if (self.squad.enemy3)
+	if (assign_danger(self.squad.enemy3,.4) == FALSE) return FALSE;
+if (self.squad.enemy4)
+	if (assign_danger(self.squad.enemy4,.3) == FALSE) return FALSE;
+if (self.squad.enemy5)
+	if (assign_danger(self.squad.enemy5,.2) == FALSE) return FALSE;
+if (self.squad.enemy6)
+	if (assign_danger(self.squad.enemy6,.1) == FALSE) return FALSE;
+if (self.squad.enemy7)
+	if (assign_danger(self.squad.enemy7,0) == FALSE) return FALSE;
+if (self.squad.enemy8)
+	if (assign_danger(self.squad.enemy8,0) == FALSE) return FALSE;
+return TRUE;
 };
-*/
 
-/*
+
+
 float(entity other_qside, entity self_qside) CompareDanger =
 {
 	local float other_danger, self_danger;
+if (self_qside == world) { return FUBAR; }
+if (other_qside == world) { return FUBAR; }
 //other_danger = other_qside.squad.danger + other_qside.squad1.danger + other_qside.squad2.danger + other_qside.squad3.danger + other_qside.squad4.danger + other_qside.squad5.danger + other_qside.squad6.danger + other_qside.squad7.danger;
 if (other_qside.squad)
-other_danger = other_danger + other_qside.squad.danger;
+other_danger = other_qside.squad.danger;
 if (other_qside.squad1)
 other_danger = other_danger + other_qside.squad1.danger;
 if (other_qside.squad2)
@@ -88,27 +96,22 @@ if (other_qside.squad7)
 other_danger = other_danger + other_qside.squad7.danger;
 //self_danger = self_qside.squad.danger + self_qside.squad1.danger + self_qside.squad2.danger + self_qside.squad3.danger + self_qside.squad4.danger;
 if (self_qside.squad)
-self_danger = self_danger + self_qside.squad.danger;
-else self_qside.squad_state_full = 0; //hack
+self_danger = self_qside.squad.danger;
 if (self_qside.squad1)
 self_danger = self_danger + self_qside.squad1.danger;
-else self_qside.squad_state_full = 0;
 if (self_qside.squad2)
 self_danger = self_danger + self_qside.squad2.danger;
-else self_qside.squad_state_full = 0;
 if (self_qside.squad3)
 self_danger = self_danger + self_qside.squad3.danger;
-else self_qside.squad_state_full = 0;
 if (self_qside.squad4)
 self_danger = self_danger + self_qside.squad4.danger;
-else self_qside.squad_state_full = 0;
 if (self_danger > other_danger)
 return TRUE;
 else return FALSE;
 };
 
-*/
-/*
+
+
 //should find closest enemy.
 entity (entity tother, entity assign) FindClosest =
 {
@@ -152,15 +155,16 @@ return closest;
 
 void (entity tsquad, entity member) RemoveFromSquad = 
 {
-	local entity null;
+	entity null = spawn();
 	if (tsquad.squad == member) tsquad.squad = null;
 else if (tsquad.squad1 == member) tsquad.squad1 = null;
 else if (tsquad.squad2 == member) tsquad.squad2 = null;
 else if (tsquad.squad3 == member) tsquad.squad3 = null;
 else if (tsquad.squad4 == member) tsquad.squad4 = null;
+	remove(null);
 };
 
-void(entity other_qside, entity tsquad) AssignTargets =
+void(entity other_qside, entity tsquad) AssignTargets = //do not use local entities for this.
 {
 	local entity temp, temp1, temp2, temp3, temp_squad;
 //work from lowest priority up, reassign in passes
@@ -190,11 +194,11 @@ if (temp.danger < other_qside.squad.danger) {
 }
 
 //unassigned
-if (!(tsquad.squad.enemy)) tsquad.squad.enemy = FindClosest(other_qside, tsquad.squad);
-if (!(tsquad.squad1.enemy)) tsquad.squad1.enemy = FindClosest(other_qside, tsquad.squad1);
-if (!(tsquad.squad2.enemy)) tsquad.squad2.enemy = FindClosest(other_qside, tsquad.squad2);
-if (!(tsquad.squad3.enemy)) tsquad.squad3.enemy = FindClosest(other_qside, tsquad.squad3);
-if (!(tsquad.squad4.enemy)) tsquad.squad4.enemy = FindClosest(other_qside, tsquad.squad4);
+if (tsquad.squad && !(tsquad.squad.enemy)) tsquad.squad.enemy = FindClosest(other_qside, tsquad.squad);
+if (tsquad.squad1 && !(tsquad.squad1.enemy)) tsquad.squad1.enemy = FindClosest(other_qside, tsquad.squad1);
+if (tsquad.squad2 && !(tsquad.squad2.enemy)) tsquad.squad2.enemy = FindClosest(other_qside, tsquad.squad2);
+if (tsquad.squad3 && !(tsquad.squad3.enemy)) tsquad.squad3.enemy = FindClosest(other_qside, tsquad.squad3);
+if (tsquad.squad4 && !(tsquad.squad4.enemy)) tsquad.squad4.enemy = FindClosest(other_qside, tsquad.squad4);
 };
 
 void() start_encounter =
@@ -202,25 +206,36 @@ void() start_encounter =
 	entity n_encounter = spawn();
 n_encounter.classname = "ai_encounter";
 self.squad.encounter = n_encounter;
-/*
-if (self.squad.squad) self.squad.squad.encounter = encounter;
-if (self.squad.squad1) self.squad.squad1.encounter = encounter;
-if (self.squad.squad2) self.squad.squad2.encounter = encounter;
-if (self.squad.squad3) self.squad.squad3.encounter = encounter;
-if (self.squad.squad4) self.squad.squad4.encounter = encounter;
+
+if (self.squad.squad) self.squad.squad.encounter = n_encounter;
+if (self.squad.squad1) self.squad.squad1.encounter = n_encounter;
+if (self.squad.squad2) self.squad.squad2.encounter = n_encounter;
+if (self.squad.squad3) self.squad.squad3.encounter = n_encounter;
+if (self.squad.squad4) self.squad.squad4.encounter = n_encounter;
 
 };
-*/
 
-/*
+
+
 float(entity memory) encounter_update =
 {
-	local entity	other_qside, self_qside, tencounter;
 //self is some monster at this point
-	if (!(self.squad.enemy)) { remove(self.squad.encounter); return; }
-	if (!(self.encounter)) { start_encounter(); }
+if (self.squad.encounter) { //self = monster
+	if (!(self.squad.enemy)) { 
+		remove(self.squad.encounter); 
+	//sprint(self.squad.enemy, "encounter end");  
+	return; }
+	remove(self.squad.encounter.enemy);
+	remove(self.squad.encounter.squad);
+}
+else start_encounter();
 local float	state_winning;
-tencounter = self.squad.encounter;
+entity	other_qside = spawn();
+entity self_qside = spawn();
+self.encounter.enemy = other_qside;
+self.encounter.squad = self_qside;
+other_qside.classname = "ai_squad";
+self_qside.classname = "ai_squad";
 //update encounter teams (qsides)
 //other qside is made up of perceived targets
 if (memory.squad.enemy)
@@ -240,23 +255,25 @@ other_qside.squad6 = memory.squad.enemy6;
 if (memory.squad.enemy7)
 other_qside.squad7 = memory.squad.enemy7;
 //qside.team = qside.squad.team ===fix this part===
-if (memory.squad.team == tencounter.squad.team)
-//encounter.squad(1) = qside (class) containing a squad or percieved squad
-self_qside = tencounter.squad;
-else self_qside = tencounter.squad1;
+self_qside = self.squad;
 //winning or losing perceived
 state_winning = CompareDanger(other_qside, self_qside);
+if (state_winning == FUBAR) {
+	sprint(memory.enemy, "CompareDanger is FUBAR\n"); 
+	return 0;
+}
 //re-assign targets to requesting squad
 //closest (distance) match to danger algorithm
 AssignTargets(other_qside, memory.squad); //remember memories are associated with squad that perceives them
 //return the encounter state to the squad for action processing.
 return state_winning;
 };
-*/
-/*
+
+
 void(entity enemy, entity  temp, entity  temp1, entity  temp2, entity  temp3, entity  temp4, entity  temp5, entity  temp6, entity  temp7, entity  temp8) SortEnemy =
 {
-	local entity null;
+	//local entity null;
+	entity null = spawn();
 	if (temp) {enemy = temp;}
 if (temp1) {
 	if (temp1.danger > enemy.danger) {enemy = temp1;}}
@@ -292,92 +309,100 @@ else if (temp7 == enemy)
 temp7 = null;
 else if (temp8 == enemy)
 temp8 = null;
+remove(null);
 };
-*/
-/*
+
+
 void() SortEnemies =
 {
-	local entity temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8, null;
+	local entity temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8;// null;
 //self.enemy
-if (self.enemy) {temp = self.enemy;}
-if (self.enemy1) {
-	temp1 = self.enemy1;
-	if (temp1.danger > self.enemy.danger) {self.enemy = temp1;}}
-if (self.enemy2) {
+entity null = spawn();
+sprint(self.squad.enemy8.enemy, "self.squad.enemy8.enemy\n"); //works
+if (self.squad.enemy) {temp = self.squad.enemy;}
+if (self.squad.enemy1) {
+	temp1 = self.squad.enemy1;
+	if (temp1.danger > self.squad.enemy.danger) {self.squad.enemy = temp1;}}
+if (self.squad.enemy2) {
 	temp2 = self.enemy2;
-	if (temp2.danger > self.enemy.danger) {self.enemy = temp2;}}
-if (self.enemy3) {
-	temp3 = self.enemy3;
-	if (temp3.danger > self.enemy.danger) {self.enemy = temp3;}}
-if (self.enemy4) {
-	temp4 = self.enemy4;
-	if (temp4.danger > self.enemy.danger) {self.enemy = temp4;}}
-if (self.enemy5) {
-	temp5 = self.enemy5;
-	if (temp5.danger > self.enemy.danger) {self.enemy = temp5;}}
-if (self.enemy6) {
-	temp6 = self.enemy6;
-	if (temp6.danger > self.enemy.danger) {self.enemy = temp6;}}
-if (self.enemy7) {
-	temp7 = self.enemy7;
-	if (temp7.danger > self.enemy.danger) {self.enemy = temp7;}}
-if (self.enemy8) {
-	temp8 = self.enemy8;
-	if (temp8.danger > self.enemy.danger) {self.enemy = temp8;}}
-if (temp == self.enemy)
+	if (temp2.danger > self.squad.enemy.danger) {self.squad.enemy = temp2;}}
+if (self.squad.enemy3) {
+	temp3 = self.squad.enemy3;
+	if (temp3.danger > self.squad.enemy.danger) {self.squad.enemy = temp3;}}
+if (self.squad.enemy4) {
+	temp4 = self.squad.enemy4;
+	if (temp4.danger > self.squad.enemy.danger) {self.squad.enemy = temp4;}}
+if (self.squad.enemy5) {
+	temp5 = self.squad.enemy5;
+	if (temp5.danger > self.squad.enemy.danger) {self.squad.enemy = temp5;}}
+if (self.squad.enemy6) {
+	temp6 = self.squad.enemy6;
+	if (temp6.danger > self.squad.enemy.danger) {self.squad.enemy = temp6;}}
+if (self.squad.enemy7) {
+	temp7 = self.squad.enemy7;
+	if (temp7.danger > self.squad.enemy.danger) {self.squad.enemy = temp7;}}
+if (self.squad.enemy8) {
+	temp8 = self.squad.enemy8;
+	if (temp8.danger > self.squad.enemy.danger) {self.squad.enemy = temp8;}}
+if (temp == self.squad.enemy)
 temp = null;
-else if (temp1 == self.enemy)
+else if (temp1 == self.squad.enemy)
 temp1 = null;
-else if (temp2 == self.enemy)
+else if (temp2 == self.squad.enemy)
 temp2 = null;
-else if (temp3 == self.enemy)
+else if (temp3 == self.squad.enemy)
 temp3 = null;
-else if (temp4 == self.enemy)
+else if (temp4 == self.squad.enemy)
 temp4 = null;
-else if (temp5 == self.enemy)
+else if (temp5 == self.squad.enemy)
 temp5 = null;
-else if (temp6 == self.enemy)
+else if (temp6 == self.squad.enemy)
 temp6 = null;
-else if (temp7 == self.enemy)
+else if (temp7 == self.squad.enemy)
 temp7 = null;
-else if (temp8 == self.enemy)
+else if (temp8 == self.squad.enemy)
 temp8 = null;
-SortEnemy(self.enemy1, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.enemy2, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.enemy3, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.enemy4, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.enemy5, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.enemy6, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.enemy7, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.enemy8, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-remove (self.enemy8);
-if (self.enemy7 == self.enemy6) 
-self.enemy7 = null;
-if (self.enemy6 == self.enemy5) 
-self.enemy6 = null;
-if (self.enemy5 == self.enemy4) 
-self.enemy5 = null;
-if (self.enemy4 == self.enemy3) 
-self.enemy4 = null;
-if (self.enemy3 == self.enemy2) 
-self.enemy3 = null;
-if (self.enemy2 == self.enemy1) 
-self.enemy2 = null;
-if (self.enemy1 == self.enemy) 
-self.enemy1 = null;
+SortEnemy(self.squad.enemy1, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(self.squad.enemy2, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(self.squad.enemy3, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(self.squad.enemy4, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(self.squad.enemy5, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(self.squad.enemy6, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(self.squad.enemy7, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(self.squad.enemy8, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+remove (self.squad.enemy8);
+if (self.squad.enemy7 == self.enemy6)
+self.squad.enemy7 = null;
+if (self.squad.enemy6 == self.enemy5)
+self.squad.enemy6 = null;
+if (self.squad.enemy5 == self.enemy4)
+self.squad.enemy5 = null;
+if (self.squad.enemy4 == self.enemy3)
+self.squad.enemy4 = null;
+if (self.squad.enemy3 == self.enemy2)
+self.squad.enemy3 = null;
+if (self.squad.enemy2 == self.enemy1)
+self.squad.enemy2 = null;
+if (self.squad.enemy1 == self.enemy)
+self.squad.enemy1 = null;
+remove(null);
+sprint(self.squad.enemy.enemy, "self.squad.enemy.enemy\n");
 };
-*/
+
 
 //monster senses a change that demands new priorities
 void(entity memory) sight_update =
 {
-//prioritize_targets();
+	//sprint(memory.enemy, "memory.enemy\n");
+	self.squad.enemy8 = memory;
+if (prioritize_targets() == FALSE) return; //does not break game. does not stop in-fighting.
 	
 //sort enemies by danger, kill off entities after 8 (remove(self.enemy8)).
-//SortEnemies(); //SV sort fields containing pointers
+SortEnemies(); //SV sort fields containing pointers.
 
 //get a target for the requester. not neccessarily the highest priority enemy.
 //then jump into behavior tree
+encounter_update(memory);// THIS IS CAUSING THE CRASH RN.
 	squad_fight(); //test
 //squad_action(encounter_update(memory));
 };
@@ -387,7 +412,7 @@ void(entity memory) sight_update =
 
 
 //at the beginning of an action. memories are shared in sqaud.
-void(entity target) update_memory =
+void(entity ntarget) update_memory =
 {
 	//local entity temp;
  entity memory = spawn () ;
@@ -395,17 +420,19 @@ void(entity target) update_memory =
  //temp.classname = "ai_memory";
 //memory = temp; //hack, didn't work
 memory.classname = "ai_memory";
-memory.origin = target.origin;
-memory.health = target.health;
-//memory.squad = self.squad;
-memory.enemy = target;
+memory.origin = ntarget.origin;
+memory.health = ntarget.health;
+memory.squad = self.squad;
+memory.enemy = ntarget;
+memory.team = ntarget.team;
 memory.solid = SOLID_NOT;
 memory.movetype = MOVETYPE_NONE;
+memory.target = ntarget.classname;
 if (/*self.enemy.enemy == target && */self.enemy.classname == "ai_memory") { //cleanup for ai_run
 	remove(self.enemy); //old memory
 }
 sight_update(memory);
-self.enemy = target; //test
+//self.enemy = memory; //test
 };
 
 
@@ -448,25 +475,28 @@ void() start_squad =
 {
 	entity tsquad = spawn();
 tsquad.classname = "ai_squad";
-//tsquad.squad_state_full = 0;
+tsquad.squad_state_full = FALSE;
 self.squad = tsquad;
 tsquad.squad = self;
 tsquad.solid = SOLID_NOT;
 tsquad.movetype = MOVETYPE_NONE;
+//sprint(other, "squad start"); //will error on level start
 }
 
 
 void (entity tother) squad_fit =
 {
 if (tother.squad.squad) {
-	//assign squad to others
+	//assign squad to other
 	tother.squad = self.squad;
 	//assign others to squad slots
-	if (!(other)) self.squad.squad = other;
+	if (!(tother)) self.squad.squad = tother;
 	else if (!(self.squad.squad1)) self.squad.squad1 = tother;
 	else if (!(self.squad.squad2)) self.squad.squad2 = tother;
 	else if (!(self.squad.squad3)) self.squad.squad3 = tother;
 	else if (!(self.squad.squad4)) self.squad.squad4 = tother;
+	else return;
+	//sprint(self, "squad merged");//want an error
 	}
 };
 
@@ -474,8 +504,9 @@ if (tother.squad.squad) {
 //squad check merge. self = seer, other = seen, team checked
 void(entity tother) squad_check_merge =
 {
+	//sprint(self, "check merge"); //looking for error
 	local float self_count, other_count;
-if (self.squad.squad_state_full) return;
+//if (self.squad.squad_state_full) return; figure this out here.
 if (tother.squad.squad_state_full) return;
 //self count
 if (self.squad.squad) self_count = self_count + 1;
@@ -483,6 +514,7 @@ if (self.squad.squad1) self_count = self_count + 1;
 if (self.squad.squad2) self_count = self_count + 1;
 if (self.squad.squad3) self_count = self_count + 1;
 if (self.squad.squad4) self_count = self_count + 1;
+if (self_count == 5) { self.squad.squad_state_full = TRUE; return; }
 //other count
 if (tother.squad.squad) other_count = other_count + 1;
 if (tother.squad.squad1) other_count = other_count + 1;
@@ -491,7 +523,7 @@ if (tother.squad.squad3) other_count = other_count + 1;
 if (tother.squad.squad4) other_count = other_count + 1;
 //can squads merge?
 if ((self_count + other_count) <= 5) {
-	if ((self_count + other_count) == 5) self.squad.squad_state_full = 0;
+	if ((self_count + other_count) == 5) self.squad.squad_state_full = TRUE;
 	squad_fit(other.squad.squad);
 	squad_fit(other.squad.squad1);
 	squad_fit(other.squad.squad2);

@@ -140,8 +140,7 @@ void		end_sys_globals;		// flag for structure dumping
 .float		currentammo;
 .float		ammo_shells, ammo_nails, ammo_rockets, ammo_cells;
 .float		coin;			//ALEX
-//.float		danger;
-//.float		squad_state_full;
+
 
 .float		items;			// bit flags
 
@@ -235,6 +234,7 @@ string version = "\nprogs_dump devkit\nversion x.0.0"; // inspired by Copper
 
 float	FALSE					= 0;
 float 	TRUE					= 1;
+float	FUBAR					= 2;
 
 // worldtype values
 float	WORLDTYPE_MEDIEVAL		= 0;
@@ -492,9 +492,10 @@ float	AS_TURRET		= 5;
 
 //HSM
 .float		squad_state_full;
-//.float		squad_state_leader;
-//.float		frustration;
-/*
+.float		squad_state_leader;
+.float		frustration;
+.float		danger;
+
 .entity 	enemy1;
 .entity 	enemy2;
 .entity 	enemy3;
@@ -502,7 +503,7 @@ float	AS_TURRET		= 5;
 .entity 	enemy5;
 .entity 	enemy6;
 .entity 	enemy7;
-.entity 	enemy8;*/
+.entity 	enemy8;
 .entity		squad;
  //ALEX
 .entity		squad1;
@@ -513,7 +514,7 @@ float	AS_TURRET		= 5;
 .entity		squad6;
 .entity		squad7;
 .entity		waypoint;
-//.entity		encounter;
+.entity		encounter;
 
 float	sleep = 6;
 float	alert = 7;
@@ -528,6 +529,9 @@ float	charge = 15;
 float	obey = 16;
 float	converse = 17;
 float	avoid = 18;
+
+float	PLAYERS = 1;
+float	MONSTERS = 2;
 
 //
 // player only fields

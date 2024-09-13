@@ -1003,6 +1003,7 @@ void() monster_enforcer =
 			}
 			self.th_missile = enf_4atk1;
 		}
+	self.team = MONSTERS; //fix encounters
 	walkmonster_start();
 };
 
