@@ -277,7 +277,7 @@ void() ChangeYaw =
 
 void() HuntTarget =
 {
-	self.goalentity = self.enemy;
+	//self.goalentity = self.enemy;
 	self.think = self.th_run;
 	self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin);
 	self.nextthink = time + 0.1;
@@ -408,9 +408,8 @@ float() FindTarget =
 
 	if (target.health <= 0)
 		return FALSE;
-
-	if (target.classname != "player")
-		if (target.enemy.health <= 0)
+	//if (!target.classname) return FALSE;
+	if (!target.classname == "player")
 			return FALSE;
 	//sprint(target, "I see you\n");
 
@@ -436,6 +435,7 @@ float() FindTarget =
 		return FALSE;
 	}
 	//else sprint(target, "not my team\n");
+	sprint(target, "I see you\n");
 
 	if (r == RANGE_NEAR)
 	{
@@ -449,22 +449,35 @@ float() FindTarget =
 	}
 	//need a check here for if client is associated with a memory in squad already
 	//preferably not by making 8 more if statements but here we go
-	if (target == self.squad.enemy)
-		return FALSE;
-	if (target == self.squad.enemy1)
-		return FALSE;
-	if (target == self.squad.enemy2)
-		return FALSE;
-	if (target == self.squad.enemy3)
-		return FALSE;
-	if (target == self.squad.enemy4)
-		return FALSE;
-	if (target == self.squad.enemy5)
-		return FALSE;
-	if (target == self.squad.enemy6)
-		return FALSE;
-	if (target == self.squad.enemy7)
-		return FALSE;
+	if (self.squad.enemy)
+		if (target == self.squad.enemy.enemy)
+			return FALSE;
+	if (self.squad.enemy1)
+		if (target == self.squad.enemy1.enemy)
+			return FALSE;
+	if (self.squad.enemy2)
+		if (target == self.squad.enemy2.enemy)
+			return FALSE;
+	if (self.squad.enemy3)
+		if (target == self.squad.enemy3.enemy)
+			return FALSE;
+	if (self.squad.enemy4)
+		if (target == self.squad.enemy4.enemy)
+			return FALSE;
+	if (self.squad.enemy5)
+		if (target == self.squad.enemy5.enemy)
+			return FALSE;
+	if (self.squad.enemy6)
+		if (target == self.squad.enemy6.enemy)
+			return FALSE;
+	if (self.squad.enemy7)
+		if (target == self.squad.enemy7.enemy)
+			return FALSE;
+	if (self.enemy)
+		if (target == self.enemy.enemy) {
+			sprint(target, "squad enemy fail\n");
+			return FALSE;
+		}
 
 //
 // got one
@@ -484,12 +497,12 @@ float() FindTarget =
 		}
 	}
 	*/
+		sprint(target, "new enemy\n");
+		update_memory(target);
+		//do something more generic with target. let squad AI determine what to do.
+		//FoundTarget();
+		return TRUE;
 	
-	sprint(target, "new enemy\n");
-	update_memory(target);
-	//do something more generic with target. let squad AI determine what to do.
-	//FoundTarget();
-	return TRUE;
 };
 
 
@@ -766,12 +779,24 @@ The monster has an enemy it is trying to kill
 */
 void(float dist) ai_run =
 {
-	 dprint("ai_run\n");
+	 sprint(self.enemy.enemy, "ai_run\n");
 	movedist = dist;
 //update memory of
-update_memory(self.enemy);
+
+local entity memory, real;
+memory = self.enemy;
+real = memory.enemy;
+
+// check knowledge of enemy
+enemy_vis = visible(real); //real target visibility --Alex
+if (enemy_vis) {
+	self.search_time = time + 5;
+	update_memory(real);
+}
+
+sprint(real, "returned to ai_run\n");
 // see if the enemy is dead
-	if ((self.enemy.health <= 0) || (self.spawnflags & PASSIVE_ALWAYS))
+	if ((memory.health <= 0) || (self.spawnflags & PASSIVE_ALWAYS))
 	{
 		self.enemy = world;
 		return;
@@ -799,22 +824,23 @@ update_memory(self.enemy);
 
 	self.show_hostile = time + 1;		// wake up other monsters
 
-// check knowledge of enemy
-	enemy_vis = visible(self.enemy); //real target visibility --Alex
-	if (enemy_vis)
-		self.search_time = time + 5;
+
 
 // look for other coop players
 	//we can also look for coop ai now. always call FindTarger --ALEX
 	if (/*coop && */self.search_time < time)
 	{
-		if (FindTarget ())
+		sprint(real, "new search\n");
+		if (FindTarget()) {
+			sprint(real, "ai_run aborted\n");
 			return;
+		}
+		else sprint(real, "ai_run continued\n");
 	}
 
-	enemy_infront = infront(self.enemy);
-	enemy_range = range(self.enemy);
-	enemy_yaw = vectoyaw(self.enemy.origin - self.origin);//should be memory
+	enemy_infront = infront(memory);
+	enemy_range = range(memory);
+	enemy_yaw = vectoyaw(memory.origin - self.origin);//should be memory
 
 	if (self.spawnflags & I_AM_TURRET)
 		{
@@ -876,7 +902,9 @@ update_memory(self.enemy);
 
 if !(self.spawnflags & I_AM_TURRET) // keeps monster from moving to player - dumptruck_ds
 // head straight in
-	movetogoal (dist);		// done in C code...
+	if(movetogoal (dist)) sprint(real,"move success\n");		// done in C code...
+	else sprint(real, "move fail\n");
+sprint(real, "movetogoal\n");
 };
 /*
 =============
