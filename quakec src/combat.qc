@@ -163,6 +163,7 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 	}
 	else
 	{
+		//================================================================
 		//DAMAGE REDUCTION DUE TO ARMOR TYPES. CHANGE FOR PROJECT -ALEX
 		//SAVE IS THE DAMAGE TO THE ARMOR.
 	//save = ceil(targ.armortype*damage);
@@ -173,6 +174,7 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 		targ.items = targ.items - (targ.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3));
 	}
 	else save = damage; //ALL DAMAGE TO ARMOR -ALEX
+	//====================================================================
 }
 // // 1998-08-12 Drowning doesn't hurt armor by Maddes/Athos  start
 // 	}
@@ -247,6 +249,7 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 	oldself = self;
 	self = targ;
 
+	/*
 	if ( (self.flags & FL_MONSTER) && attacker != world)
 	{
 	// get mad unless of the same class (except for soldiers)
@@ -289,13 +292,18 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 			}
 		}
 	}
+	*/
 
 	if (self.th_pain)
 	{
-		self.th_pain (attacker, take);
+		self.th_pain (world, take); //was attacker
 	// nightmare mode monsters don't go into pain frames often
 		if (skill == 3)
 			self.pain_finished = time + 5;
+	}
+	if (self.enemy.enemy != attacker) {
+		if (attacker.team && attacker.team != self.team)
+			FoundTarget(attacker);
 	}
 
 	self = oldself;

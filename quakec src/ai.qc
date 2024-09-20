@@ -331,7 +331,7 @@ void() SightSound =
 };
 
 //old foundtarget behaviors
-void() FoundTarget =
+void(entity target) FoundTarget =
 {
 	// let other monsters see this monster for a while
 		sight_entity = self;
@@ -343,11 +343,11 @@ void() FoundTarget =
 		{
 			SightSound();
 		}
-		//HuntTarget();
-		sprint(self.enemy.enemy, "FoundTarget");
+		update_memory(target);
+		sprint(target, "FoundTarget");
 		if (self.sight_trigger == 1) //thanks RennyC -- dumptruck_ds
 		{
-			activator = self.enemy;
+			activator = target;
 			SUB_UseAndForgetTargets();
 		}
 };
@@ -498,9 +498,9 @@ float() FindTarget =
 	}
 	*/
 		sprint(target, "new enemy\n");
-		update_memory(target);
+		//update_memory(target);
 		//do something more generic with target. let squad AI determine what to do.
-		//FoundTarget();
+		FoundTarget(target);
 		return TRUE;
 	
 };
@@ -799,16 +799,9 @@ sprint(real, "returned to ai_run\n");
 	if ((memory.health <= 0) || (self.spawnflags & PASSIVE_ALWAYS))
 	{
 		self.enemy = world;
-		return;
+		//return;
 	// FIXME: look all around for other targets
-		/*
-		if (self.enemy.health > 0) //oldenemy?
-		{
-			//self.enemy = self.oldenemy;
-			HuntTarget ();
-		}
-		else
-		{
+	
 			if (self.spawnflags & I_AM_TURRET)
 				{
 					self.th_stand ();
@@ -818,8 +811,7 @@ sprint(real, "returned to ai_run\n");
 			else
 				self.th_stand ();
 			return;
-		}
-		*/
+		
 	}
 
 	self.show_hostile = time + 1;		// wake up other monsters
@@ -840,7 +832,7 @@ sprint(real, "returned to ai_run\n");
 
 	enemy_infront = infront(memory);
 	enemy_range = range(memory);
-	enemy_yaw = vectoyaw(memory.origin - self.origin);//should be memory
+	enemy_yaw = vectoyaw(memory.origin - self.origin);
 
 	if (self.spawnflags & I_AM_TURRET)
 		{
@@ -900,10 +892,10 @@ sprint(real, "returned to ai_run\n");
     return;
   }
 
-if !(self.spawnflags & I_AM_TURRET) // keeps monster from moving to player - dumptruck_ds
-// head straight in
-	if(movetogoal (dist)) sprint(real,"move success\n");		// done in C code...
-	else sprint(real, "move fail\n");
+  if !(self.spawnflags & I_AM_TURRET) // keeps monster from moving to player - dumptruck_ds
+  // head straight in
+	  movetogoal(dist);		// done in C code...
+
 sprint(real, "movetogoal\n");
 };
 /*

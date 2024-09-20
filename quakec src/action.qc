@@ -9,6 +9,10 @@ void() squad_fight =
 {
 	entity new_waypoint = spawn();
 	new_waypoint.classname = "ai_waypoint";
+	setmodel(new_waypoint, "progs/backpack.mdl");
+	setsize(new_waypoint, '-16 -16 0', '16 16 56');
+	new_waypoint.solid = SOLID_TRIGGER;
+
 	if (self.waypoint) {remove(self.waypoint);}
 	self.waypoint = new_waypoint;
 	self.goalentity = new_waypoint;
@@ -19,7 +23,7 @@ void() squad_fight =
 	//apply offset to squad dest
 		//turn monster dest into waypoint entity
 	if (!self.squad) { 
-		sprint(self.enemy.enemy, "squad failed.\n"); 
+		sprint(self.enemy.enemy, "squad failed.\n"); //no print
 		return;
 	}
 	if (self.squad.squad == self) {
@@ -36,7 +40,7 @@ void() squad_fight =
 		self.waypoint.origin = waypoint_offset(-48, self.enemy);
 	else {
 		sprint(self.enemy.enemy, "squad_fight failed.\n");
-		self.waypoint.origin = self.enemy.origin; //force it to work.
+		new_waypoint.origin = self.enemy.origin + '0 0 12'; //force it to work.
 	}
 //run towards waypoint while attacking self.enemy
 	if (!self.think == self.th_run) self.think = self.th_run;

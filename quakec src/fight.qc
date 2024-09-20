@@ -184,7 +184,7 @@ Stay facing the enemy
 */
 void() ai_face =
 {
-	self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin);
+	self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin); //memory origin.
 	ChangeYaw ();
 };
 
