@@ -344,7 +344,7 @@ void(entity target) FoundTarget =
 			SightSound();
 		}
 		update_memory(target);
-		sprint(target, "FoundTarget");
+		sprint(target, "FoundTarget\n");
 		if (self.sight_trigger == 1) //thanks RennyC -- dumptruck_ds
 		{
 			activator = target;
@@ -450,31 +450,48 @@ float() FindTarget =
 	//need a check here for if client is associated with a memory in squad already
 	//preferably not by making 8 more if statements but here we go
 	if (self.squad.enemy)
-		if (target == self.squad.enemy.enemy)
+		if (target == self.squad.enemy.enemy) {
+			update_memory(target);
 			return FALSE;
+		}
 	if (self.squad.enemy1)
-		if (target == self.squad.enemy1.enemy)
+		if (target == self.squad.enemy1.enemy) {
+			update_memory(target);
 			return FALSE;
+		}
 	if (self.squad.enemy2)
-		if (target == self.squad.enemy2.enemy)
+		if (target == self.squad.enemy2.enemy) {
+			update_memory(target);
 			return FALSE;
+		}
 	if (self.squad.enemy3)
-		if (target == self.squad.enemy3.enemy)
+		if (target == self.squad.enemy3.enemy) {
+			update_memory(target);
 			return FALSE;
+		}
 	if (self.squad.enemy4)
-		if (target == self.squad.enemy4.enemy)
+		if (target == self.squad.enemy4.enemy) {
+			update_memory(target);
 			return FALSE;
+		}
 	if (self.squad.enemy5)
-		if (target == self.squad.enemy5.enemy)
+		if (target == self.squad.enemy5.enemy) {
+			update_memory(target);
 			return FALSE;
+		}
 	if (self.squad.enemy6)
-		if (target == self.squad.enemy6.enemy)
+		if (target == self.squad.enemy6.enemy) {
+			update_memory(target);
 			return FALSE;
+		}
 	if (self.squad.enemy7)
-		if (target == self.squad.enemy7.enemy)
+		if (target == self.squad.enemy7.enemy) {
+			update_memory(target);
 			return FALSE;
+		}
 	if (self.enemy)
 		if (target == self.enemy.enemy) {
+			update_memory(target);
 			sprint(target, "squad enemy fail\n");
 			return FALSE;
 		}

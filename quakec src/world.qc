@@ -474,6 +474,7 @@ void() worldspawn =
 	precache_model ("progs/e_mdls/e_plas.mdl");
 	precache_model ("progs/e_mdls/e_coin.mdl");
 	precache_model("progs/e_mdls/human.mdl");
+	precache_model("progs/armor.mdl");
 
 	precache_model ("progs/w_s_key.mdl"); // dumptruck_ds needed for DropStuff
 	precache_model ("progs/w_g_key.mdl"); //

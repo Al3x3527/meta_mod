@@ -346,6 +346,9 @@ void(entity enemy, entity  temp, entity  temp1, entity  temp2, entity  temp3, en
 {
 	//local entity null;
 	entity null = spawn();
+if (!enemy) {
+	enemy = temp8;
+}
 	if (temp) {enemy = temp;}
 if (temp1) {
 	if (temp1.danger > enemy.danger) {enemy = temp1;}}
@@ -388,77 +391,100 @@ remove(null);
 void() SortEnemies = //this works despite passing local entities. probably because they have no relations.
 {
 	local entity temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8;// null;
+local entity sq;
+sq = self.squad;
 //self.enemy
 entity null = spawn();
 //sprint(self.squad.enemy8.enemy, "self.squad.enemy8.enemy\n"); //works
-if (self.squad.enemy) {temp = self.squad.enemy;}
-if (self.squad.enemy1) {
-	temp1 = self.squad.enemy1;
-	if (temp1.danger > self.squad.enemy.danger) {self.squad.enemy = temp1;}}
-if (self.squad.enemy2) {
-	temp2 = self.enemy2;
-	if (temp2.danger > self.squad.enemy.danger) {self.squad.enemy = temp2;}}
-if (self.squad.enemy3) {
-	temp3 = self.squad.enemy3;
-	if (temp3.danger > self.squad.enemy.danger) {self.squad.enemy = temp3;}}
-if (self.squad.enemy4) {
-	temp4 = self.squad.enemy4;
-	if (temp4.danger > self.squad.enemy.danger) {self.squad.enemy = temp4;}}
-if (self.squad.enemy5) {
-	temp5 = self.squad.enemy5;
-	if (temp5.danger > self.squad.enemy.danger) {self.squad.enemy = temp5;}}
-if (self.squad.enemy6) {
-	temp6 = self.squad.enemy6;
-	if (temp6.danger > self.squad.enemy.danger) {self.squad.enemy = temp6;}}
-if (self.squad.enemy7) {
-	temp7 = self.squad.enemy7;
-	if (temp7.danger > self.squad.enemy.danger) {self.squad.enemy = temp7;}}
-if (self.squad.enemy8) {
-	temp8 = self.squad.enemy8;
-	if (temp8.danger > self.squad.enemy.danger) {self.squad.enemy = temp8;}}
-if (temp == self.squad.enemy)
+if (sq.enemy) {temp = sq.enemy;}
+if (sq.enemy1) {
+	temp1 = sq.enemy1;
+	//if (temp1.danger > sq.enemy.danger) {
+	//	sq.enemy = temp1;}
+}
+if (sq.enemy2) {
+	temp2 = sq.enemy2;
+	//if (temp2.danger > sq.enemy.danger) {
+	//	sq.enemy = temp2;}
+}
+if (sq.enemy3) {
+	temp3 = sq.enemy3;
+	//if (temp3.danger > sq.enemy.danger) {
+	//	sq.enemy = temp3;}
+}
+if (sq.enemy4) {
+	temp4 = sq.enemy4;
+	//if (temp4.danger > sq.enemy.danger) {
+	//	sq.enemy = temp4;}
+}
+if (sq.enemy5) {
+	temp5 = sq.enemy5;
+	//if (temp5.danger > sq.enemy.danger) {
+	//	sq.enemy = temp5;}
+}
+if (sq.enemy6) {
+	temp6 = sq.enemy6;
+	//if (temp6.danger > sq.enemy.danger) {
+	//	sq.enemy = temp6;}
+}
+if (sq.enemy7) {
+	temp7 = sq.enemy7;
+	//if (temp7.danger > sq.enemy.danger) {
+	//	sq.enemy = temp7;}
+}
+if (sq.enemy8) {
+	temp8 = sq.enemy8;
+	//if (temp8.danger > sq.enemy.danger) {
+	//	sq.enemy = temp8;}
+}
+/*
+if (temp == sq.enemy)
 temp = null;
-else if (temp1 == self.squad.enemy)
+else if (temp1 == sq.enemy)
 temp1 = null;
-else if (temp2 == self.squad.enemy)
+else if (temp2 == sq.enemy)
 temp2 = null;
-else if (temp3 == self.squad.enemy)
+else if (temp3 == sq.enemy)
 temp3 = null;
-else if (temp4 == self.squad.enemy)
+else if (temp4 == sq.enemy)
 temp4 = null;
-else if (temp5 == self.squad.enemy)
+else if (temp5 == sq.enemy)
 temp5 = null;
-else if (temp6 == self.squad.enemy)
+else if (temp6 == sq.enemy)
 temp6 = null;
-else if (temp7 == self.squad.enemy)
+else if (temp7 == sq.enemy)
 temp7 = null;
-else if (temp8 == self.squad.enemy)
+else if (temp8 == sq.enemy)
 temp8 = null;
-SortEnemy(self.squad.enemy1, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.squad.enemy2, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.squad.enemy3, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.squad.enemy4, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.squad.enemy5, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.squad.enemy6, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.squad.enemy7, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(self.squad.enemy8, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-remove (self.squad.enemy8);
-if (self.squad.enemy7 == self.enemy6)
-self.squad.enemy7 = null;
-if (self.squad.enemy6 == self.enemy5)
-self.squad.enemy6 = null;
-if (self.squad.enemy5 == self.enemy4)
-self.squad.enemy5 = null;
-if (self.squad.enemy4 == self.enemy3)
-self.squad.enemy4 = null;
-if (self.squad.enemy3 == self.enemy2)
-self.squad.enemy3 = null;
-if (self.squad.enemy2 == self.enemy1)
-self.squad.enemy2 = null;
-if (self.squad.enemy1 == self.enemy)
-self.squad.enemy1 = null;
+*/
+SortEnemy(sq.enemy, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(sq.enemy1, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(sq.enemy2, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(sq.enemy3, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(sq.enemy4, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(sq.enemy5, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(sq.enemy6, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+SortEnemy(sq.enemy7, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+//SortEnemy(sq.enemy8, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+//remove (sq.enemy8); //!
+if (sq.enemy8.enemy == sq.enemy7.enemy)
+sq.enemy8 = null;
+if (sq.enemy7.enemy == sq.enemy6.enemy)
+sq.enemy7 = null;
+if (sq.enemy6.enemy == sq.enemy5.enemy)
+sq.enemy6 = null;
+if (sq.enemy5.enemy == sq.enemy4.enemy)
+sq.enemy5 = null;
+if (sq.enemy4.enemy == sq.enemy3.enemy)
+sq.enemy4 = null;
+if (sq.enemy3.enemy == sq.enemy2.enemy)
+sq.enemy3 = null;
+if (sq.enemy2.enemy == sq.enemy1.enemy)
+sq.enemy2 = null;
+if (sq.enemy1.enemy == self.enemy.enemy)
+sq.enemy1 = null;
 remove(null);
-//sprint(self.squad.enemy.enemy, "self.squad.enemy.enemy\n");
+sprint(sq.enemy.enemy, "sq.enemy.enemy\n");
 };
 
 
@@ -468,18 +494,19 @@ void(entity memory) sight_update =
 local float state_winning; //debug
 
 self.squad.enemy8 = memory;
-if (prioritize_targets() == FALSE) return; //does not break game. does not stop in-fighting.
+if (prioritize_targets() == FALSE) return; //still works
 
 //sort enemies by danger, kill off entities after 8 (remove(self.enemy8)).
-SortEnemies(); //SV sort fields containing pointers.
-sprint(memory.enemy, "sort complete\n");
+SortEnemies(); //now we fall through the ground when self(monster) dies.
+//sprint(memory.enemy, "sort complete\n");
 
 //get a target for the requester. not neccessarily the highest priority enemy.
 //then jump into behavior tree
-encounter_update(memory); //crash sandwiched to here. multiple ai only.
-sprint(memory.enemy, "encounter update complete\n");
+//encounter_update(memory); //crash sandwiched to here. multiple ai only.
+//sprint(memory.enemy, "encounter update complete\n");
+self.enemy = memory;//debug only
 
-squad_fight(); //test
+//squad_fight(); //test
 //squad_action(encounter_update(memory));
 };
 //squad gives enemies to monsters
@@ -494,28 +521,29 @@ void(entity new_target) update_memory =
 		sprint(self.enemy.enemy, "memory update failed\n");
 		return;
 }
-if (new_target == self.enemy.enemy && self.enemy.classname == "ai_memory") { //cleanup for ai_run
-	//remove(self.enemy); //old memory
-	local entity memory;
-	memory = self.enemy;
-}
- else {
+
+ if (self.enemy.enemy != new_target) {
 	entity memory = spawn();
-	//for debug
-	setmodel(memory, "progs/e_mdls/human.mdl");
-	setsize(self, '-16 -16 -32', '16 16 32');
+	memory.classname = "ai_memory";
+	setmodel(memory, "progs/armor.mdl"); //debug
+	setsize(memory, '-16 -16 0', '16 16 56');
 	memory.solid = SOLID_TRIGGER;//SOLID_NOT;
 
-	memory.classname = "ai_memory";
 	memory.movetype = MOVETYPE_NONE;
 	memory.target = new_target.classname;
 	memory.enemy = new_target;
 	memory.team = new_target.team;
 	memory.squad = self.squad;
 }
-memory.origin = new_target.origin;
+ else if (self.enemy.classname == "ai_memory") { //cleanup for ai_run
+	//remove(self.enemy); //old memory
+	 local entity memory;
+	 memory = self.enemy;
+ }
+ //else crash probably
+memory.origin = new_target.origin + '0 0 12';
 memory.health = new_target.health;
-memory.velocity = new_target.velocity;
+//memory.velocity = new_target.velocity;
 sprint(new_target, "memory updated\n");
 
 sight_update(memory);
