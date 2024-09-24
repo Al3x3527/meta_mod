@@ -1312,7 +1312,7 @@ void(entity t1, entity t2) make_angry_at =
 
 		entity oself = self;
 		self = t1; // FoundTarget() only acts on self
-		FoundTarget();
+		FoundTarget(t2); //void FoundTarget(entity target) --Alex
 		self = oself;
 	}
 };

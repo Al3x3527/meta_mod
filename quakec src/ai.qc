@@ -409,7 +409,7 @@ float() FindTarget =
 	if (target.health <= 0)
 		return FALSE;
 	//if (!target.classname) return FALSE;
-	if (!target.classname == "player")
+	if (target.classname != "player")
 			return FALSE;
 	//sprint(target, "I see you\n");
 
@@ -451,6 +451,7 @@ float() FindTarget =
 	//preferably not by making 8 more if statements but here we go
 	if (self.squad.enemy)
 		if (target == self.squad.enemy.enemy) {
+			//sprint(target, "squad memory success\n");
 			update_memory(target);
 			return FALSE;
 		}
@@ -489,7 +490,7 @@ float() FindTarget =
 			update_memory(target);
 			return FALSE;
 		}
-	if (self.enemy)
+	if (self.enemy.enemy)
 		if (target == self.enemy.enemy) {
 			update_memory(target);
 			sprint(target, "squad enemy fail\n");
@@ -796,13 +797,13 @@ The monster has an enemy it is trying to kill
 */
 void(float dist) ai_run =
 {
-	 sprint(self.enemy.enemy, "ai_run\n");
-	movedist = dist;
 //update memory of
-
 local entity memory, real;
 memory = self.enemy;
 real = memory.enemy;
+
+sprint(real, "ai_run\n");
+movedist = dist;
 
 // check knowledge of enemy
 enemy_vis = visible(real); //real target visibility --Alex
@@ -870,9 +871,11 @@ sprint(real, "returned to ai_run\n");
 		ai_run_melee ();
 		return;
 	}
-
-	if (CheckAnyAttack ())
+	sprint(real, "check any attack.\n");
+	if (CheckAnyAttack()) {
+		sprint(real, "beginning an attack.\n");
 		return;					// beginning an attack
+	}
 
 	// if ((self.attack_state == AS_SLIDING) || !(self.spawnflags & I_AM_TURRET))
 	if (self.attack_state == AS_SLIDING)

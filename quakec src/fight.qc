@@ -114,11 +114,17 @@ float() CheckAttack =
 		return FALSE;
 	}
 
-	if (trace_inopen && trace_inwater)
-	return FALSE;			// sight line crossed contents
+	if (trace_inopen && trace_inwater) {
+		sprint(targ.enemy, "sight line crossed contents\n");
+		return FALSE;			// sight line crossed contents
+	}
 
-	if (trace_ent != targ)
+	if (trace_ent != targ) {
+		sprint(targ.enemy, "dont have a clear shot\n");
 		return FALSE;		// don't have a clear shot
+	}
+
+	sprint(targ.enemy, "melee check\n");
 
 	if (enemy_range == RANGE_MELEE)
 	{	// melee attack
@@ -285,6 +291,7 @@ float() SoldierCheckAttack =
 	local float		chance;
 
 	// dprint("SoldierAttack\n");
+	sprint(self.enemy.enemy, "Soldier Attack\n");
 	if (self.spawnflags & I_AM_TURRET) //dumptruck_ds
 		{
 			// self.th_turret ();
@@ -295,7 +302,7 @@ float() SoldierCheckAttack =
 			return TRUE;
 		}
 
-	targ = self.enemy;
+	targ = self.enemy.enemy; //Alex
 
 // see if any entities are in the way of the shot
 	spot1 = self.origin + self.view_ofs;
@@ -303,8 +310,10 @@ float() SoldierCheckAttack =
 
 	traceline (spot1, spot2, FALSE, self);
 
-	if (trace_inopen && trace_inwater)
+	if (trace_inopen && trace_inwater) {
+		sprint(targ, "sight line crossed contents\n");
 		return FALSE;			// sight line crossed contents
+	}
 
 	if ((self.spawnflags & I_AM_TURRET) && (trace_ent != targ))
 	{
@@ -313,8 +322,10 @@ float() SoldierCheckAttack =
 		return FALSE;
 	}
 
-	if (trace_ent != targ)
+	if (trace_ent != targ) {
+		sprint(targ, "dont have a clear shot\n");
 		return FALSE;	// don't have a clear shot
+	}
 
 // missile attack
 	if (time < self.attack_finished)

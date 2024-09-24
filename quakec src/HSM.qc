@@ -270,10 +270,10 @@ if (state_winning == FUBAR) {
 	return 0;
 }
 else if (state_winning == 0) {
-	sprint(memory.enemy, "Losing\n");
+	//sprint(memory.enemy, "Losing\n");
 }
 else if (state_winning == 1) {
-	sprint(memory.enemy, "Winning\n");
+	//sprint(memory.enemy, "Winning\n");
 }
 //re-assign targets to requesting squad
 //closest (distance) match to danger algorithm
@@ -342,55 +342,54 @@ sprint(player, "back to encounter update.\n");
 };
 
 
-void(entity enemy, entity  temp, entity  temp1, entity  temp2, entity  temp3, entity  temp4, entity  temp5, entity  temp6, entity  temp7, entity  temp8) SortEnemy =
+entity (entity  temp, entity  temp1, entity  temp2, entity  temp3, entity  temp4, entity  temp5, entity  temp6, entity  temp7, entity  temp8) SortEnemy =
 {
-	//local entity null;
+	local entity field;
 	entity null = spawn();
-if (!enemy) {
-	enemy = temp8;
+//if (!field) {
+	field = temp8;
+//}
+	if (temp.danger) { field = temp;}
+if (temp1.danger) {
+	if (temp1.danger > field.danger) { field = temp1;} 
+	//sprint(field.enemy, "field = temp1\n");
 }
-	if (temp) {enemy = temp;}
-if (temp1) {
-	if (temp1.danger > enemy.danger) {enemy = temp1;}}
-if (temp2) {
-	if (temp2.danger > enemy.danger) {enemy = temp2;}}
-if (temp3) {
-	if (temp3.danger > enemy.danger) {enemy = temp3;}}
-if (temp4) {
-	if (temp4.danger > enemy.danger) {enemy = temp4;}}
-if (temp5) {
-	if (temp5.danger > enemy.danger) {enemy = temp5;}}
-if (temp6) {
-	if (temp6.danger > enemy.danger) {enemy = temp6;}}
-if (temp7) {
-	if (temp7.danger > enemy.danger) {enemy = temp7;}}
-if (temp8) {
-	if (temp8.danger > enemy.danger) {enemy = temp8;}}
-if (temp == enemy)
-temp = null;
-else if (temp1 == enemy)
-temp1 = null;
-else if (temp2 == enemy)
-temp2 = null;
-else if (temp3 == enemy)
-temp3 = null;
-else if (temp4 == enemy)
-temp4 = null;
-else if (temp5 == enemy)
-temp5 = null;
-else if (temp6 == enemy)
-temp6 = null;
-else if (temp7 == enemy)
-temp7 = null;
-else if (temp8 == enemy)
-temp8 = null;
+if (temp2.danger) {
+	if (temp2.danger > field.danger) { field = temp2;}}
+if (temp3.danger) {
+	if (temp3.danger > field.danger) { field = temp3;}}
+if (temp4.danger) {
+	if (temp4.danger > field.danger) { field = temp4;}}
+if (temp5.danger) {
+	if (temp5.danger > field.danger) { field = temp5;}}
+if (temp6.danger) {
+	if (temp6.danger > field.danger) { field = temp6;}}
+if (temp7.danger) {
+	if (temp7.danger > field.danger) { field = temp7;}}
+if (temp8.danger) {
+	if (temp8.danger > field.danger) { field = temp8; 
+	//sprint(field.enemy, "field = temp8\n");
+	}
+}
+if (temp8 == field) {
+	temp8 = null;
+	//sprint(temp8.enemy, "temp8.enemy = null?\n");
+} else if (temp7 == field) temp7 = null;
+else if (temp6 == field) temp6 = null;
+else if (temp5 == field) temp5 = null;
+else if (temp4 == field) temp4 = null;
+else if (temp3 == field) temp3 = null;
+else if (temp2 == field) temp2 = null;
+else if (temp1 == field) temp1 = null;
+else temp = null;
 remove(null);
-};
+return(field);
+}
 
 
-void() SortEnemies = //this works despite passing local entities. probably because they have no relations.
+void() SortEnemies = 
 {
-	local entity temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8;// null;
+local entity temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8;// null;
 local entity sq;
 sq = self.squad;
 //self.enemy
@@ -399,74 +398,41 @@ entity null = spawn();
 if (sq.enemy) {temp = sq.enemy;}
 if (sq.enemy1) {
 	temp1 = sq.enemy1;
-	//if (temp1.danger > sq.enemy.danger) {
-	//	sq.enemy = temp1;}
 }
 if (sq.enemy2) {
 	temp2 = sq.enemy2;
-	//if (temp2.danger > sq.enemy.danger) {
-	//	sq.enemy = temp2;}
-}
+	}
 if (sq.enemy3) {
 	temp3 = sq.enemy3;
-	//if (temp3.danger > sq.enemy.danger) {
-	//	sq.enemy = temp3;}
-}
+	}
 if (sq.enemy4) {
 	temp4 = sq.enemy4;
-	//if (temp4.danger > sq.enemy.danger) {
-	//	sq.enemy = temp4;}
-}
+	}
 if (sq.enemy5) {
 	temp5 = sq.enemy5;
-	//if (temp5.danger > sq.enemy.danger) {
-	//	sq.enemy = temp5;}
 }
 if (sq.enemy6) {
 	temp6 = sq.enemy6;
-	//if (temp6.danger > sq.enemy.danger) {
-	//	sq.enemy = temp6;}
 }
 if (sq.enemy7) {
 	temp7 = sq.enemy7;
-	//if (temp7.danger > sq.enemy.danger) {
-	//	sq.enemy = temp7;}
-}
+	}
 if (sq.enemy8) {
 	temp8 = sq.enemy8;
-	//if (temp8.danger > sq.enemy.danger) {
-	//	sq.enemy = temp8;}
-}
-/*
-if (temp == sq.enemy)
-temp = null;
-else if (temp1 == sq.enemy)
-temp1 = null;
-else if (temp2 == sq.enemy)
-temp2 = null;
-else if (temp3 == sq.enemy)
-temp3 = null;
-else if (temp4 == sq.enemy)
-temp4 = null;
-else if (temp5 == sq.enemy)
-temp5 = null;
-else if (temp6 == sq.enemy)
-temp6 = null;
-else if (temp7 == sq.enemy)
-temp7 = null;
-else if (temp8 == sq.enemy)
-temp8 = null;
-*/
-SortEnemy(sq.enemy, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(sq.enemy1, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(sq.enemy2, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(sq.enemy3, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(sq.enemy4, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(sq.enemy5, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(sq.enemy6, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-SortEnemy(sq.enemy7, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-//SortEnemy(sq.enemy8, temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
-//remove (sq.enemy8); //!
+	}
+
+sq.enemy = SortEnemy(temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+//sprint(sq.enemy.enemy, "sq.enemy.enemy\n");
+sq.enemy1 = SortEnemy(temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+sq.enemy2 = SortEnemy(temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+sq.enemy3 = SortEnemy(temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+sq.enemy4 = SortEnemy(temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+sq.enemy5 = SortEnemy(temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+sq.enemy6 = SortEnemy(temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+sq.enemy7 = SortEnemy(temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
+
+if (sq.enemy8.enemy != sq.enemy7.enemy)
+remove (sq.enemy8);
 if (sq.enemy8.enemy == sq.enemy7.enemy)
 sq.enemy8 = null;
 if (sq.enemy7.enemy == sq.enemy6.enemy)
@@ -481,9 +447,11 @@ if (sq.enemy3.enemy == sq.enemy2.enemy)
 sq.enemy3 = null;
 if (sq.enemy2.enemy == sq.enemy1.enemy)
 sq.enemy2 = null;
-if (sq.enemy1.enemy == self.enemy.enemy)
+if (sq.enemy1.enemy == sq.enemy.enemy)
 sq.enemy1 = null;
 remove(null);
+
+//remove(temp); remove(temp1); remove(temp2); remove(temp3); remove(temp4); remove(temp5); remove(temp6); remove(temp7); remove(temp8);
 sprint(sq.enemy.enemy, "sq.enemy.enemy\n");
 };
 
@@ -497,16 +465,16 @@ self.squad.enemy8 = memory;
 if (prioritize_targets() == FALSE) return; //still works
 
 //sort enemies by danger, kill off entities after 8 (remove(self.enemy8)).
-SortEnemies(); //now we fall through the ground when self(monster) dies.
-//sprint(memory.enemy, "sort complete\n");
+SortEnemies(); //now we fall through the ground when self(monster) dies. not anymore??
+sprint(self.squad.enemy.enemy, "sort complete\n"); //the sort doesn't work. spawn() temporaries
 
 //get a target for the requester. not neccessarily the highest priority enemy.
 //then jump into behavior tree
-//encounter_update(memory); //crash sandwiched to here. multiple ai only.
-//sprint(memory.enemy, "encounter update complete\n");
-self.enemy = memory;//debug only
+encounter_update(memory); //crash sandwiched to here. multiple ai only.
+sprint(memory.enemy, "encounter update complete\n");
+//self.enemy = memory;//debug only.
 
-//squad_fight(); //test
+squad_fight(); //test
 //squad_action(encounter_update(memory));
 };
 //squad gives enemies to monsters
@@ -517,36 +485,41 @@ self.enemy = memory;//debug only
 //at the beginning of an action. memories are shared in sqaud.
 void(entity new_target) update_memory =
 {
-	if (!new_target.classname == "player") {
+	if (new_target.classname != "player") {
 		sprint(self.enemy.enemy, "memory update failed\n");
 		return;
 }
 
  if (self.enemy.enemy != new_target) {
-	entity memory = spawn();
-	memory.classname = "ai_memory";
-	setmodel(memory, "progs/armor.mdl"); //debug
-	setsize(memory, '-16 -16 0', '16 16 56');
-	memory.solid = SOLID_TRIGGER;//SOLID_NOT;
+	entity new_memory = spawn();
+	new_memory.classname = "ai_memory";
+	setmodel(new_memory, "progs/armor.mdl"); //debug
+	setsize(new_memory, '-16 -16 0', '16 16 56');
+	new_memory.solid = SOLID_TRIGGER;//SOLID_NOT;
 
-	memory.movetype = MOVETYPE_NONE;
-	memory.target = new_target.classname;
-	memory.enemy = new_target;
-	memory.team = new_target.team;
-	memory.squad = self.squad;
+	new_memory.movetype = MOVETYPE_NONE;
+	new_memory.target = new_target.classname;
+	new_memory.enemy = new_target;
+	new_memory.team = new_target.team;
+	new_memory.squad = self.squad;
+
+	new_memory.origin = new_target.origin + '0 0 12';
+	new_memory.health = new_target.health;
+	
+	sight_update(new_memory);
 }
  else if (self.enemy.classname == "ai_memory") { //cleanup for ai_run
 	//remove(self.enemy); //old memory
 	 local entity memory;
 	 memory = self.enemy;
+
+	 memory.origin = new_target.origin + '0 0 12';
+	 memory.health = new_target.health;
+	 //memory.velocity = new_target.velocity;
+	 sprint(new_target, "memory updated\n");
+	 sight_update(memory);
  }
  //else crash probably
-memory.origin = new_target.origin + '0 0 12';
-memory.health = new_target.health;
-//memory.velocity = new_target.velocity;
-sprint(new_target, "memory updated\n");
-
-sight_update(memory);
 };
 
 

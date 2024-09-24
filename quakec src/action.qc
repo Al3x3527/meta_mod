@@ -40,10 +40,10 @@ void() squad_fight =
 		self.waypoint.origin = waypoint_offset(-48, self.enemy);
 	else {
 		sprint(self.enemy.enemy, "squad_fight failed.\n");
-		new_waypoint.origin = self.enemy.origin + '0 0 12'; //force it to work.
+		new_waypoint.origin = self.enemy.origin - '0 0 12'; //force it to work.
 	}
 //run towards waypoint while attacking self.enemy
-	if (!self.think == self.th_run) self.think = self.th_run;
+	if (self.think != self.th_run) self.think = self.th_run;
 	//let ai complete their last think. ai will check squad.attack_state.
 };
 
@@ -112,7 +112,7 @@ void(float state_winning) squad_action =
 	} //there is an attack state
 }
 
-/*
+
 //set monster state and dest for each monster in squad
 	if (self.classname == human)
 		human_fight(yaw);
