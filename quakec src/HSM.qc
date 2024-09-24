@@ -205,7 +205,58 @@ if (temp_squad.squad4) {
 
 void(entity other_qside, entity self_squad) AssignTargets = 
 {
-	//code moved to encounter update.
+local entity temp, temp1, temp2, temp3, player; //temp_squad;
+
+entity temp_squad = spawn();
+//work from lowest priority up, reassign in passes
+	//who is available
+temp_squad = self_squad;
+player = other_qside.squad.enemy;
+//who is closest, is he stronger
+//who else is next, are they stronger
+//closest to enemy0
+temp = FindClosest(temp_squad, other_qside.squad);
+
+temp.enemy = other_qside.squad;
+//sprint(temp.enemy.enemy, "temp.enemy.enemy\n");
+RemoveFromSquad(temp_squad, temp, player); //this is probably broken.
+sprint(player, "temp removed from temp squad.\n");
+//who is stronger?
+
+if (temp.danger < other_qside.squad.danger && temp1.squad) {
+	temp1 = FindClosest(temp_squad, other_qside.squad);
+	if (temp1 == temp) { sprint(player, "found the same entity\n"); } else if (!temp) { sprint(player, "temp not found\n"); }
+	temp1.enemy = other_qside.squad;
+	if (temp1.enemy) {
+		sprint(player, "temp1.enemy\n");
+		RemoveFromSquad(temp_squad, temp1, player);
+		sprint(player, "temp1\n");
+	} else sprint(player, "temp1 failed\n");
+	if ((temp.danger + temp1.danger) < other_qside.squad.danger && temp2.squad) {
+		temp2 = FindClosest(temp_squad, other_qside.squad);
+		temp2.enemy = other_qside.squad;
+		RemoveFromSquad(temp_squad, temp2, player);
+		sprint(player, "temp2\n");
+		if ((temp.danger + temp1.danger + temp2.danger) < other_qside.squad.danger && temp3.squad) {
+			temp3 = FindClosest(temp_squad, other_qside.squad);
+			temp3.enemy = other_qside.squad;
+			RemoveFromSquad(temp_squad, temp3, player);
+			sprint(player, "temp3\n");
+		}
+	}
+}
+
+//unassigned
+//sprint(player, "unassigned.\n");
+if (self_squad.squad && !(self_squad.squad.enemy)) self_squad.squad.enemy = FindClosest(other_qside, self_squad.squad);
+if (self_squad.squad1 && !(self_squad.squad1.enemy)) self_squad.squad1.enemy = FindClosest(other_qside, self_squad.squad1);
+if (self_squad.squad2 && !(self_squad.squad2.enemy)) self_squad.squad2.enemy = FindClosest(other_qside, self_squad.squad2);
+if (self_squad.squad3 && !(self_squad.squad3.enemy)) self_squad.squad3.enemy = FindClosest(other_qside, self_squad.squad3);
+if (self_squad.squad4 && !(self_squad.squad4.enemy)) self_squad.squad4.enemy = FindClosest(other_qside, self_squad.squad4);
+
+
+remove(temp_squad);
+
 };
 
 void() start_encounter =
@@ -239,6 +290,8 @@ else start_encounter();
 local float	state_winning;
 entity	other_qside = spawn();
 entity self_qside = spawn();
+local entity player;
+
 self.encounter.enemy = other_qside;
 self.encounter.squad = self_qside;
 other_qside.classname = "ai_squad";
@@ -263,6 +316,7 @@ if (memory.squad.enemy7)
 other_qside.squad7 = memory.squad.enemy7;
 //qside.team = qside.squad.team
 self_qside = self.squad;
+player = other_qside.squad.enemy;
 //winning or losing perceived
 state_winning = CompareDanger(other_qside, self_qside);
 if (state_winning == FUBAR) {
@@ -277,64 +331,7 @@ else if (state_winning == 1) {
 }
 //re-assign targets to requesting squad
 //closest (distance) match to danger algorithm
-//AssignTargets(other_qside, memory.squad); //remember memories are associated with squad that perceives them
-
-local entity self_squad;
-self_squad = memory.squad;
-local entity temp, temp1, temp2, temp3, player; //temp_squad;
-	
-entity temp_squad = spawn();
-//work from lowest priority up, reassign in passes
-	//who is available
-temp_squad = self_squad;
-player = other_qside.squad.enemy;
-//who is closest, is he stronger
-//who else is next, are they stronger
-//closest to enemy0
-temp = FindClosest(temp_squad, other_qside.squad);
-
-temp.enemy = other_qside.squad;
-//sprint(temp.enemy.enemy, "temp.enemy.enemy\n");
-RemoveFromSquad(temp_squad, temp, player);
-sprint(player, "temp removed from temp squad.\n");
-//who is stronger?
-
-if (temp.danger < other_qside.squad.danger && temp1.squad) {
-	temp1 = FindClosest(temp_squad, other_qside.squad);
-	if (temp1 == temp) { sprint(player, "found the same entity\n"); }
-	else if (!temp) { sprint(player, "temp not found\n"); }
-	temp1.enemy = other_qside.squad;
-	if (temp1.enemy) {
-		sprint(player, "temp1.enemy\n");
-		RemoveFromSquad(temp_squad, temp1, player);
-		sprint(player, "temp1\n");
-	}
-	else sprint(player, "temp1 failed\n");
-	if ((temp.danger + temp1.danger) < other_qside.squad.danger && temp2.squad) {
-		temp2 = FindClosest(temp_squad, other_qside.squad);
-		temp2.enemy = other_qside.squad;
-		RemoveFromSquad(temp_squad, temp2, player);
-		sprint(player, "temp2\n");
-		if ((temp.danger + temp1.danger + temp2.danger) < other_qside.squad.danger && temp3.squad) {
-			temp3 = FindClosest(temp_squad, other_qside.squad);
-			temp3.enemy = other_qside.squad;
-			RemoveFromSquad(temp_squad, temp3, player);
-			sprint(player, "temp3\n");
-		}
-	}
-}
-
-//unassigned
-//sprint(player, "unassigned.\n");
-if (self_squad.squad && !(self_squad.squad.enemy)) self_squad.squad.enemy = FindClosest(other_qside, self_squad.squad);
-if (self_squad.squad1 && !(self_squad.squad1.enemy)) self_squad.squad1.enemy = FindClosest(other_qside, self_squad.squad1);
-if (self_squad.squad2 && !(self_squad.squad2.enemy)) self_squad.squad2.enemy = FindClosest(other_qside, self_squad.squad2);
-if (self_squad.squad3 && !(self_squad.squad3.enemy)) self_squad.squad3.enemy = FindClosest(other_qside, self_squad.squad3);
-if (self_squad.squad4 && !(self_squad.squad4.enemy)) self_squad.squad4.enemy = FindClosest(other_qside, self_squad.squad4);
-
-
-remove(temp_squad);
-
+AssignTargets(other_qside, memory.squad); //remember memories are associated with squad that perceives them
 //return the encounter state to the squad for action processing.
 sprint(player, "back to encounter update.\n");
 //crash here?
@@ -583,7 +580,7 @@ if (request.squad.squad) {
 	else if (!(self.squad.squad3)) self.squad.squad3 = request;
 	else if (!(self.squad.squad4)) self.squad.squad4 = request;
 	else return;
-	//sprint(self.enemy.enemy, "squad merged\n");
+	sprint(self.enemy.enemy, "squad merged\n");
 	}
 };
 
@@ -595,6 +592,7 @@ void(entity request) squad_check_merge =
 	local float self_count, other_count;
 //if (self.squad.squad_state_full) return; figure this out here.
 if (request.squad.squad_state_full) return;
+self_count = 0;
 //self count
 if (self.squad.squad) self_count = self_count + 1;
 if (self.squad.squad1) self_count = self_count + 1;
@@ -602,6 +600,7 @@ if (self.squad.squad2) self_count = self_count + 1;
 if (self.squad.squad3) self_count = self_count + 1;
 if (self.squad.squad4) self_count = self_count + 1;
 if (self_count == 5) { self.squad.squad_state_full = TRUE; return; }
+other_count = 0;
 //other count
 if (request.squad.squad) other_count = other_count + 1;
 if (request.squad.squad1) other_count = other_count + 1;
