@@ -99,7 +99,7 @@ float() CheckAttack =
 			return TRUE;
 		}
 
-	targ = self.enemy;
+	targ = self.enemy.enemy;
 
 // see if any entities are in the way of the shot
 	spot1 = self.origin + self.view_ofs;
