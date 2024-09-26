@@ -19,35 +19,35 @@ void() squad_fight =
 		return;
 	}
 	if (sq.squad.health > 0) {
-		sprint(player, "leader found.\n");
+		//sprint(player, "leader found.\n");
 		self = sq.squad;
 		create_waypoint();
 		self.waypoint.origin = self.enemy.origin; //squad leader
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
 	if (sq.squad1.health > 0) {
-		sprint(player, "squad1\n");
+	//	sprint(player, "squad1\n");
 		self = sq.squad1;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(48, self.enemy);
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
 	if (sq.squad2.health > 0) {
-		sprint(player, "squad2\n");
+	//	sprint(player, "squad2\n");
 		self = sq.squad2;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(-48, self.enemy);
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
 	if (sq.squad3.health > 0) {
-		sprint(player, "squad3\n");
+	//	sprint(player, "squad3\n");
 		self = sq.squad3;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(48, self.enemy);
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
 	if (sq.squad4.health > 0) {
-		sprint(player, "squad4\n");
+	//	sprint(player, "squad4\n");
 		self = sq.squad4;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(-48, self.enemy);

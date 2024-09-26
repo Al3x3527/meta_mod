@@ -70,34 +70,30 @@ if (self.squad.enemy8)
 return TRUE;
 };
 
-void() find_sdanger = //needs fixing
+void() find_sdanger =
 {
-	entity null = spawn();
-local float count = 0;
+local float count = FALSE;
 local entity sqs;
 sqs = self.squad;
 
-if (sqs.squad.health > 0) { assign_danger(sqs.squad, 0); count = count + 1;}
-else sqs.squad = null;
-if (sqs.squad1.health > 0) { assign_danger(sqs.squad1, 0); count = count + 1;}
-else sqs.squad1 = null;
-if (sqs.squad2.health > 0) { assign_danger(sqs.squad2, 0); count = count + 1;}
-else sqs.squad2 = null;
-if (sqs.squad3.health > 0) { assign_danger(sqs.squad3, 0); count = count + 1;}
-else sqs.squad3 = null;
-if (sqs.squad4.health > 0) { assign_danger(sqs.squad4, 0); count = count + 1;}
-else sqs.squad4 = null;
-if (count == 0) {
+if (sqs.squad.health > 0) { assign_danger(sqs.squad, 0); count = TRUE;}
+if (sqs.squad1.health > 0) { assign_danger(sqs.squad1, 0); count = TRUE;}
+if (sqs.squad2.health > 0) { assign_danger(sqs.squad2, 0); count = TRUE;}
+if (sqs.squad3.health > 0) { assign_danger(sqs.squad3, 0); count = TRUE;}
+if (sqs.squad4.health > 0) { assign_danger(sqs.squad4, 0); count = TRUE;}
+if (!count) { //doesn't work
 	sprint(self.squad.enemy.enemy, "squad is dead\n");
-	//remove (sqs.enemy);
-	//remove (sqs.enemy1);
-	//remove (sqs.enemy2);
-	//remove (sqs.enemy3);
-	//remove (sqs.enemy4);
-	//remove(sqs);
+	if (sqs.enemy) remove (sqs.enemy);
+	if (sqs.enemy1) remove (sqs.enemy1);
+	if (sqs.enemy2) remove (sqs.enemy2);
+	if (sqs.enemy3) remove (sqs.enemy3);
+	if (sqs.enemy4) remove (sqs.enemy4);
+	if (sqs.enemy5) remove(sqs.enemy5);
+	if (sqs.enemy6) remove(sqs.enemy6);
+	if (sqs.enemy7) remove(sqs.enemy7);
+	remove(sqs);
 }
-remove(null);
-}
+};
 
 
 
@@ -246,8 +242,8 @@ void() start_encounter =
 n_encounter.classname = "ai_encounter";
 n_encounter.origin = self.origin;
 self.squad.encounter = n_encounter;
-setmodel(n_encounter, "progs/backpack.mdl");
-setsize(n_encounter, '-16 -16 0', '16 16 56');
+//setmodel(n_encounter, "progs/backpack.mdl");
+//setsize(n_encounter, '-16 -16 0', '16 16 56');
 n_encounter.solid = SOLID_TRIGGER;
 
 if (self.squad.squad) self.squad.squad.encounter = n_encounter;
@@ -284,7 +280,6 @@ self.squad = sq;
 other_qside.classname = "ai_squad";
 //self_qside.classname = "ai_squad";
 //update encounter teams (qsides)
-//other qside is made up of perceived targets
 if (sq.enemy.health > 0) other_qside.squad = sq.enemy;
 if (sq.enemy1.health > 0) other_qside.squad1 = sq.enemy1;
 if (sq.enemy2.health > 0) other_qside.squad2 = sq.enemy2;
@@ -293,13 +288,7 @@ if (sq.enemy4.health > 0) other_qside.squad4 = sq.enemy4;
 if (sq.enemy5.health > 0) other_qside.squad5 = sq.enemy5;
 if (sq.enemy6.health > 0) other_qside.squad6 = sq.enemy6;
 if (sq.enemy7.health > 0) other_qside.squad7 = sq.enemy7;
-//qside.team = qside.squad.team
-//self_qside = sq; //self.squad = sqs "=" sq (real)
-//closest (distance) match to danger algorithm
-//self.nextthink = time + 0.4; //let the code breathe or something.
-//self.think = AssignTargets;
 AssignTargets();
-//return the encounter state to the squad for action processing.
 //sprint(player, "back to encounter update.\n");
 return CompareDanger(other_qside, self_qside);//state_winning;
 };
@@ -352,7 +341,7 @@ return(field);
 
 void() SortEnemies = 
 {
-local entity temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8;// null;
+local entity temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8;
 local entity sq;
 sq = self.squad;
 //self.enemy
@@ -413,8 +402,6 @@ sq.enemy2 = null;
 if (sq.enemy1.enemy == sq.enemy.enemy)
 sq.enemy1 = null;
 remove(null);
-
-//remove(temp); remove(temp1); remove(temp2); remove(temp3); remove(temp4); remove(temp5); remove(temp6); remove(temp7); remove(temp8);
 //sprint(sq.enemy.enemy, "sq.enemy.enemy\n");
 };
 
@@ -459,8 +446,8 @@ void(entity new_target) update_memory =
  if (self.enemy.enemy != new_target) {
 	entity new_memory = spawn();
 	new_memory.classname = "ai_memory";
-	setmodel(new_memory, "progs/armor.mdl"); //debug
-	setsize(new_memory, '-16 -16 0', '16 16 56');
+	//setmodel(new_memory, "progs/armor.mdl"); //debug
+	//setsize(new_memory, '-16 -16 0', '16 16 56');
 	new_memory.solid = SOLID_TRIGGER;//SOLID_NOT;
 
 	new_memory.movetype = MOVETYPE_NONE;
@@ -502,8 +489,8 @@ void() create_waypoint =
 {
 	entity new_waypoint = spawn();
 	new_waypoint.classname = "ai_waypoint";
-	setmodel(new_waypoint, "progs/backpack.mdl");
-	setsize(new_waypoint, '-16 -16 0', '16 16 56');
+	//setmodel(new_waypoint, "progs/backpack.mdl");
+	//setsize(new_waypoint, '-16 -16 0', '16 16 56');
 	new_waypoint.solid = SOLID_TRIGGER;
 
 	if (self.waypoint) { remove(self.waypoint); }

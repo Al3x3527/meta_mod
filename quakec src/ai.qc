@@ -434,13 +434,13 @@ float() FindTarget =
 		return FALSE;
 
 	if (target.team == self.team) {//-ALEX
-		//sprint(target, self.classname);
-		//sprint(target, "\n");
+		//sprint(self.enemy.enemy, self.classname);
+		//sprint(self.enemy.enemy, "\n");
 		squad_check_merge(target);
 		return FALSE;
 	}
 	//else sprint(target, "not my team\n");
-	sprint(target, "I see you\n");
+	//sprint(target, "I see you\n");
 
 	if (r == RANGE_NEAR)
 	{
@@ -520,7 +520,7 @@ float() FindTarget =
 		}
 	}
 	*/
-		sprint(target, "new enemy\n");
+	//	sprint(target, "new enemy\n");
 		//update_memory(target);
 		//do something more generic with target. let squad AI determine what to do.
 		FoundTarget(target);
@@ -813,8 +813,10 @@ movedist = dist;
 // check knowledge of enemy
 enemy_vis = visible(real); //real target visibility --Alex
 if (enemy_vis) {
-	self.search_time = time + 5;
+	if (self.memory_time < time) //fixes animations
 	update_memory(real);
+	self.memory_time = time + .5;
+	self.search_time = time + 4.9; //originally 5
 }
 
 //sprint(real, "returned to ai_run\n");
@@ -843,9 +845,9 @@ if (enemy_vis) {
 
 // look for other coop players
 	//we can also look for coop ai now. always call FindTarger --ALEX
-	if (/*coop && */self.search_time < time)
+	if (/*coop && */self.search_time < time) //updated before update memory
 	{
-		sprint(real, "new search\n");
+		//sprint(real, "new search\n");
 		if (FindTarget()) {
 			//sprint(real, "ai_run aborted\n");
 			return;

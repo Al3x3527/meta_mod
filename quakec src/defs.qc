@@ -515,6 +515,7 @@ float	AS_TURRET		= 5;
 .entity		squad7;
 .entity		waypoint;
 .entity		encounter;
+.float		memory_time;
 
 float	sleep = 6;
 float	alert = 7;
