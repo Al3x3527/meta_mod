@@ -7,29 +7,54 @@ AI behavior tree
 //squad actions called every ai think
 void() squad_fight =
 {
-	entity new_waypoint = spawn();
-	new_waypoint.classname = "ai_waypoint";
-	setmodel(new_waypoint, "progs/backpack.mdl");
-	setsize(new_waypoint, '-16 -16 0', '16 16 56');
-	new_waypoint.solid = SOLID_TRIGGER;
+	local entity player, sq, oself;
+	player = self.squad.enemy.enemy;
+	if (!self.squad) return;
+	sq = self.squad;
+	oself = self;
 
-	if (self.waypoint) {remove(self.waypoint);}
-	self.waypoint = new_waypoint;
-	self.goalentity = new_waypoint;
-	self.squad.attack_state = fight;
-		//modify squad action
-			//push or flank?
-				//look for a place near self.enemy which the target can't see
-	//apply offset to squad dest
-		//turn monster dest into waypoint entity
-	if (!self.squad) { 
-		sprint(self.enemy.enemy, "squad failed.\n"); //no print
+	sq.attack_state = fight;
+	if (!sq) { 
+		//sprint(player, "squad failed.\n");
 		return;
 	}
-	if (self.squad.squad == self) {
-		sprint(self.enemy.enemy, "leader found.\n");
+	if (sq.squad.health > 0) {
+		sprint(player, "leader found.\n");
+		self = sq.squad;
+		create_waypoint();
 		self.waypoint.origin = self.enemy.origin; //squad leader
+		if (self.think != self.th_run) self.think = self.th_run;
 	}
+	if (sq.squad1.health > 0) {
+		sprint(player, "squad1\n");
+		self = sq.squad1;
+		create_waypoint();
+		self.waypoint.origin = waypoint_offset(48, self.enemy);
+		if (self.think != self.th_run) self.think = self.th_run;
+	}
+	if (sq.squad2.health > 0) {
+		sprint(player, "squad2\n");
+		self = sq.squad2;
+		create_waypoint();
+		self.waypoint.origin = waypoint_offset(-48, self.enemy);
+		if (self.think != self.th_run) self.think = self.th_run;
+	}
+	if (sq.squad3.health > 0) {
+		sprint(player, "squad3\n");
+		self = sq.squad3;
+		create_waypoint();
+		self.waypoint.origin = waypoint_offset(48, self.enemy);
+		if (self.think != self.th_run) self.think = self.th_run;
+	}
+	if (sq.squad4.health > 0) {
+		sprint(player, "squad4\n");
+		self = sq.squad4;
+		create_waypoint();
+		self.waypoint.origin = waypoint_offset(-48, self.enemy);
+		if (self.think != self.th_run) self.think = self.th_run;
+	}
+	else self = oself;
+	/*
 	else if (self.squad.squad1 == self)
 		self.waypoint.origin = waypoint_offset(48, self.enemy);
 	else if (self.squad.squad2 == self)
@@ -42,9 +67,7 @@ void() squad_fight =
 		sprint(self.enemy.enemy, "squad_fight failed.\n");
 		new_waypoint.origin = self.enemy.origin - '0 0 12'; //force it to work.
 	}
-//run towards waypoint while attacking self.enemy
-	if (self.think != self.th_run) self.think = self.th_run;
-	//let ai complete their last think. ai will check squad.attack_state.
+	*/
 };
 
 //something has changed, decide what to do next

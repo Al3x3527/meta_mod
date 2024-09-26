@@ -344,7 +344,7 @@ void(entity target) FoundTarget =
 			SightSound();
 		}
 		update_memory(target);
-		sprint(target, "FoundTarget\n");
+		//sprint(target, "FoundTarget\n");
 		if (self.sight_trigger == 1) //thanks RennyC -- dumptruck_ds
 		{
 			activator = target;
@@ -409,12 +409,17 @@ float() FindTarget =
 	if (target.health <= 0)
 		return FALSE;
 	//if (!target.classname) return FALSE;
-	if (target.classname != "player")
-			return FALSE;
+	/*if (target.classname != "player")
+			return FALSE;*/
 	//sprint(target, "I see you\n");
 
 	/*if (client == self.enemy)
 		return FALSE; */
+
+	if (target.classname == "ai_squad" || target.classname == "ai_memory" || target.classname == "ai_encounter") {
+		//sprint(self.enemy.enemy, "tried to target HSM\n");
+		return FALSE;
+	}
 
 	if (target.flags & FL_NOTARGET)
 		return FALSE;
@@ -429,8 +434,8 @@ float() FindTarget =
 		return FALSE;
 
 	if (target.team == self.team) {//-ALEX
-		sprint(target, self.classname);
-		sprint(target, "\n");
+		//sprint(target, self.classname);
+		//sprint(target, "\n");
 		squad_check_merge(target);
 		return FALSE;
 	}
@@ -802,7 +807,7 @@ local entity memory, real;
 memory = self.enemy;
 real = memory.enemy;
 
-sprint(real, "ai_run\n");
+//sprint(real, "ai_run\n");
 movedist = dist;
 
 // check knowledge of enemy
@@ -812,7 +817,7 @@ if (enemy_vis) {
 	update_memory(real);
 }
 
-sprint(real, "returned to ai_run\n");
+//sprint(real, "returned to ai_run\n");
 // see if the enemy is dead
 	if ((memory.health <= 0) || (self.spawnflags & PASSIVE_ALWAYS))
 	{
@@ -842,10 +847,10 @@ sprint(real, "returned to ai_run\n");
 	{
 		sprint(real, "new search\n");
 		if (FindTarget()) {
-			sprint(real, "ai_run aborted\n");
+			//sprint(real, "ai_run aborted\n");
 			return;
 		}
-		else sprint(real, "ai_run continued\n");
+		//else sprint(real, "ai_run continued\n");
 	}
 
 	enemy_infront = infront(memory);
@@ -871,9 +876,9 @@ sprint(real, "returned to ai_run\n");
 		ai_run_melee ();
 		return;
 	}
-	sprint(real, "check any attack.\n");
+	//sprint(real, "check any attack.\n");
 	if (CheckAnyAttack()) {
-		sprint(real, "beginning an attack.\n");
+		//sprint(real, "beginning an attack.\n"); not appearing
 		return;					// beginning an attack
 	}
 
@@ -916,7 +921,7 @@ sprint(real, "returned to ai_run\n");
   // head straight in
 	  movetogoal(dist);		// done in C code...
 
-sprint(real, "movetogoal\n");
+//sprint(real, "movetogoal\n"); not appearing
 };
 /*
 =============
