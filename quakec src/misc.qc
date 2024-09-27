@@ -1306,8 +1306,8 @@ float INFIGHT_PLAYER_ACTIVATION = 2;
 void(entity t1, entity t2) make_angry_at =
 {
 	if (t2.health > 0 && t1.health > 0) { // checks if targets are alive
-		if (t1.enemy.classname == "player")
-			t1.oldenemy = t1.enemy;
+		//if (t1.enemy.classname == "player")
+			//t1.oldenemy = t1.enemy;
 		t1.enemy = t2;
 
 		entity oself = self;

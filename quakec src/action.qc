@@ -15,7 +15,7 @@ void() squad_fight =
 
 	sq.attack_state = fight;
 	if (!sq) { 
-		//sprint(player, "squad failed.\n");
+		dprint("squad failed at ACTION\n");
 		return;
 	}
 	if (sq.squad.health > 0) {

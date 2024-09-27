@@ -176,8 +176,8 @@ void() monster_use =
 		return;
 	if (activator.movetype == MOVETYPE_NOCLIP) // Copper -- dumptruck_ds
 		return FALSE;
-		if (activator.classname != "player")
-		return;
+		//if (activator.classname != "player")
+		//return;
 
 
 // delay reaction so if the monster is teleported, its sound is still

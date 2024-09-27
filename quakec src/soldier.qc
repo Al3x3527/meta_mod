@@ -662,7 +662,7 @@ void() monster_army =
 	self.th_pain = SUB_NullPain;
 	self.th_die = army_die;
 
-	self.team = MONSTERS; //fix encounters
+	if !(self.team) self.team = MONSTERS; //fix encounters
 	walkmonster_start ();
 };
 

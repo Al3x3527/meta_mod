@@ -330,7 +330,7 @@ void() SightSound =
 		sound_sight (self, CHAN_VOICE, "boss2/sight.wav", 1, ATTN_NONE);
 };
 
-//old foundtarget behaviors
+
 void(entity target) FoundTarget =
 {
 	// let other monsters see this monster for a while
@@ -377,47 +377,56 @@ float() FindTarget =
 	local entity	target;
 	local float		r;
 
-// if the first spawnflag bit is set, the monster will only wake up on
-// really seeing the player, not another monster getting angry
+	// if the first spawnflag bit is set, the monster will only wake up on
+	// really seeing the player, not another monster getting angry
 
-// spawnflags & 3 is a big hack, because zombie crucified used the first
-// spawn flag prior to the ambush flag, and I forgot about it, so the second
-// spawn flag works as well
+	// spawnflags & 3 is a big hack, because zombie crucified used the first
+	// spawn flag prior to the ambush flag, and I forgot about it, so the second
+	// spawn flag works as well
 
-	if (sight_entity_time >= time - 0.1 && !(self.spawnflags & 3) ) //sight entity global variable used in ai.qc --Alex
-	{
-		target = sight_entity;
-		if (target.enemy == self.enemy)
-			return TRUE;
-	}
-	else
-	{
-		target = checkclient (); //PF_checkclient -- does not run through whole list each frame, only iterates once
-		//should utilize this call for all indirect ai interactions --ALEX
-		if (!target)
-			return FALSE;	// current check entity isn't in PVS
-	}
+		if (sight_entity_time >= time - 0.1 && !(self.spawnflags & 3)) //sight entity global variable used in ai.qc --Alex
+		{
+			target = sight_entity;
+			if (target.enemy == self.enemy)
+				return TRUE;
+		} else
+		{
+			target = checkclient(); //PF_checkclient -- does not run through whole list each frame, only iterates once
+			//should utilize this call for all indirect ai interactions --ALEX
+			if (!target) {
+				dprint("!target\n");
+				return FALSE;	// current check entity isn't in PVS
+			}
+		}
 
-	//if (target.classname != "player") return FALSE; //stop targeting the world
+		//if (target.classname != "player") return FALSE;
 
-	if ((self.spawnflags & PASSIVE_UNTIL_ATTACKED) || (self.spawnflags & PASSIVE_ALWAYS)) //passives don't do anything. -Alex
-		return FALSE;
+		if ((self.spawnflags & PASSIVE_UNTIL_ATTACKED) || (self.spawnflags & PASSIVE_ALWAYS)) {
+			dprint("passive\n");
+			return FALSE;
+		}
 
-	if (target.flags & FL_NOTARGET || target.movetype == MOVETYPE_NOCLIP) // from Copper -- dumptruck_ds
-		return FALSE;
+		if (target.flags & FL_NOTARGET || target.movetype == MOVETYPE_NOCLIP){ // from Copper -- dumptruck_ds
+			dprint("NOTARGET\n");
+			return FALSE;
+		}
 
-	if (target.health <= 0)
-		return FALSE;
+		if (target.health <= 0) {
+			dprint("target health <= 0\n");
+			return FALSE;
+		}
 	//if (!target.classname) return FALSE;
-	/*if (target.classname != "player")
-			return FALSE;*/
-	//sprint(target, "I see you\n");
+		if (target.classname == "player") {
+			dprint("target player\n");
+			return FALSE;
+		}
+	//dprint("checkclient found a non-player entity.\n");
 
 	/*if (client == self.enemy)
 		return FALSE; */
 
 	if (target.classname == "ai_squad" || target.classname == "ai_memory" || target.classname == "ai_encounter") {
-		//sprint(self.enemy.enemy, "tried to target HSM\n");
+		dprint("tried to target HSM\n");
 		return FALSE;
 	}
 
@@ -430,12 +439,13 @@ float() FindTarget =
 	if (r == RANGE_FAR)
 		return FALSE;
 
-	if (!visible (target))
+	if (!visible(target)) {
+		dprint("findtarget not visible\n");
 		return FALSE;
+	}
 
 	if (target.team == self.team) {//-ALEX
-		//sprint(self.enemy.enemy, self.classname);
-		//sprint(self.enemy.enemy, "\n");
+		dprint("findtarget same team\n");
 		squad_check_merge(target);
 		return FALSE;
 	}
@@ -454,9 +464,10 @@ float() FindTarget =
 	}
 	//need a check here for if client is associated with a memory in squad already
 	//preferably not by making 8 more if statements but here we go
+	//dprint("valid enemy found\n");
 	if (self.squad.enemy)
 		if (target == self.squad.enemy.enemy) {
-			//sprint(target, "squad memory success\n");
+			//dprint(self.classname "sees squad memory\n");
 			update_memory(target);
 			return FALSE;
 		}
@@ -498,7 +509,7 @@ float() FindTarget =
 	if (self.enemy.enemy)
 		if (target == self.enemy.enemy) {
 			update_memory(target);
-			sprint(target, "squad enemy fail\n");
+			dprint("squad enemy fail (FindTarget)\n");
 			return FALSE;
 		}
 
@@ -520,7 +531,7 @@ float() FindTarget =
 		}
 	}
 	*/
-	//	sprint(target, "new enemy\n");
+		dprint("new enemy\n");
 		//update_memory(target);
 		//do something more generic with target. let squad AI determine what to do.
 		FoundTarget(target);
@@ -612,15 +623,18 @@ The monster is staying in one place for a while, with slight angle turns
 */
 void() ai_stand =
 {
-	if (FindTarget ())
+	//if (self.memory_time < time) { //no effect
+	//self.memory_time = time + .1;
+	if (FindTarget())
 		return;
-
+	//}
+dprint("ai stand no target\n");
 	if (time > self.pausetime)
 	{
 		self.th_walk ();
 		return;
 	}
-
+	//dprint("self.pausetime ",ftos(self.pausetime),"\n");
 // change angle slightly
 
 };
@@ -811,7 +825,7 @@ real = memory.enemy;
 movedist = dist;
 
 // check knowledge of enemy
-enemy_vis = visible(real); //real target visibility --Alex
+enemy_vis = visible(real);// --Alex
 if (enemy_vis) {
 	if (self.memory_time < time) //fixes animations
 	update_memory(real);
@@ -833,8 +847,10 @@ if (enemy_vis) {
 				}
 			else if (self.movetarget)
 				self.th_walk ();
-			else
-				self.th_stand ();
+			else {
+				self.th_stand();
+				dprint("self.th_stand from run\n");
+			}
 			return;
 		
 	}
@@ -922,8 +938,6 @@ if (enemy_vis) {
   if !(self.spawnflags & I_AM_TURRET) // keeps monster from moving to player - dumptruck_ds
   // head straight in
 	  movetogoal(dist);		// done in C code...
-
-//sprint(real, "movetogoal\n"); not appearing
 };
 /*
 =============

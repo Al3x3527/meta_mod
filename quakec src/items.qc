@@ -2490,10 +2490,10 @@ void() DropStuff =
 {
 	local float	rand_drop;
 
-if (!self.drop_item)
+/*if (!self.drop_item)
 {
 	DropCoin();
-	}
+	} */
 	if (self.drop_item == 1)
 		{
 			DropKey1();
@@ -2504,7 +2504,7 @@ if (!self.drop_item)
 		}
 	if (self.drop_item == 3)
 		{
-			DropVial();
+			DropCoin();
 		}
 	if (self.drop_item == 4)
 		{
