@@ -394,7 +394,7 @@ float() FindTarget =
 			target = checkclient(); //PF_checkclient -- does not run through whole list each frame, only iterates once
 			//should utilize this call for all indirect ai interactions --ALEX
 			if (!target) {
-				dprint("!target\n");
+				dprint("current check entity isn't in PVS\n");
 				return FALSE;	// current check entity isn't in PVS
 			}
 		}
@@ -402,23 +402,23 @@ float() FindTarget =
 		//if (target.classname != "player") return FALSE;
 
 		if ((self.spawnflags & PASSIVE_UNTIL_ATTACKED) || (self.spawnflags & PASSIVE_ALWAYS)) {
-			dprint("passive\n");
+			//dprint("passive\n");
 			return FALSE;
 		}
 
 		if (target.flags & FL_NOTARGET || target.movetype == MOVETYPE_NOCLIP){ // from Copper -- dumptruck_ds
-			dprint("NOTARGET\n");
+			//dprint("NOTARGET\n");
 			return FALSE;
 		}
 
 		if (target.health <= 0) {
-			dprint("target health <= 0\n");
+			//dprint("target health <= 0\n");
 			return FALSE;
 		}
 	//if (!target.classname) return FALSE;
 		if (target.classname == "player") {
-			dprint("target player\n");
-			return FALSE;
+			//dprint("target player\n");
+			//return FALSE;
 		}
 	//dprint("checkclient found a non-player entity.\n");
 
@@ -426,7 +426,7 @@ float() FindTarget =
 		return FALSE; */
 
 	if (target.classname == "ai_squad" || target.classname == "ai_memory" || target.classname == "ai_encounter") {
-		dprint("tried to target HSM\n");
+		//dprint("tried to target HSM\n");
 		return FALSE;
 	}
 
@@ -440,12 +440,12 @@ float() FindTarget =
 		return FALSE;
 
 	if (!visible(target)) {
-		dprint("findtarget not visible\n");
+		//dprint("findtarget not visible\n");
 		return FALSE;
 	}
 
 	if (target.team == self.team) {//-ALEX
-		dprint("findtarget same team\n");
+		//dprint("findtarget same team\n");
 		squad_check_merge(target);
 		return FALSE;
 	}
@@ -628,7 +628,7 @@ void() ai_stand =
 	if (FindTarget())
 		return;
 	//}
-dprint("ai stand no target\n");
+//dprint("ai stand no target\n");
 	if (time > self.pausetime)
 	{
 		self.th_walk ();

@@ -176,8 +176,8 @@ void() monster_use =
 		return;
 	if (activator.movetype == MOVETYPE_NOCLIP) // Copper -- dumptruck_ds
 		return FALSE;
-		//if (activator.classname != "player")
-		//return;
+		if (activator.classname != "player")
+		return;
 
 
 // delay reaction so if the monster is teleported, its sound is still
@@ -212,9 +212,9 @@ void() monster_death_use =
 	{
 		activator = self.infight_activator;
 	} 
-	else
+	else if (self.enemy.enemy) //else if ALEX
 	{
-		activator = self.enemy;
+		activator = self.enemy.enemy;
 	}
 	SUB_UseTargets ();
 };
@@ -268,6 +268,11 @@ if(!(self.spawnflags & 8))
 		self.yaw_speed = 20;
 	self.view_ofs = '0 0 25';
 	self.use = monster_use;
+	//squad up --Alex
+
+	if (!(self.squad)) {
+		start_squad();
+	}
 
 	self.flags = self.flags | FL_MONSTER;
 
@@ -328,11 +333,7 @@ void() walkmonster_start =
 		remove(self);
 		return;
 	}
-//squad up --Alex
 
-if (!(self.squad)) {
-	start_squad();
-}
 
 
 	if(monster_teleport(walkmonster_start_go))

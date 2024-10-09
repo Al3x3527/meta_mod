@@ -7,8 +7,7 @@ AI behavior tree
 //squad actions called every ai think
 void() squad_fight =
 {
-	local entity player, sq, oself;
-	player = self.squad.enemy.enemy;
+	local entity sq, oself;
 	if (!self.squad) return;
 	sq = self.squad;
 	oself = self;
@@ -19,55 +18,48 @@ void() squad_fight =
 		return;
 	}
 	if (sq.squad.health > 0) {
-		//sprint(player, "leader found.\n");
 		self = sq.squad;
 		create_waypoint();
 		self.waypoint.origin = self.enemy.origin; //squad leader
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
 	if (sq.squad1.health > 0) {
-	//	sprint(player, "squad1\n");
 		self = sq.squad1;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(48, self.enemy);
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
 	if (sq.squad2.health > 0) {
-	//	sprint(player, "squad2\n");
 		self = sq.squad2;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(-48, self.enemy);
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
 	if (sq.squad3.health > 0) {
-	//	sprint(player, "squad3\n");
 		self = sq.squad3;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(48, self.enemy);
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
 	if (sq.squad4.health > 0) {
-	//	sprint(player, "squad4\n");
 		self = sq.squad4;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(-48, self.enemy);
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
 	else self = oself;
-	/*
-	else if (self.squad.squad1 == self)
-		self.waypoint.origin = waypoint_offset(48, self.enemy);
-	else if (self.squad.squad2 == self)
-		self.waypoint.origin = waypoint_offset(-48, self.enemy);
-	else if (self.squad.squad3 == self)
-		self.waypoint.origin = waypoint_offset(48, self.enemy);
-	else if (self.squad.squad4 == self)
-		self.waypoint.origin = waypoint_offset(-48, self.enemy);
-	else {
-		sprint(self.enemy.enemy, "squad_fight failed.\n");
-		new_waypoint.origin = self.enemy.origin - '0 0 12'; //force it to work.
-	}
-	*/
+};
+
+void() squad_spawn =
+{
+	if (self.squad.health > 0) {
+		self = self.squad;
+		if (!self.enemy) self.ideal_yaw = self.angles_y + 70 * random();
+		ChangeYaw();
+		create_waypoint();
+		self.waypoint.origin = waypoint_cast(48);
+		self.think = self.th_run;
+}
 };
 
 //something has changed, decide what to do next

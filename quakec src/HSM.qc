@@ -467,7 +467,7 @@ void(entity new_target) update_memory =
 		//sprint(self.enemy.enemy, "memory update failed\n");
 	//	return;
 //}
-	dprint("update memory\n");
+	//dprint("update memory\n");
  if (self.enemy.enemy != new_target) {
 	entity new_memory = spawn();
 	new_memory.classname = "ai_memory";
@@ -538,6 +538,16 @@ vec = target.origin - d + b;
 return vec;
 };
 
+vector (float dist) waypoint_cast =
+{
+	local vector vec;
+local float d;
+d = dist + 48 * random();
+makevectors(self.v_angle);
+vec = (self.origin + v_forward * d);
+return vec;
+}
+
 
 /*Waypoint Point Entity (.5 .5 .5) (-8 -8 -8) (8 8 8) X X X X X X X X NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER X NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
 Waypoint class for squad tactics
@@ -561,6 +571,21 @@ new_squad.solid = SOLID_NOT;
 new_squad.movetype = MOVETYPE_NONE;
 }
 
+void(entity mobot) mobot_squad = 
+{
+	entity new_squad = spawn();
+new_squad.classname = "ai_squad";
+new_squad.squad_state_full = FALSE;
+mobot.squad = new_squad;
+new_squad.squad = mobot; //unexpected behavior.
+
+new_squad.solid = SOLID_NOT;
+new_squad.movetype = MOVETYPE_NONE;
+
+new_squad.nextthink = time + 0.4;
+new_squad.think = squad_spawn;
+}
+
 
 void (entity request) squad_fit =
 {
@@ -580,7 +605,7 @@ void (entity request) squad_fit =
 //squad check merge. self = seer, request = seen, team checked
 void(entity request) squad_check_merge =
 {
-	dprint("squad check merge\n");
+	//dprint("squad check merge\n");
 	local float self_count, other_count;
 local entity os;
 if (request.squad.squad_state_full) return;
