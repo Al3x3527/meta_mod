@@ -496,23 +496,25 @@ float	AS_TURRET		= 5;
 .float		frustration;
 .float		danger;
 
-.entity 	enemy1;
-.entity 	enemy2;
-.entity 	enemy3;
-.entity 	enemy4;
-.entity 	enemy5;
-.entity 	enemy6;
-.entity 	enemy7;
-.entity 	enemy8;
+.entity		memory;
+.entity 	memory1;
+.entity 	memory2;
+.entity 	memory3;
+.entity 	memory4;
+.entity 	memory5;
+.entity 	memory6;
+.entity 	memory7;
+.entity 	memory8;
 .entity		squad;
  //ALEX
-.entity		squad1;
-.entity		squad2;
-.entity		squad3;
-.entity		squad4;
-.entity		squad5;
-.entity		squad6;
-.entity		squad7;
+.entity		ally;
+.entity		ally1;
+.entity		ally2;
+.entity		ally3;
+.entity		ally4;
+.entity		ally5;
+.entity		ally6;
+.entity		ally7;
 .entity		waypoint;
 .entity		encounter;
 .float		memory_time;
@@ -524,12 +526,13 @@ float	flee = 9;
 float	uncover = 10;
 float	guard = 11;
 float	search = 12;
-float	pause = 13; //wait taken
+float	ss_wait = 13; //wait taken
 float	vehicle = 14;
 float	charge = 15;
 float	obey = 16;
 float	converse = 17;
 float	avoid = 18;
+float	ss_spawn = 19;
 
 float	PLAYERS = 1;
 float	MONSTERS = 2;

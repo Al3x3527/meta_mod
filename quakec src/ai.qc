@@ -415,7 +415,7 @@ float() FindTarget =
 			//dprint("target health <= 0\n");
 			return FALSE;
 		}
-	//if (!target.classname) return FALSE;
+	if (!target.classname) return FALSE;
 		if (target.classname == "player") {
 			//dprint("target player\n");
 			//return FALSE;
@@ -465,44 +465,44 @@ float() FindTarget =
 	//need a check here for if client is associated with a memory in squad already
 	//preferably not by making 8 more if statements but here we go
 	//dprint("valid enemy found\n");
-	if (self.squad.enemy)
-		if (target == self.squad.enemy.enemy) {
+	//if (self.squad.memory)
+		if (target == self.squad.memory.enemy) {
 			//dprint(self.classname "sees squad memory\n");
 			update_memory(target);
 			return FALSE;
 		}
-	if (self.squad.enemy1)
-		if (target == self.squad.enemy1.enemy) {
+	//if (self.squad.memory1)
+		if (target == self.squad.memory1.enemy) {
 			update_memory(target);
 			return FALSE;
 		}
-	if (self.squad.enemy2)
-		if (target == self.squad.enemy2.enemy) {
+	//if (self.squad.memory2)
+		if (target == self.squad.memory2.enemy) {
 			update_memory(target);
 			return FALSE;
 		}
-	if (self.squad.enemy3)
-		if (target == self.squad.enemy3.enemy) {
+	//if (self.squad.memory3)
+		if (target == self.squad.memory3.enemy) {
 			update_memory(target);
 			return FALSE;
 		}
-	if (self.squad.enemy4)
-		if (target == self.squad.enemy4.enemy) {
+	//if (self.squad.memory4)
+		if (target == self.squad.memory4.enemy) {
 			update_memory(target);
 			return FALSE;
 		}
-	if (self.squad.enemy5)
-		if (target == self.squad.enemy5.enemy) {
+	//if (self.squad.memory5)
+		if (target == self.squad.memory5.enemy) {
 			update_memory(target);
 			return FALSE;
 		}
-	if (self.squad.enemy6)
-		if (target == self.squad.enemy6.enemy) {
+	//if (self.squad.memory6)
+		if (target == self.squad.memory6.enemy) {
 			update_memory(target);
 			return FALSE;
 		}
-	if (self.squad.enemy7)
-		if (target == self.squad.enemy7.enemy) {
+	//if (self.squad.memory7)
+		if (target == self.squad.memory7.enemy) {
 			update_memory(target);
 			return FALSE;
 		}
@@ -510,6 +510,15 @@ float() FindTarget =
 		if (target == self.enemy.enemy) {
 			update_memory(target);
 			dprint("squad enemy fail (FindTarget)\n");
+			dprint("target ");
+			dprint(target.classname);
+			dprint("\n");
+			dprint("enemy ");
+			dprint(self.enemy.classname);
+			dprint("\n");
+			dprint("enemy.enemy ");
+			dprint(self.enemy.enemy.classname);
+			dprint("\n");
 			return FALSE;
 		}
 
@@ -817,11 +826,11 @@ The monster has an enemy it is trying to kill
 void(float dist) ai_run =
 {
 //update memory of
-local entity memory, real;
-memory = self.enemy;
-real = memory.enemy;
+local entity fake, real;
+fake = self.enemy;
+real = fake.enemy;
 
-//sprint(real, "ai_run\n");
+dprint("ai_run\n");
 movedist = dist;
 
 // check knowledge of enemy
@@ -829,13 +838,13 @@ enemy_vis = visible(real);// --Alex
 if (enemy_vis) {
 	if (self.memory_time < time) //fixes animations
 	update_memory(real);
-	self.memory_time = time + .5;
+	self.memory_time = time + .5 + .2 * random();
 	self.search_time = time + 4.9; //originally 5
 }
 
 //sprint(real, "returned to ai_run\n");
 // see if the enemy is dead
-	if ((memory.health <= 0) || (self.spawnflags & PASSIVE_ALWAYS))
+	if ((fake.health <= 0) || (self.spawnflags & PASSIVE_ALWAYS))
 	{
 		self.enemy = world;
 		//return;
@@ -852,13 +861,8 @@ if (enemy_vis) {
 				dprint("self.th_stand from run\n");
 			}
 			return;
-		
 	}
-
 	self.show_hostile = time + 1;		// wake up other monsters
-
-
-
 // look for other coop players
 	//we can also look for coop ai now. always call FindTarger --ALEX
 	if (/*coop && */self.search_time < time) //updated before update memory
@@ -870,16 +874,20 @@ if (enemy_vis) {
 		}
 		//else sprint(real, "ai_run continued\n");
 	}
-
-	enemy_infront = infront(memory);
-	enemy_range = range(memory);
-	enemy_yaw = vectoyaw(memory.origin - self.origin);
-
+	if (enemy_vis) {
+		enemy_infront = infront(real);
+		enemy_range = range(real);
+		enemy_yaw = vectoyaw(real.origin - self.origin);
+	}
+	else {
+		enemy_infront = infront(fake);
+		enemy_range = range(fake);
+		enemy_yaw = vectoyaw(fake.origin - self.origin);
+	}
 	if (self.spawnflags & I_AM_TURRET)
 		{
 			ai_face ();
 		}
-
 	// if ((self.attack_state == AS_MISSILE) || !(self.spawnflags & I_AM_TURRET))
 	if (self.attack_state == AS_MISSILE)
 	{

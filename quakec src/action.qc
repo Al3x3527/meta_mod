@@ -4,62 +4,104 @@ AI behavior tree
 --Alex
 */
 
-//squad actions called every ai think
+
 void() squad_fight =
 {
-	local entity sq, oself;
-	if (!self.squad) return;
-	sq = self.squad;
-	oself = self;
-
+	local entity sq;
+	sq = self;
+	
 	sq.attack_state = fight;
+	dprint("squad fight\n");
 	if (!sq) { 
 		dprint("squad failed at ACTION\n");
 		return;
 	}
-	if (sq.squad.health > 0) {
-		self = sq.squad;
+	if (sq.ally.health > 0) {
+		self = sq.ally;
 		create_waypoint();
 		self.waypoint.origin = self.enemy.origin; //squad leader
-		if (self.think != self.th_run) self.think = self.th_run;
+		if (self.think != self.th_run) {
+			self.think = self.th_run; dprint("th_run set\n");
+		}
 	}
-	if (sq.squad1.health > 0) {
-		self = sq.squad1;
+	if (sq.ally1.health > 0) {
+		self = sq.ally1;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(48, self.enemy);
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
-	if (sq.squad2.health > 0) {
-		self = sq.squad2;
+	if (sq.ally2.health > 0) {
+		self = sq.ally2;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(-48, self.enemy);
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
-	if (sq.squad3.health > 0) {
-		self = sq.squad3;
+	if (sq.ally3.health > 0) {
+		self = sq.ally3;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(48, self.enemy);
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
-	if (sq.squad4.health > 0) {
-		self = sq.squad4;
+	if (sq.ally4.health > 0) {
+		self = sq.ally4;
 		create_waypoint();
 		self.waypoint.origin = waypoint_offset(-48, self.enemy);
 		if (self.think != self.th_run) self.think = self.th_run;
 	}
-	else self = oself;
+	self = sq;
 };
 
 void() squad_spawn =
 {
-	if (self.squad.health > 0) {
-		self = self.squad;
+	local entity sq = self;
+	if (self.ally.health > 0) {
+		self.attack_state = 0;
+		self = self.ally;
 		if (!self.enemy) self.ideal_yaw = self.angles_y + 70 * random();
 		ChangeYaw();
 		create_waypoint();
 		self.waypoint.origin = waypoint_cast(48);
 		self.think = self.th_run;
 }
+	self = sq;
+};
+
+void() squad_wait =
+{
+	local entity sq = self;
+
+	sq.attack_state = ss_wait;
+	dprint("squad wait\n");
+
+	if (sq.ally.health > 0) {
+		self = sq.ally;
+		if (self.think != self.th_stand) self.think = self.th_stand;
+	}
+	if (sq.ally1.health > 0) {
+		self = sq.ally1;
+		if (self.think != self.th_stand) self.think = self.th_stand;
+	}
+	if (sq.ally2.health > 0) {
+		self = sq.ally2;
+		if (self.think != self.th_stand) self.think = self.th_stand;
+	}
+	if (sq.ally3.health > 0) {
+		self = sq.ally3;
+		if (self.think != self.th_stand) self.think = self.th_stand;
+	}
+	if (sq.ally4.health > 0) {
+		self = sq.ally4;
+		if (self.think != self.th_stand) self.think = self.th_stand;
+	}
+	self = sq;
+	if (self.encounter) dprint("waiting in encounter\n");
+}
+
+void() squad_action =
+{
+	if (self.attack_state == ss_spawn) {squad_spawn();}
+else if (self.ally.enemy) {squad_fight();} //should just move waypoint around most of the time.
+else squad_wait();
 };
 
 //something has changed, decide what to do next
