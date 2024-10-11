@@ -46,7 +46,7 @@ if (!tother || tother == world) {
 float() prioritize_targets =
 {
 	local entity sq = self;
-dprint("prioritize targets\n");
+//dprint("prioritize targets\n");
 if (sq.memory) {
 	if (sq.memory.health > 0) { 
 	//	dprint("memory assign danger\n");
@@ -263,11 +263,12 @@ n_encounter.classname = "ai_encounter";
 n_encounter.origin = self.origin;
 self.encounter = n_encounter;
 n_encounter.squad = self;
-setmodel(n_encounter, "progs/backpack.mdl");
-setsize(n_encounter, '-16 -16 0', '16 16 56');
+//setmodel(n_encounter, "progs/backpack.mdl");
+//setsize(n_encounter, '-16 -16 0', '16 16 56');
 n_encounter.solid = SOLID_NOT;
+n_encounter.health = 1;
 //encounter_update(); new encounter just react.
-dprint("new encounter\n");
+//dprint("new encounter\n");
 n_encounter.think = encounter_update;
 n_encounter.nextthink = time + 0.4;
 };
@@ -280,15 +281,17 @@ float() check_encounter =
 			return TRUE;
 //encounter must reference something real
 //entity null = spawn();
+	self.health = 0;
 self = enc.squad;
 remove(enc);
 //self.encounter = null;
 //remove(null); //really gone
-dprint("encounter end\n");
+//dprint("encounter end\n");
 //if (enc) dprint("remove encounter failed?\n");
 //if (enc.squad) dprint("remove encounter failed\n");
-if (self.encounter) dprint("check will fail\n");
+//if (self.encounter) dprint("check will fail\n");
 //if (self.encounter.classname == "ai_encounter") dprint("idk\n");
+//if (self.encounter.health = 0) dprint("encounter no health test\n");
 return FALSE;
 }
 
@@ -296,8 +299,9 @@ void () encounter_update =
 {//self = encounter
 if (self.enemy.classname == "ai_squad") remove(self.enemy); //worldspawn fist pass.
 //self now encounter.
-SortEnemies();
+
 if (check_encounter() == FALSE) return; 
+SortEnemies();
 entity	other_qside = spawn();
 //entity self_qside = spawn();
 local entity sq;
@@ -425,10 +429,16 @@ if (sq.memory8.health > 0) dprint("failed to sort out memory8\n");
 
 void() squad_update =
 {
-	local entity oself = self;
+	//local entity oself = self;
+float f = 0;
+if (self.ally) f = f + self.ally.health;
+if (self.ally1) f = f + self.ally1.health;
+if (self.ally2) f = f + self.ally2.health;
+if (self.ally3) f = f + self.ally3.health;
+if (self.ally4) f = f + self.ally4.health;
 //squad entity
-if (self.ally.health + self.ally1.health + self.ally2.health + self.ally3.health + self.ally4.health <= 0) {
-	dprint("squad expired\n");
+if (f <= 0) {
+	//dprint("squad expired\n");
 	if (self.memory) remove(self.memory);
 	if (self.memory1) remove(self.memory1);
 	if (self.memory2) remove(self.memory2);
@@ -439,8 +449,8 @@ if (self.ally.health + self.ally1.health + self.ally2.health + self.ally3.health
 	if (self.memory7) remove(self.memory7);
 	if (self.memory8) remove(self.memory8);
 	remove(self);
-	if (oself) 
-		if (oself.classname == "ai_squad") dprint("remove squad failed\n");
+	//if (oself) 
+	//	if (oself.classname == "ai_squad") dprint("remove squad failed\n");
 	return;
 }
 //dprint("squad update\n");
@@ -472,19 +482,19 @@ if (prioritize_targets() == FALSE) {
 	//dprint("sight update bad squad\n");
 	//return;
 //}
-if (self.encounter) {
-	dprint("sight update complete\n");
+if (self.encounter.health > 0) {
+//	dprint("sight update complete\n");
 	self = oself;
 	return;
 }
-dprint("sight update no encounter\n");
+//dprint("sight update no encounter\n");
 start_encounter();
 if (self.ally) self.ally.enemy = nm;
 if (self.ally1) self.ally1.enemy = nm;
 if (self.ally2) self.ally2.enemy = nm;
 if (self.ally3) self.ally3.enemy = nm;
 if (self.ally4) self.ally4.enemy = nm;
-dprint("initial response\n");
+//dprint("initial response\n");
 squad_action();
 self = oself;
 };
@@ -514,15 +524,15 @@ if (sq.memory.enemy == nt) {
 	else if (sq.memory7.enemy == nt) nm = sq.memory7;
 	else if (sq.memory8.enemy == nt) {
 		nm = sq.memory8;
-		dprint("target was memory8\n");
+	//	dprint("target was memory8\n");
 	}
 	else {
-		dprint("new memory\n");
+	//	dprint("new memory\n");
 		entity new_memory = spawn();
 		new_memory.classname = "ai_memory";
 		new_memory.think = memorythink;
-		setmodel(new_memory, "progs/armor.mdl"); //debug
-		setsize(new_memory, '-16 -16 0', '16 16 56');
+	//	setmodel(new_memory, "progs/armor.mdl"); //debug
+	//	setsize(new_memory, '-16 -16 0', '16 16 56');
 		new_memory.solid = SOLID_TRIGGER;//SOLID_NOT;
 		new_memory.movetype = MOVETYPE_NONE;
 		new_memory.target = nt.classname;
@@ -544,7 +554,7 @@ if (nm.health <= 0) { //reducing causes for bad sort
 	return;
 }
 nm.nextthink = time + 4.61; //when memory should expire
-dprint("memory updated\n");
+//dprint("memory updated\n");
 sight_update(nm);
 //else dprint("memory update failed\n");
 };
@@ -569,8 +579,8 @@ void() create_waypoint =
 {
 	entity new_waypoint = spawn();
 	new_waypoint.classname = "ai_waypoint";
-	setmodel(new_waypoint, "progs/backpack.mdl");
-	setsize(new_waypoint, '-16 -16 0', '16 16 56');
+//	setmodel(new_waypoint, "progs/backpack.mdl");
+//	setsize(new_waypoint, '-16 -16 0', '16 16 56');
 	new_waypoint.solid = SOLID_TRIGGER;
 	new_waypoint.think = waypointthink;
 
@@ -628,8 +638,8 @@ new_squad.ally = self;
 
 new_squad.solid = SOLID_NOT;
 new_squad.movetype = MOVETYPE_NONE;
-setmodel(new_squad, "progs/armor.mdl");
-setsize(new_squad, '-16 -16 0', '16 16 56');
+//setmodel(new_squad, "progs/armor.mdl");
+//setsize(new_squad, '-16 -16 0', '16 16 56');
 new_squad.nextthink = time + 0.4;
 }
 
@@ -661,7 +671,7 @@ void (entity request) squad_fit =
 	else {
 		dprint("squad fit failed\n"); 
 	}
-	dprint("squad merged\n");
+//	dprint("squad merged\n");
 };
 
 

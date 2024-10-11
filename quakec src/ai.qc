@@ -545,7 +545,7 @@ float() FindTarget =
 		}
 	}
 	*/
-		dprint("new enemy\n");
+		//dprint("new enemy\n");
 		//update_memory(target);
 		//do something more generic with target. let squad AI determine what to do.
 		FoundTarget(target);
@@ -835,7 +835,7 @@ local entity fake, real;
 fake = self.enemy;
 real = fake.enemy;
 
-dprint("ai_run\n");
+//dprint("ai_run\n");
 movedist = dist;
 
 // check knowledge of enemy
@@ -863,7 +863,7 @@ if (enemy_vis) {
 				self.th_walk ();
 			else {
 				self.th_stand();
-				dprint("self.th_stand from run\n");
+				//dprint("self.th_stand from run\n");
 			}
 			return;
 	}
