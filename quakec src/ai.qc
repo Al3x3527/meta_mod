@@ -874,16 +874,16 @@ if (enemy_vis) {
 		}
 		//else sprint(real, "ai_run continued\n");
 	}
-	if (enemy_vis) {
-		enemy_infront = infront(real);
-		enemy_range = range(real);
-		enemy_yaw = vectoyaw(real.origin - self.origin);
-	}
-	else {
+	//if (enemy_vis) {
+	//	enemy_infront = infront(real);
+	//	enemy_range = range(real);
+	//	enemy_yaw = vectoyaw(real.origin - self.origin);
+	//}
+	//else {
 		enemy_infront = infront(fake);
 		enemy_range = range(fake);
 		enemy_yaw = vectoyaw(fake.origin - self.origin);
-	}
+	//}
 	if (self.spawnflags & I_AM_TURRET)
 		{
 			ai_face ();

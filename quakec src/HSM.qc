@@ -165,28 +165,28 @@ if (ts.ally.health > 0) {
 }
 if (ts.ally1.health > 0) {
 	tlen = vlen(ts.ally1.origin - en.origin);
-	if (tlen < len) { //length tvec < vec
-		len = tlen;
-		closest = ts.ally1;
-	}
+		if (!(len) || (tlen < len)) { //length tvec < vec
+			len = tlen;
+			closest = ts.ally1;
+		}
 }
 if (ts.ally2.health > 0) {
 	tlen = vlen(ts.ally2.origin - en.origin);
-	if (tlen < len) {
+	if (!(len) || (tlen < len)) {
 		len = tlen;
 		closest = ts.ally2;
 	}
 }
 if (ts.ally3.health > 0) {
 	tlen = vlen(ts.ally3.origin - en.origin);
-	if (tlen < len) {
+	if (!(len) || (tlen < len)) {
 		len = tlen;
 		closest = ts.ally3;
 	}
 }
 if (ts.ally4.health > 0) {
 	tlen = vlen(ts.ally4.origin - en.origin);
-	if (tlen < len) {
+	if (!(len) || (tlen < len)) {
 		len = tlen;
 		closest = ts.ally4;
 	}
@@ -209,6 +209,12 @@ else if (ts.ally3 == member) ts.ally3 = null;
 else if (ts.ally4 == member) ts.ally4 = null;
 else dprint("RemoveFromSquad Failed\n");
 remove(null);
+/*if (ts.ally == member) dprint("RemoveFromSquad Failed\n");
+else if (ts.ally1 == member) dprint("RemoveFromSquad Failed\n");
+else if (ts.ally2 == member) dprint("RemoveFromSquad Failed\n");
+else if (ts.ally3 == member) dprint("RemoveFromSquad Failed\n");
+else if (ts.ally4 == member) dprint("RemoveFromSquad Failed\n");
+else dprint("RemoveFromSquad Works\n");*/
 };
 
 void() AssignTargets = 
@@ -284,13 +290,18 @@ n_encounter.nextthink = time + 0.4;
 
 float() check_encounter =
 {//self = encounter
-	if (self.squad.memory)
-		if (self.squad.memory.health > 0)
+	local entity enc = self;
+	if (enc.squad.memory)
+		if (enc.squad.memory.health > 0)
 			return TRUE;
 //encounter must reference something real
-self = self.squad;
-remove(self.encounter);
+entity null = spawn();
+self = enc.squad;
+remove(enc);
+self.encounter = null;
+remove(null); //really gone
 dprint("encounter end\n");
+if (enc) dprint("remove encounter failed\n");
 return FALSE;
 }
 
@@ -325,7 +336,7 @@ self.nextthink = time + 0.4;
 void(entity ts, entity member) RemoveMemory =
 {
 	entity null = spawn();
-if (ts.memory == member) ts.memory = null;
+/*if (ts.memory == member) ts.memory = null;
 else if (ts.memory1 == member) ts.memory1 = null;
 else if (ts.memory2 == member) ts.memory2 = null;
 else if (ts.memory3 == member) ts.memory3 = null;
@@ -334,16 +345,35 @@ else if (ts.memory5 == member) ts.memory5 = null;
 else if (ts.memory6 == member) ts.memory6 = null;
 else if (ts.memory7 == member) ts.memory7 = null;
 else if (ts.memory8 == member) ts.memory8 = null;
-else dprint("RemoveEnemy Failed\n");
+else dprint("RemoveMemory Failed\n");*/
+if (ts.memory == member) ts.memory = null;
+if (ts.memory1 == member) ts.memory1 = null;
+if (ts.memory2 == member) ts.memory2 = null;
+if (ts.memory3 == member) ts.memory3 = null;
+if (ts.memory4 == member) ts.memory4 = null;
+if (ts.memory5 == member) ts.memory5 = null;
+if (ts.memory6 == member) ts.memory6 = null;
+if (ts.memory7 == member) ts.memory7 = null;
+if (ts.memory8 == member) ts.memory8 = null;
 remove(null);
+/*if (ts.memory == member) dprint("RemoveMemory Failed\n");
+else if (ts.memory1 == member) dprint("RemoveMemory Failed\n");
+else if (ts.memory2 == member) dprint("RemoveMemory Failed\n");
+else if (ts.memory3 == member) dprint("RemoveMemory Failed\n");
+else if (ts.memory4 == member) dprint("RemoveMemory Failed\n");
+else if (ts.memory5 == member) dprint("RemoveMemory Failed\n");
+else if (ts.memory6 == member) dprint("RemoveMemory Failed\n");
+else if (ts.memory7 == member) dprint("RemoveMemory Failed\n");
+else if (ts.memory8 == member) dprint("RemoveMemory Failed\n");*/
 };
 
 entity (entity  ts) FindStrongest =
 {
-	local entity str; //strongest
+	entity null = spawn();
+	null.danger = 0;
+	local entity str = null; //strongest
 
 	if (ts.memory.health > 0) { str = ts.memory;}
-	
 	if (ts.memory1.danger > str.danger) { str = ts.memory1;}
 	if (ts.memory2.danger > str.danger) { str = ts.memory2;}
 	if (ts.memory3.danger > str.danger) { str = ts.memory3;}
@@ -354,8 +384,12 @@ entity (entity  ts) FindStrongest =
 	if (ts.memory8.danger > str.danger) {
 		str = ts.memory8;
 	}
-
-//if (str.health <= 0)dprint("strongest return nothing\n");
+	remove(null);
+	if (str.health <= 0) {
+		//dprint("strongest return nothing\n"); 
+		return;
+	}
+//else dprint("strongest found\n");
 return(str);
 }
 
@@ -445,6 +479,7 @@ if (sq.memory.health <= 0) dprint("sort failed\n");
 
 void() squad_update =
 {
+	local entity oself = self;
 //squad entity
 if !(self.ally.health + self.ally1.health + self.ally2.health + self.ally3.health + self.ally4.health > 0) {
 	dprint("squad expired\n");
@@ -458,6 +493,7 @@ if !(self.ally.health + self.ally1.health + self.ally2.health + self.ally3.healt
 	if (self.memory7) remove(self.memory7);
 	if (self.memory8) remove(self.memory8);
 	remove(self);
+	if (oself) dprint("remove squad failed\n");
 	return;
 }
 //dprint("squad update\n");
