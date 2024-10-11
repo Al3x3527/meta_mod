@@ -249,9 +249,9 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 	oldself = self;
 	self = targ;
 
-	/*
-	if ( (self.flags & FL_MONSTER) && attacker != world)
-	{
+	
+	if ((self.flags & FL_MONSTER) && attacker != world)
+	{/*
 	// get mad unless of the same class (except for soldiers)
 		if (self != attacker && attacker != self.enemy)
 		{
@@ -294,19 +294,20 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 	}
 	*/
 
-	if (self.th_pain)
-	{
-		self.th_pain (world, take); //was attacker
-	// nightmare mode monsters don't go into pain frames often
-		if (skill == 3)
-			self.pain_finished = time + 5;
-	}
-	if (self.enemy.enemy != attacker) {
-		if (attacker.team && attacker.team != self.team)
-			FoundTarget(attacker);
-	}
+		if (self.th_pain)
+		{
+			self.th_pain(world, take); //was attacker
+		// nightmare mode monsters don't go into pain frames often
+			if (skill == 3)
+				self.pain_finished = time + 5;
+		}
+		if (self.enemy.enemy != attacker) {
+			if (attacker.team && attacker.team != self.team)
+				FoundTarget(attacker);
+		}
 
-	self = oldself;
+		self = oldself;
+	}
 };
 
 /*

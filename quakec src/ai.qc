@@ -506,6 +506,11 @@ float() FindTarget =
 			update_memory(target);
 			return FALSE;
 		}
+		if (target == self.squad.memory8.enemy) {
+			dprint("target was memory8\n");
+			update_memory(target);
+			return FALSE;
+		}
 	if (self.enemy.enemy)
 		if (target == self.enemy.enemy) {
 			update_memory(target);
@@ -838,7 +843,7 @@ enemy_vis = visible(real);// --Alex
 if (enemy_vis) {
 	if (self.memory_time < time) //fixes animations
 	update_memory(real);
-	self.memory_time = time + .5 + .2 * random();
+	self.memory_time = time + .5;// +.2 * random();
 	self.search_time = time + 4.9; //originally 5
 }
 
@@ -875,14 +880,14 @@ if (enemy_vis) {
 		//else sprint(real, "ai_run continued\n");
 	}
 	//if (enemy_vis) {
-	//	enemy_infront = infront(real);
-	//	enemy_range = range(real);
-	//	enemy_yaw = vectoyaw(real.origin - self.origin);
+		enemy_infront = infront(real);
+		enemy_range = range(real);
+		enemy_yaw = vectoyaw(real.origin - self.origin);
 	//}
 	//else {
-		enemy_infront = infront(fake);
-		enemy_range = range(fake);
-		enemy_yaw = vectoyaw(fake.origin - self.origin);
+	//	enemy_infront = infront(fake);
+	//	enemy_range = range(fake);
+	//	enemy_yaw = vectoyaw(fake.origin - self.origin);
 	//}
 	if (self.spawnflags & I_AM_TURRET)
 		{
@@ -946,6 +951,7 @@ if (enemy_vis) {
   if !(self.spawnflags & I_AM_TURRET) // keeps monster from moving to player - dumptruck_ds
   // head straight in
 	  movetogoal(dist);		// done in C code...
+  if !(self.waypoint) dprint("no self.waypoint ai_run\n");
 };
 /*
 =============

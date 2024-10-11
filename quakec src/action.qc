@@ -16,37 +16,47 @@ void() squad_fight =
 		dprint("squad failed at ACTION\n");
 		return;
 	}
-	if (sq.ally.health > 0) {
-		self = sq.ally;
-		create_waypoint();
-		self.waypoint.origin = self.enemy.origin; //squad leader
-		if (self.think != self.th_run) {
-			self.think = self.th_run; dprint("th_run set\n");
+	if (sq.ally) { //was not the problem
+		if (sq.ally.health > 0) {
+			self = sq.ally;
+			create_waypoint();
+			self.waypoint.origin = self.enemy.origin; //squad leader
+			if (self.think == self.th_stand) {
+				self.think = self.th_run; dprint("th_run set\n");
+			}
 		}
 	}
-	if (sq.ally1.health > 0) {
-		self = sq.ally1;
-		create_waypoint();
-		self.waypoint.origin = waypoint_offset(48, self.enemy);
-		if (self.think != self.th_run) self.think = self.th_run;
+	if (sq.ally1) {
+		if (sq.ally1.health > 0) {
+			self = sq.ally1;
+			create_waypoint();
+			self.waypoint.origin = waypoint_offset(48, self.enemy);
+			if (self.think == self.th_stand) self.think = self.th_run;
+		}
 	}
-	if (sq.ally2.health > 0) {
-		self = sq.ally2;
-		create_waypoint();
-		self.waypoint.origin = waypoint_offset(-48, self.enemy);
-		if (self.think != self.th_run) self.think = self.th_run;
+	if (sq.ally2) {
+		if (sq.ally2.health > 0) {
+			self = sq.ally2;
+			create_waypoint();
+			self.waypoint.origin = waypoint_offset(-48, self.enemy);
+			if (self.think == self.th_stand) self.think = self.th_run;
+		}
 	}
-	if (sq.ally3.health > 0) {
-		self = sq.ally3;
-		create_waypoint();
-		self.waypoint.origin = waypoint_offset(48, self.enemy);
-		if (self.think != self.th_run) self.think = self.th_run;
+	if (sq.ally3) {
+		if (sq.ally3.health > 0) {
+			self = sq.ally3;
+			create_waypoint();
+			self.waypoint.origin = waypoint_offset(48, self.enemy);
+			if (self.think == self.th_stand) self.think = self.th_run;
+		}
 	}
-	if (sq.ally4.health > 0) {
-		self = sq.ally4;
-		create_waypoint();
-		self.waypoint.origin = waypoint_offset(-48, self.enemy);
-		if (self.think != self.th_run) self.think = self.th_run;
+	if (sq.ally4) {
+		if (sq.ally4.health > 0) {
+			self = sq.ally4;
+			create_waypoint();
+			self.waypoint.origin = waypoint_offset(-48, self.enemy);
+			if (self.think == self.th_stand) self.think = self.th_run;
+		}
 	}
 	self = sq;
 };
