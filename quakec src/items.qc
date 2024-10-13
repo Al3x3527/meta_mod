@@ -1058,12 +1058,9 @@ local entity otemp;
 local entity	item;
 item = spawn();
 item.origin = self.origin - '0 0 24';
-//if (self.classname == "monster_enforcer") {
-	//sprint (other, "monster enforcer"); } why did I do this?
 otemp = other;
 other = self;
 self = item;
-//sprint(other, "drop weapon called \n");
 	
 if (other.weapon == IT_AXE) {
 	self.classname = "weapon_axe";

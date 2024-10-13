@@ -391,15 +391,15 @@ local entity sq;
 sq = self.squad;
 entity null = spawn();
 
-if (sq.memory) ts.memory = sq.memory;
-if (sq.memory1) ts.memory1 = sq.memory1;
-if (sq.memory2) ts.memory2 = sq.memory2;
-if (sq.memory3) ts.memory3 = sq.memory3;
-if (sq.memory4) ts.memory4 = sq.memory4;
-if (sq.memory5) ts.memory5 = sq.memory5;
-if (sq.memory6) ts.memory6 = sq.memory6;
-if (sq.memory7) ts.memory7 = sq.memory7;
-if (sq.memory8) ts.memory8 = sq.memory8;
+if (sq.memory.classname == "ai_memory") ts.memory = sq.memory;
+if (sq.memory1.classname == "ai_memory") ts.memory1 = sq.memory1;
+if (sq.memory2.classname == "ai_memory") ts.memory2 = sq.memory2;
+if (sq.memory3.classname == "ai_memory") ts.memory3 = sq.memory3;
+if (sq.memory4.classname == "ai_memory") ts.memory4 = sq.memory4;
+if (sq.memory5.classname == "ai_memory") ts.memory5 = sq.memory5;
+if (sq.memory6.classname == "ai_memory") ts.memory6 = sq.memory6;
+if (sq.memory7.classname == "ai_memory") ts.memory7 = sq.memory7;
+if (sq.memory8.classname == "ai_memory") ts.memory8 = sq.memory8;
 
 if (!(sq.memory = FindStrongest(ts))) dprint("sq.enemy unfilled by sort\n");
 else RemoveMemory(ts, sq.memory);
@@ -494,6 +494,7 @@ if (self.ally1) self.ally1.enemy = nm;
 if (self.ally2) self.ally2.enemy = nm;
 if (self.ally3) self.ally3.enemy = nm;
 if (self.ally4) self.ally4.enemy = nm;
+if !(self.memory.health > 0) self.memory = nm;
 //dprint("initial response\n");
 squad_action();
 self = oself;
@@ -525,6 +526,12 @@ if (sq.memory.enemy == nt) {
 	else if (sq.memory8.enemy == nt) {
 		nm = sq.memory8;
 	//	dprint("target was memory8\n");
+		if (nm.enemy.classname == "ai_memory") {
+			dprint("bad chain memory update\n");
+			remove(nm.enemy);
+			remove(nm);
+			return;
+		}
 	}
 	else {
 	//	dprint("new memory\n");
@@ -533,12 +540,12 @@ if (sq.memory.enemy == nt) {
 		new_memory.think = memorythink;
 	//	setmodel(new_memory, "progs/armor.mdl"); //debug
 	//	setsize(new_memory, '-16 -16 0', '16 16 56');
-		new_memory.solid = SOLID_TRIGGER;//SOLID_NOT;
+		new_memory.solid = SOLID_NOT;
 		new_memory.movetype = MOVETYPE_NONE;
 		new_memory.target = nt.classname;
 		new_memory.enemy = nt;
 		new_memory.team = nt.team;
-		//new_memory.squad = sq; GIVE SQUAD TO MARK CURRENT
+		//new_memory.squad = sq; sight update
 		nm = new_memory;
 		//if (nt.classname == "player") dprint("new target is player\n");
 	}
@@ -548,12 +555,12 @@ if (sq.memory.enemy == nt) {
 	}
 nm.origin = nt.origin + '0 0 12';
 nm.health = nt.health;
-if (nm.health <= 0) { //reducing causes for bad sort
+if !(nm.health > 0) { //reducing causes for bad sort
 	dprint("memory update no health\n");
 	remove(nm);
 	return;
 }
-nm.nextthink = time + 4.61; //when memory should expire
+nm.nextthink = time + 4.7; //when memory should expire
 //dprint("memory updated\n");
 sight_update(nm);
 //else dprint("memory update failed\n");
@@ -581,14 +588,14 @@ void() create_waypoint =
 	new_waypoint.classname = "ai_waypoint";
 //	setmodel(new_waypoint, "progs/backpack.mdl");
 //	setsize(new_waypoint, '-16 -16 0', '16 16 56');
-	new_waypoint.solid = SOLID_TRIGGER;
+	new_waypoint.solid = SOLID_NOT;
 	new_waypoint.think = waypointthink;
 
 	if (self.waypoint) { remove(self.waypoint); }
 
 	self.waypoint = new_waypoint;
 	self.goalentity = new_waypoint;
-	new_waypoint.nextthink = time + 5;
+	new_waypoint.nextthink = time + 4.9;
 };
 
 vector (float dist, entity  target) waypoint_offset = //untested
@@ -640,7 +647,7 @@ new_squad.solid = SOLID_NOT;
 new_squad.movetype = MOVETYPE_NONE;
 //setmodel(new_squad, "progs/armor.mdl");
 //setsize(new_squad, '-16 -16 0', '16 16 56');
-new_squad.nextthink = time + 0.4;
+new_squad.nextthink = time + 0.3 + .5 * random();
 }
 
 void(entity mobot) mobot_squad = 
@@ -655,7 +662,7 @@ new_squad.ally = mobot;
 new_squad.solid = SOLID_NOT;
 new_squad.movetype = MOVETYPE_NONE;
 new_squad.attack_state = ss_spawn;
-new_squad.nextthink = time + 0.4;
+new_squad.nextthink = time + 0.3 + .5 * random();
 }
 
 

@@ -24,10 +24,10 @@ void() squad_fight =
 			if (self.attack_state == 0) {
 				self.think = self.th_run; //dprint("th_run set\n");
 			}
-			else {
-				dprint("ally busy\n");
+			//else {
+			//	dprint("ally busy\n");
 				
-			}
+			//}
 		}
 	}
 	if (sq.ally1) {
@@ -70,14 +70,18 @@ void() squad_spawn =
 	local entity sq = self;
 	if (self.ally.health > 0) {
 		self.attack_state = 0;
-		self = self.ally;
-		if (!self.enemy) self.ideal_yaw = self.angles_y + 70 * random();
-		ChangeYaw();
-		create_waypoint();
-		self.waypoint.origin = waypoint_cast(48);
-		self.think = self.th_run;
+		//if ((self.spawnflags & MOBOT_DONT_SPAWN_ANGRY)) {
+		if (!self.ally.enemy) {
+			self = self.ally;
+			self.ideal_yaw = self.angles_y + 70 * random();
+			ChangeYaw();
+			create_waypoint();
+			self.waypoint.origin = waypoint_cast(48); //placeholder
+			self.think = self.th_walk;
+			self = sq;
+		}
+		else squad_fight();
 }
-	self = sq;
 };
 
 void() squad_wait =
@@ -108,14 +112,14 @@ void() squad_wait =
 		self.think = self.th_stand;
 	}
 	self = sq;
-	if (self.encounter) 
-		if (self.encounter.health > 0 ) dprint("waiting in encounter\n");
+	//if (self.encounter) 
+	//	if (self.encounter.health > 0 ) dprint("waiting in encounter\n");
 }
 
 void() squad_action =
 {
 	if (self.attack_state == ss_spawn) {squad_spawn();}
-else if (self.ally.enemy.health > 0) {squad_fight();} //should just move waypoint around most of the time.
+else if (self.memory.health > 0) {squad_fight();} //should just move waypoint around most of the time.
 //problem detecting when no enemy
 else squad_wait();
 };

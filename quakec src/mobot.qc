@@ -415,8 +415,13 @@ if (self.style == 12) // spawn a Shalrath
 	// bot.nextthink = time + 0.1 + random();
 	if (!(self.spawnflags & MOBOT_DONT_SPAWN_ANGRY))
 	{
-		if (bot.classname != "monster_zombie") // required to avoid animation issues -- dumptruck_ds
+		if (bot.classname != "monster_zombie") { // required to avoid animation issues -- dumptruck_ds
+			local entity pl; //dumptruck_ds -- this is Shamblernaut's method
+
+			pl = find(world, classname, "player");
+			activator = pl;
 			bot.think = monster_use;
+		}
 		else
 			bot.think = bot.th_walk;
 	}

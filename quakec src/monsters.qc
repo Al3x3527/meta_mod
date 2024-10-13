@@ -232,7 +232,7 @@ void() monster_pain_use =
 	if (!self.pain_target)
 		return;
 
-	activator = self.enemy;
+	activator = self.enemy.enemy; //point to real
 	SUB_UsePain ();
 };
 

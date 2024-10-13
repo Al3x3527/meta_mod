@@ -386,7 +386,7 @@ float() FindTarget =
 
 		if (sight_entity_time >= time - 0.1 && !(self.spawnflags & 3)) //sight entity global variable used in ai.qc --Alex
 		{
-			target = sight_entity;
+			target = sight_entity; //target not always checkclient()
 			if (target.enemy == self.enemy)
 				return TRUE;
 		} else
@@ -394,7 +394,7 @@ float() FindTarget =
 			target = checkclient(); //PF_checkclient -- does not run through whole list each frame, only iterates once
 			//should utilize this call for all indirect ai interactions --ALEX
 			if (!target) {
-				dprint("current check entity isn't in PVS\n");
+			//	dprint("current check entity isn't in PVS\n");
 				return FALSE;	// current check entity isn't in PVS
 			}
 		}
@@ -416,10 +416,10 @@ float() FindTarget =
 			return FALSE;
 		}
 	if (!target.classname) return FALSE;
-		if (target.classname == "player") {
+		//if (target.classname == "player") {
 			//dprint("target player\n");
 			//return FALSE;
-		}
+		//}
 	//dprint("checkclient found a non-player entity.\n");
 
 	/*if (client == self.enemy)
@@ -436,7 +436,7 @@ float() FindTarget =
 		return FALSE;
 
 	r = range (target);
-	if (r == RANGE_FAR)
+	if ((target != sight_entity) && (r == RANGE_FAR)) //range sometimes okay --ALEX
 		return FALSE;
 
 	if (!visible(target)) {
@@ -459,7 +459,7 @@ float() FindTarget =
 	}
 	else if (r == RANGE_MID)
 	{
-		if ( /* client.show_hostile < time || */ !infront (target))
+		if (target.show_hostile < time &&  !infront (target)) // was ||
 			return FALSE;
 	}
 	//need a check here for if client is associated with a memory in squad already
@@ -507,7 +507,7 @@ float() FindTarget =
 			return FALSE;
 		}
 		if (target == self.squad.memory8.enemy) {
-			dprint("target was memory8\n");
+		//	dprint("target was memory8\n");
 			update_memory(target);
 			return FALSE;
 		}
@@ -846,6 +846,7 @@ if (enemy_vis) {
 	self.memory_time = time + .5;// +.2 * random();
 	self.search_time = time + 4.9; //originally 5
 }
+else dprint("enemy not visisble\n");
 
 //sprint(real, "returned to ai_run\n");
 // see if the enemy is dead
