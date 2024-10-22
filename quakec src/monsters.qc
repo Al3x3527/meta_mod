@@ -184,6 +184,7 @@ void() monster_use =
 // heard
 	//self.enemy = activator;
 	self.nextthink = time + 0.1;
+//	dprint("monster use\n");
 	update_memory(activator); //Alex
 	//self.think = FoundTarget//(self.enemy); //void(entity target) --Alex
 };
@@ -205,7 +206,7 @@ void() monster_death_use =
 	if (self.flags & FL_SWIM)
 		self.flags = self.flags - FL_SWIM;
 
-	if (!self.target)
+	if (!(self.target || self.target2))
 		return;
 
 	if(self.infight_activator)

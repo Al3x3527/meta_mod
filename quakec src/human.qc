@@ -48,7 +48,16 @@ void()	man_fire13 = [$fire9, man_fire14] {ai_face(); };
 void()	man_fire14 = [$fire10, man_fire1] {ai_face(); SUB_CheckRefire(man_fire1);
 }; */
 
-void() man_pain = {}
+void (entity attacker, float damage) human_pain =
+{
+	if (self.pain_finished > time)
+		return;
+self.pain_finished = time + 0.6;
+sound_pain(self, CHAN_VOICE, "soldier/pain1.wav", 1, ATTN_NORM);
+man_pain();
+};
+
+void() man_pain = { ai_pain(1); };
 
 void()	man_hit1 = [$walk1, man_hit2] {ai_melee();	};
 void()	man_hit2 = [$walk2, man_hit1] {ai_melee();	};
@@ -63,7 +72,7 @@ void() human_melee =
 
 void() h_death1 =
 {
-
+	man_die();
 }
 
 void() man_die =
@@ -123,10 +132,10 @@ void() monster_human =
 	self.th_melee = human_melee;
 	//self.th_missile = man_fire1; //placeholder until weapon system for AI implemented
 	if !(self.berserk) //Berserk test from http://celephais.net/board/view_thread.php?id=4&start=3465 -- dumptruck_ds
-		self.th_pain = man_pain;
+		self.th_pain = human_pain;
 	else
 		self.th_pain = SUB_NullPain;
-	self.th_die = man_die;
+	self.th_die = h_death1;
 	walkmonster_start();
 };
 

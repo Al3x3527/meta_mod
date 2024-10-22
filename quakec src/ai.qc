@@ -117,6 +117,7 @@ local entity	temp;
 		return;
 
 	if (other.enemy)
+		if (other.enemy.health > 0)//more robust --ALEX
 		return;		// fighting, not following a path
 
 	temp = self;
@@ -127,7 +128,8 @@ local entity	temp;
 		sound_misc (self, CHAN_VOICE, "ogre/ogdrag.wav", 1, ATTN_IDLE);// play chainsaw drag sound -- sound_custom -- dumptruck_ds
 
 //dprint ("t_movetarget\n");
-	self.goalentity = self.movetarget = find (world, targetname, other.target);
+	
+	self.goalentity = self.movetarget = find (world, targetname, other.target); //use target1 for counters.
 	self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 	if (!self.movetarget)
 	{
@@ -623,7 +625,11 @@ void(float dist) ai_walk =
 	// check for noticing a player
 	if (FindTarget ())
 		return;
-
+	if (self.target || self.target2)  //for mobots --ALEX
+		if !(self.movetarget) {
+			self.goalentity = self.movetarget = find(world, targetname, self.target);
+			self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
+		}
 	movetogoal (dist);
 };
 
@@ -835,7 +841,7 @@ local entity fake, real;
 fake = self.enemy;
 real = fake.enemy;
 
-//dprint("ai_run\n");
+dprint("ai_run\n");
 movedist = dist;
 
 // check knowledge of enemy
@@ -864,7 +870,7 @@ else dprint("enemy not visisble\n");
 				self.th_walk ();
 			else {
 				self.th_stand();
-				//dprint("self.th_stand from run\n");
+				dprint("self.th_stand from run\n");
 			}
 			return;
 	}
@@ -897,20 +903,19 @@ else dprint("enemy not visisble\n");
 	// if ((self.attack_state == AS_MISSILE) || !(self.spawnflags & I_AM_TURRET))
 	if (self.attack_state == AS_MISSILE)
 	{
-		// dprint ("ai_run_missile... from ai_run\n");
+		 dprint ("ai_run_missile... from ai_run\n");
 		ai_run_missile ();
 		return;
 	}
 	// if ((self.attack_state == AS_MELEE) || !(self.spawnflags & I_AM_TURRET))
 	if (self.attack_state == AS_MELEE)
 	{
-//dprint ("ai_run_melee\n");
+dprint ("ai_run_melee\n");
 		ai_run_melee ();
 		return;
 	}
-	//sprint(real, "check any attack.\n");
+	
 	if (CheckAnyAttack()) {
-		//sprint(real, "beginning an attack.\n"); not appearing
 		return;					// beginning an attack
 	}
 

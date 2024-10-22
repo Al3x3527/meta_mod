@@ -284,12 +284,13 @@ style(Choices) =
 	10 : "Spawn"
 	11 : "Zombie"
 	12 : "Shalrath"
+	13 : "Goblin"
 ]
 style2(integer) : "Overrides Style and selects random monster"
 wait(integer) : "Wait this long between spawns (default 5)"
 count(integer) : "How many monsters to spawn (default 5)"
 ]
-@PointClass base(MonsterClass, OneTargetname) = info_monster_spawnpoint : "Destination for func_monster_spawner" []
+@PointClass base(MonsterClass, OneTarget, OneTargetname) = info_monster_spawnpoint : "Destination for func_monster_spawner" []
 @PointClass base(PlayerClass) = info_player_start : "Player 1 start" []
 @PointClass base(PlayerClass) = info_player_coop : "Player cooperative start" []
 @PointClass base(PlayerClass) = info_player_start2 : "Player episode return point" []
@@ -3517,5 +3518,35 @@ style(Choices) : "Attack type" =
 	4 : "lightning"
 	5 : "nails (rapid fire)"
 ]
+//snd here
+]
+
+@PointClass base(Appearflags, OneTargetname, Effects) size(-16 -16 0, 16 16 32) color(80 0 200)  model(
+	{{
+		mdl_body -> {"path" : mdl_body, "skin" : skin}, {"path": "progs/e_mdls/oil.mdl" , "skin" : skin}
+	}}
+) = item_oil
+	:"Motor Oil"
+
+[
+skin(Choices):"oil skin" : 0 =
+	[
+		0:"Default"
+	]
+spawnflags(Flags) =
+[
+	1:"Not in coop" : 0
+]
+]
+
+// @PointClass base(Monster, Berserk, CustomMdls) size(-16 -16 16, 16 16 56) model({ "path": ":progs/e_mdls/human.mdl" }) = monster_shortguy : "Short guy
+@PointClass base(Monster, Berserk, CustomMdls, Turret) size(-16 -16 16, 16 16 56) model(
+	{{
+		mdl_body -> {"path" : mdl_body, "skin" : skin}, {"path": "progs/e_mdls/shortguy.mdl" , "skin" : skin}
+	}}
+) = monster_shortguy
+: "Short Guy
+Default health = 80" [
+keep_ammo(integer) : "Don't drop backpack" : : "Don't drop backpack upon death"
 //snd here
 ]

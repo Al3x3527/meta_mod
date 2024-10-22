@@ -45,6 +45,7 @@ local entity bot, spawn_spot;
 	// spawn_spot = SelectSpawnPoint (); // let's not use deathmatch points for this -- dumptruck_ds
 	bot.origin = spawn_spot.origin + '0 0 1';
 	bot.angles = spawn_spot.angles;
+	bot.target = spawn_spot.target;
 	bot.fixangle = TRUE;
 	bot.proj_speed_mod = 1;
 	if (!(self.spawnflags & MOBOT_SILENT_SPAWN)) 			// SILENT
@@ -409,6 +410,38 @@ if (self.style == 12) // spawn a Shalrath
 		bot.yaw_speed = 120;
 		bot.view_ofs = '0 0 22';
 	}
+if (self.style == 13) // spawn a goblin
+{
+	// set size and shape
+	bot.solid = SOLID_SLIDEBOX;
+	bot.movetype = MOVETYPE_STEP;
+	setmodel(bot, "progs/e_mdls/shortguy.mdl");
+	setsize(bot, '-16 -16 16', '16 16 56');
+	bot.flags = bot.flags | FL_MONSTER;
+	bot.takedamage = DAMAGE_AIM;
+
+	// define his animation
+	self.th_stand = short_stand1;
+	self.th_walk = short_walk1;
+	self.th_run = short_run1;
+	self.th_melee = shortguy_melee;
+	self.th_missile = short_atk1;
+	self.th_die = short_death1;
+	bot.th_missile = short_atk1;
+	if !(self.berserk) //Berserk test from http://celephais.net/board/view_thread.php?id=4&start=3465 -- dumptruck_ds
+		bot.th_pain = shortguy_pain;
+	else
+		bot.th_pain = SUB_NullPain;
+	bot.health = 80;
+
+	// polish him up
+	bot.classname = "monster_short";
+	bot.ideal_yaw = bot.angles * '0 1 0';
+	bot.yaw_speed = 120;
+	bot.view_ofs = '0 0 22';
+
+//	dprint("goblin spawned\n");
+}
 
 // begin his thinking
 	bot.nextthink = time + 0.2; // this seems better with monster_use -- dumptruck_ds
@@ -417,7 +450,7 @@ if (self.style == 12) // spawn a Shalrath
 	{
 		if (bot.classname != "monster_zombie") { // required to avoid animation issues -- dumptruck_ds
 			local entity pl; //dumptruck_ds -- this is Shamblernaut's method
-
+		//	dprint("about to monster_use\n");
 			pl = find(world, classname, "player");
 			activator = pl;
 			bot.think = monster_use;

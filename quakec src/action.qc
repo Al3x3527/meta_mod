@@ -11,7 +11,7 @@ void() squad_fight =
 	sq = self;
 	
 	sq.attack_state = fight;
-	//dprint("squad fight\n");
+	dprint("squad fight\n");
 	if (!sq) { 
 		dprint("squad failed at ACTION\n");
 		return;
@@ -22,7 +22,7 @@ void() squad_fight =
 			create_waypoint();
 			self.waypoint.origin = self.enemy.origin; //squad leader
 			if (self.attack_state == 0) {
-				self.think = self.th_run; //dprint("th_run set\n");
+				self.think = self.th_run; dprint("th_run set\n");
 			}
 			//else {
 			//	dprint("ally busy\n");
@@ -93,23 +93,28 @@ void() squad_wait =
 
 	if (sq.ally.health > 0) {
 		self = sq.ally;
-		self.think = self.th_stand;
+	if (!self.movetarget)	self.think = self.th_stand;
+	else self.think = self.th_walk;
 	}
 	if (sq.ally1.health > 0) {
 		self = sq.ally1;
-		self.think = self.th_stand;
+		if (!self.movetarget)	self.think = self.th_stand;
+		else self.think = self.th_walk;
 	}
 	if (sq.ally2.health > 0) {
 		self = sq.ally2;
-		self.think = self.th_stand;
+		if (!self.movetarget)	self.think = self.th_stand;
+		else self.think = self.th_walk;
 	}
 	if (sq.ally3.health > 0) {
 		self = sq.ally3;
-		self.think = self.th_stand;
+		if (!self.movetarget)	self.think = self.th_stand;
+		else self.think = self.th_walk;
 	}
 	if (sq.ally4.health > 0) {
 		self = sq.ally4;
-		self.think = self.th_stand;
+		if (!self.movetarget)	self.think = self.th_stand;
+		else self.think = self.th_walk;
 	}
 	self = sq;
 	//if (self.encounter) 
@@ -118,6 +123,7 @@ void() squad_wait =
 
 void() squad_action =
 {
+	//dprint("squad_action\n");
 	if (self.attack_state == ss_spawn) {squad_spawn();}
 else if (self.memory.health > 0) {squad_fight();} //should just move waypoint around most of the time.
 //problem detecting when no enemy

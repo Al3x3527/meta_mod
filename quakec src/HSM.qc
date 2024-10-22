@@ -378,7 +378,7 @@ entity (entity  ts) FindStrongest =
 	remove(null);
 	if (str.health <= 0) {
 		//dprint("strongest return nothing\n"); 
-		return;
+		return(world); //void unsafe
 	}
 //else dprint("strongest found\n");
 return(str);

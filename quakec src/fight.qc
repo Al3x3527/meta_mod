@@ -240,16 +240,16 @@ void() ai_melee =
 	local vector	delta;
 	local float 	ldmg;
 
-	if (!self.enemy)
+	if (!self.enemy.enemy)
 		return;		// removed before stroke
 
-	delta = self.enemy.origin - self.origin;
+	delta = self.enemy.enemy.origin - self.origin;//real
 
 	if (vlen(delta) > 60)
 		return;
 
 	ldmg = (random() + random() + random()) * 3;
-	T_Damage (self.enemy, self, self, ldmg);
+	T_Damage (self.enemy.enemy, self, self, ldmg); //real
 };
 
 
@@ -258,19 +258,19 @@ void() ai_melee_side =
 	local vector	delta;
 	local float 	ldmg;
 
-	if (!self.enemy)
+	if (!self.enemy.enemy)
 		return;		// removed before stroke
 
 	ai_charge_side();
 
-	delta = self.enemy.origin - self.origin;
+	delta = self.enemy.enemy.origin - self.origin;
 
 	if (vlen(delta) > 60)
 		return;
-	if (!CanDamage (self.enemy, self))
+	if (!CanDamage (self.enemy.enemy, self)) //real
 		return;
 	ldmg = (random() + random() + random()) * 3;
-	T_Damage (self.enemy, self, self, ldmg);
+	T_Damage (self.enemy.enemy, self, self, ldmg); //real
 };
 
 
