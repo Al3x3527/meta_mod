@@ -306,8 +306,9 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 				FoundTarget(attacker);
 		}
 
-		self = oldself;
+		
 	}
+	self = oldself;
 };
 
 /*
