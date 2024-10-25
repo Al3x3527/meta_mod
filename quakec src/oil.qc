@@ -31,7 +31,7 @@ void() item_oil =
 };
 
 /* 
-Short Guy
+Goblin
 =====================================================================================================================================
 */
 
@@ -47,39 +47,40 @@ $frame walk1 walk2 walk3
 $frame shoot1 shoot2
 
 /*
-Guy code
+Goblin code
 */
 
-void()	short_stand1 = [$stand1, short_stand2] {ai_stand(); };
-void()	short_stand2 = [$stand1, short_stand1] {ai_stand(); };
+void()	goblin_stand1 = [$stand1, goblin_stand2] {ai_stand(); };
+void()	goblin_stand2 = [$stand1, goblin_stand1] {ai_stand(); };
 
 
-void()	short_walk1 = [$walk1, short_walk2] {
+void()	goblin_walk1 = [$walk1, goblin_walk2] {
 	if (random() < 0.2)
 		sound_idle(self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE); //dumptruck_ds
 	ai_walk(2); };
-void()	short_walk2 = [$walk2, short_walk3] {ai_walk(4); };
-void()	short_walk3 = [$walk3, short_walk1] {ai_walk(4); };
+void()	goblin_walk2 = [$walk2, goblin_walk3] {ai_walk(4); };
+void()	goblin_walk3 = [$walk3, goblin_walk1] {ai_walk(4); };
 
-void()	short_run1 = [$walk1, short_run2] {
+void()	goblin_run1 = [$walk1, goblin_run2] {
+	//dprint("goblin run1\n");
 	ai_run(6); //move to waypoint, face enemy
 };
-void()	short_run2 = [$walk2, short_run3] {ai_run(6);	};
-void()	short_run3 = [$walk3, short_run1] {ai_run(6);	};
+void()	goblin_run2 = [$walk2, goblin_run3] {ai_run(6);	};
+void()	goblin_run3 = [$walk3, goblin_run1] {ai_run(6);	};
 
-void()	short_atk1 = [$shoot1, short_atk2] {ai_face(); self.count = 0; self.t_length = 4 + floor(random() * 4); };
-void()	short_atk2 = {
-	//dprint("short atk2\n");
+void()	goblin_atk1 = [$shoot1, goblin_atk2] {ai_face(); self.count = 0; self.t_length = 4 + floor(random() * 4); };
+void()	goblin_atk2 = {
+	//dprint("goblin atk2\n");
 self.frame = $shoot2;
 self.nextthink = time + .1;
-self.think = short_atk3;
+self.think = goblin_atk3;
 ai_face();
-short_fire();
+goblin_fire();
 self.effects = self.effects | EF_MUZZLEFLASH; };
-void()	short_atk3 = [$shoot1, short_atk4] {ai_face(); };
-void()	short_atk4 = [$shoot1, short_atk1] {ai_face(); SUB_CheckRefire(short_atk1); };
+void()	goblin_atk3 = [$shoot1, goblin_atk4] {ai_face(); };
+void()	goblin_atk4 = [$shoot1, goblin_atk1] {ai_face(); SUB_CheckRefire(goblin_atk1); };
 
-void() short_fire =
+void() goblin_fire =
 {
 	local	vector	dir;
 	local	entity	en;
@@ -98,33 +99,33 @@ void() short_fire =
 
 };
 
-void(entity attacker, float damage) shortguy_pain =
+void(entity attacker, float damage) goblin_pain =
 {
 	if (self.pain_finished > time)
 		return;
 self.pain_finished = time + 0.6;
 sound_pain(self, CHAN_VOICE, "soldier/pain1.wav", 1, ATTN_NORM);
-short_pain();
+goblin_pain1();
 };
 
-void() short_pain = { ai_pain(1); };
+void() goblin_pain1 = { ai_pain(1); };
 
-void()	short_hit1 = [$shoot1, short_hit2] {ai_melee();	//dprint("shortguy melee\n"); 
+void()	goblin_hit1 = [$shoot1, goblin_hit2] {ai_melee();	//dprint("shortguy melee\n"); 
 };
-void()	short_hit2 = [$shoot2, short_hit1] {ai_melee();	};
+void()	goblin_hit2 = [$shoot2, goblin_hit1] {ai_melee();	};
 
-void() shortguy_melee = {short_hit1();}
+void() goblin_melee = { goblin_hit1();}
 
-void() short_death1 = {short_die();}
+void() goblin_death1 = { goblin_die();}
 
-void() short_die =
+void() goblin_die =
 {
 	remove(self);
 	return;
 }
 
 
-void() monster_shortguy =
+void() monster_goblin =
 {
 	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
 		return;
@@ -135,7 +136,7 @@ void() monster_shortguy =
 		return;
 	}
 
-	precache_body_model2("progs/e_mdls/shortguy.mdl");  // custom_mdls function -- dumptruck_ds
+	precache_body_model2("progs/e_mdls/goblin.mdl");  // custom_mdls function -- dumptruck_ds
 	//dumptruck_ds
 	precache_sound2_death("enforcer/death1.wav");
 	precache_sound2_attack("enforcer/enfire.wav");
@@ -155,32 +156,32 @@ void() monster_shortguy =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	body_model("progs/e_mdls/shortguy.mdl");
+	body_model("progs/e_mdls/goblin.mdl");
 	setsize(self, '-16 -16 16', '16 16 56');
 
 	if (!self.health) //thanks RennyC -- dumptruck_ds
 		self.health = 80;
 
-	self.th_stand = short_stand1;
-	self.th_walk = short_walk1;
-	self.th_run = short_run1;
-	self.th_melee = shortguy_melee;
-	self.th_missile = short_atk1;
+	self.th_stand = goblin_stand1;
+	self.th_walk = goblin_walk1;
+	self.th_run = goblin_run1;
+	self.th_melee = goblin_melee;
+	self.th_missile = goblin_atk1;
 	if !(self.berserk) //Berserk test from http://celephais.net/board/view_thread.php?id=4&start=3465 -- dumptruck_ds
-		self.th_pain = shortguy_pain;
+		self.th_pain = goblin_pain;
 	else
 		self.th_pain = SUB_NullPain;
-	self.th_die = short_death1;
+	self.th_die = goblin_death1;
 	walkmonster_start();
 };
 
-void() monster_dead_shortguy =
+void() monster_dead_goblin =
 {
 	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
 		return;
 
-	precache_model("progs/e_mdls/shortguy.mdl");
-	setmodel(self, "progs/e_mdls/shortguy.mdl");
+	precache_model("progs/e_mdls/goblin.mdl");
+	setmodel(self, "progs/e_mdls/goblin.mdl");
 	if (self.spawnflags & 2)
 	{
 		//self.frame = $fdeath11;

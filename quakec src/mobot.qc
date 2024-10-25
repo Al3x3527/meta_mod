@@ -415,32 +415,32 @@ if (self.style == 13) // spawn a goblin
 	// set size and shape
 	bot.solid = SOLID_SLIDEBOX;
 	bot.movetype = MOVETYPE_STEP;
-	setmodel(bot, "progs/e_mdls/shortguy.mdl");
+	setmodel(bot, "progs/e_mdls/goblin.mdl");
 	setsize(bot, '-16 -16 16', '16 16 56');
 	bot.flags = bot.flags | FL_MONSTER;
 	bot.takedamage = DAMAGE_AIM;
 
 	// define his animation
-	self.th_stand = short_stand1;
-	self.th_walk = short_walk1;
-	self.th_run = short_run1;
-	self.th_melee = shortguy_melee;
-	self.th_missile = short_atk1;
-	self.th_die = short_death1;
-	bot.th_missile = short_atk1;
+	bot.th_run = goblin_run1;
+	bot.th_stand = goblin_stand1;
+	bot.th_walk = goblin_walk1;
+	bot.th_melee = goblin_melee;
+	bot.th_missile = goblin_atk1;
+	bot.th_die = goblin_death1;
+	bot.th_missile = goblin_atk1;
 	if !(self.berserk) //Berserk test from http://celephais.net/board/view_thread.php?id=4&start=3465 -- dumptruck_ds
-		bot.th_pain = shortguy_pain;
+		bot.th_pain = goblin_pain;
 	else
 		bot.th_pain = SUB_NullPain;
 	bot.health = 80;
 
 	// polish him up
-	bot.classname = "monster_short";
+	bot.classname = "monster_goblin";
 	bot.ideal_yaw = bot.angles * '0 1 0';
 	bot.yaw_speed = 120;
 	bot.view_ofs = '0 0 22';
 
-//	dprint("goblin spawned\n");
+	dprint("goblin spawned\n");
 }
 
 // begin his thinking

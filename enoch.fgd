@@ -3539,13 +3539,13 @@ spawnflags(Flags) =
 ]
 ]
 
-// @PointClass base(Monster, Berserk, CustomMdls) size(-16 -16 16, 16 16 56) model({ "path": ":progs/e_mdls/human.mdl" }) = monster_shortguy : "Short guy
+// @PointClass base(Monster, Berserk, CustomMdls) size(-16 -16 16, 16 16 56) model({ "path": ":progs/e_mdls/goblin.mdl" }) = monster_goblin : "goblin
 @PointClass base(Monster, Berserk, CustomMdls, Turret) size(-16 -16 16, 16 16 56) model(
 	{{
-		mdl_body -> {"path" : mdl_body, "skin" : skin}, {"path": "progs/e_mdls/shortguy.mdl" , "skin" : skin}
+		mdl_body -> {"path" : mdl_body, "skin" : skin}, {"path": "progs/e_mdls/goblin.mdl" , "skin" : skin}
 	}}
-) = monster_shortguy
-: "Short Guy
+) = monster_goblin
+: "goblin
 Default health = 80" [
 keep_ammo(integer) : "Don't drop backpack" : : "Don't drop backpack upon death"
 //snd here

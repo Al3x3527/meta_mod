@@ -62,6 +62,7 @@ void() squad_fight =
 			if (self.attack_state == 0) self.think = self.th_run;
 		}
 	}
+	//dprint("squad fight complete\n");
 	self = sq;
 };
 
