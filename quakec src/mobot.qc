@@ -440,7 +440,7 @@ if (self.style == 13) // spawn a goblin
 	bot.yaw_speed = 120;
 	bot.view_ofs = '0 0 22';
 
-	dprint("goblin spawned\n");
+	//dprint("goblin spawned\n");
 }
 
 // begin his thinking

@@ -440,7 +440,7 @@ else
 
 	org = self.origin + v_forward * 30 + v_right * 8.5 + '0 0 16';
 
-	LaunchLaser(org, self.enemy.origin - self.origin);
+	LaunchLaser(org, self.enemy.enemy.origin - self.origin); //to actually hit target --ALEX
 };
 
 //============================================================================

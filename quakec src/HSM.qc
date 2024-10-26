@@ -551,6 +551,8 @@ if (sq.memory.enemy == nt) {
 	}
 	if !(nm.classname == "ai_memory") {
 		dprint("bad memory update\n");
+		if (nm.classname == "world")
+			dprint("memory is world\n");
 		return;
 	}
 nm.origin = nt.origin + '0 0 12';

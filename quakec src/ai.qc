@@ -841,7 +841,7 @@ local entity fake, real;
 fake = self.enemy;
 real = fake.enemy;
 
-dprint("ai_run\n");
+//dprint("ai_run\n");
 movedist = dist;
 
 // check knowledge of enemy
@@ -852,7 +852,8 @@ if (enemy_vis) {
 	self.memory_time = time + .5;// +.2 * random();
 	self.search_time = time + 4.9; //originally 5
 }
-else dprint("enemy not visisble\n");
+else dprint("enemy not visisble\n"); //sometimes in err
+//visible() being called when no self.enemy >> ai_run() when no enemy
 
 //sprint(real, "returned to ai_run\n");
 // see if the enemy is dead
@@ -870,7 +871,7 @@ else dprint("enemy not visisble\n");
 				self.th_walk ();
 			else {
 				self.th_stand();
-				dprint("self.th_stand from run\n");
+				//dprint("self.th_stand from run\n");
 			}
 			return;
 	}
@@ -889,7 +890,7 @@ else dprint("enemy not visisble\n");
 	//if (enemy_vis) {
 		enemy_infront = infront(real);
 		enemy_range = range(real);
-		enemy_yaw = vectoyaw(real.origin - self.origin);
+		enemy_yaw = vectoyaw(real.origin - self.origin); //monsters still can't aim.
 	//}
 	//else {
 	//	enemy_infront = infront(fake);
@@ -903,14 +904,14 @@ else dprint("enemy not visisble\n");
 	// if ((self.attack_state == AS_MISSILE) || !(self.spawnflags & I_AM_TURRET))
 	if (self.attack_state == AS_MISSILE)
 	{
-		 dprint ("ai_run_missile... from ai_run\n");
+		// dprint ("ai_run_missile... from ai_run\n");
 		ai_run_missile ();
 		return;
 	}
 	// if ((self.attack_state == AS_MELEE) || !(self.spawnflags & I_AM_TURRET))
 	if (self.attack_state == AS_MELEE)
 	{
-dprint ("ai_run_melee\n");
+//dprint ("ai_run_melee\n");
 		ai_run_melee ();
 		return;
 	}

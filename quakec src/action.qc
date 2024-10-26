@@ -11,7 +11,7 @@ void() squad_fight =
 	sq = self;
 	
 	sq.attack_state = fight;
-	dprint("squad fight\n");
+	//dprint("squad fight\n");
 	if (!sq) { 
 		dprint("squad failed at ACTION\n");
 		return;
@@ -22,7 +22,7 @@ void() squad_fight =
 			create_waypoint();
 			self.waypoint.origin = self.enemy.origin; //squad leader
 			if (self.attack_state == 0) {
-				self.think = self.th_run; dprint("th_run set\n");
+				self.think = self.th_run;// dprint("th_run set\n");
 			}
 			//else {
 			//	dprint("ally busy\n");

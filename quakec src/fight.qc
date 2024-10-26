@@ -188,9 +188,9 @@ ai_face
 Stay facing the enemy
 =============
 */
-void() ai_face =
+void() ai_face = //used while shooting
 {
-	self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin); //memory origin.
+	self.ideal_yaw = vectoyaw(self.enemy.enemy.origin - self.origin); //real origin to not shoot through body.
 	ChangeYaw ();
 };
 
