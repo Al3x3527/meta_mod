@@ -263,6 +263,7 @@ n_encounter.classname = "ai_encounter";
 n_encounter.origin = self.origin;
 self.encounter = n_encounter;
 n_encounter.squad = self;
+n_encounter.flags = FL_NOTARGET;
 //setmodel(n_encounter, "progs/backpack.mdl");
 //setsize(n_encounter, '-16 -16 0', '16 16 56');
 n_encounter.solid = SOLID_NOT;
@@ -545,6 +546,7 @@ if (sq.memory.enemy == nt) {
 		new_memory.target = nt.classname;
 		new_memory.enemy = nt;
 		new_memory.team = nt.team;
+		new_memory.flags = FL_NOTARGET;
 		//new_memory.squad = sq; sight update
 		nm = new_memory;
 		//if (nt.classname == "player") dprint("new target is player\n");
@@ -644,7 +646,7 @@ new_squad.think = squad_update;
 new_squad.squad_state_full = FALSE;
 self.squad = new_squad;
 new_squad.ally = self;
-
+new_squad.flags = FL_NOTARGET;//test
 new_squad.solid = SOLID_NOT;
 new_squad.movetype = MOVETYPE_NONE;
 //setmodel(new_squad, "progs/armor.mdl");
@@ -660,7 +662,7 @@ new_squad.think = squad_update;
 new_squad.squad_state_full = FALSE;
 mobot.squad = new_squad;
 new_squad.ally = mobot;
-
+new_squad.flags = FL_NOTARGET;//test
 new_squad.solid = SOLID_NOT;
 new_squad.movetype = MOVETYPE_NONE;
 new_squad.attack_state = ss_spawn;
