@@ -32,15 +32,19 @@ if (!tother || tother == world) {
 	dprint("danger bad target\n");
 	return FALSE; 
 }
-		//if (tother.target == "monster_human") //target represents a monster_human class. 
-			c_factor = 0.5;
-		//else c_factor = 1;
-		h_factor = TargetHealthPercent(tother);
-		//if (tother.weapon == 32)
-			w_factor = 1;
-		//else w_factor = 0.8;
-		tother.danger = c_factor * h_factor * w_factor + f;
-		return TRUE;
+if (tother.target == "monster_human") //target represents a monster_human class. 
+c_factor = 0.5;
+else if (tother.target == "monster_soldier")
+c_factor = 0.55;
+else if (tother.target == "monster_enforcer")
+c_factor = 0.7;
+else c_factor = 1;
+h_factor = TargetHealthPercent(tother);
+//if (tother.weapon == 32)
+w_factor = 1;
+//else w_factor = 0.8;
+tother.danger = c_factor * h_factor * w_factor + f;
+return TRUE;
 };
 
 float() prioritize_targets =

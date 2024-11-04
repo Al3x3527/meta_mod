@@ -120,15 +120,40 @@ void() squad_wait =
 	self = sq;
 	//if (self.encounter) 
 	//	if (self.encounter.health > 0 ) dprint("waiting in encounter\n");
+};
+
+void() squad_charge = 
+{
+local entity sq = self;
+sq.attack_state = charge;
+dprint("squad_charge\n");
+
+if (sq.ally.health > 0) {
+	self = sq.ally;
+	create_waypoint();
+	if (self.target) {
+		if !(self.movetarget) {
+			self.movetarget = find(world, targetname, self.target);
+		}
+		self.waypoint.origin = self.movetarget.origin;
+	}
+	else if (self.enemy) {
+		self.waypoint.origin = self.enemy.origin;
+		self.think = self.th_run;
+	}
 }
+
+};
 
 void() squad_action =
 {
 	//dprint("squad_action\n");
-	if (self.attack_state == ss_spawn) {squad_spawn();}
-else if (self.memory.health > 0) {squad_fight();} //should just move waypoint around most of the time.
-//problem detecting when no enemy
-else squad_wait();
+	if !(self.memory.health > 0) {squad_wait(); return;} //default
+	if (self.attack_state == ss_spawn) { squad_spawn(); return; }
+	if (self.attack_state == charge) {squad_charge(); return;}
+	if (self.memory.health > 0) { squad_fight(); return; } //should just move waypoint around most of the time.
+	//problem detecting when no enemy
+	dprint("squad_action exception\n");
 };
 
 //something has changed, decide what to do next
@@ -217,3 +242,42 @@ void(float state_winning) squad_action =
 	else if (self.classname == beast)
 		beast_fight(yaw);
 		*/
+
+void() trigger_monsteraction_touch =
+{
+	if (self.estate != STATE_ACTIVE) return;
+
+	if (other.flags != FL_MONSTER)
+		return;
+
+//behavior here
+	other.squad.attack_state = self.attack_state;
+};
+
+/*QUAKED trigger_monsteraction (.5 .5 .5) ? X X X DT_STARTOFF X X X X NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER X NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
+
+Walking monsters that touch this will be forced into an action state. This will affect the whole squad.
+
+
+If DT_STARTOFF flag is set, this makes the trigger
+inactive. This can be targeted and toggled off and on.
+*/
+void() trigger_monsteraction =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+	self.use = push_toggle;
+	if (self.spawnflags & DT_STARTOFF) // dumptruck_ds
+		 {
+			 self.estate = STATE_INACTIVE;
+		 }
+	//defaults here
+	if !(self.attack_state)
+		self.attack_state = ss_wait;
+
+	InitTrigger();
+	self.touch = trigger_monsteraction_touch;
+
+	SUB_CheckWaiting();
+};

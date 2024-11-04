@@ -625,7 +625,7 @@ void(float dist) ai_walk =
 	// check for noticing a player
 	if (FindTarget ())
 		return;
-	if (self.target || self.target2)  //for mobots --ALEX
+	if (self.target || self.target2)  //for mobots --ALEX --obsolete?
 		if !(self.movetarget) {
 			self.goalentity = self.movetarget = find(world, targetname, self.target);
 			self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);

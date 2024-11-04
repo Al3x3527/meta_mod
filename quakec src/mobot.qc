@@ -51,7 +51,7 @@ local entity bot, spawn_spot;
 	if (!(self.spawnflags & MOBOT_SILENT_SPAWN)) 			// SILENT
 	spawn_tfog (bot.origin);
 	spawn_tdeath (bot.origin, bot);
-	if (spawn_spot.team) bot.team = spawn_spot.team;
+	if (self.team) bot.team = self.team;
 	else bot.team = MONSTERS;
 	mobot_squad(bot);
 
