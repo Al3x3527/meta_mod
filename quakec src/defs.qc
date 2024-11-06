@@ -515,7 +515,7 @@ float	AS_TURRET		= 5;
 .entity		ally5;
 .entity		ally6;
 .entity		ally7;
-.entity		waypoint;
+//.entity		waypoint;
 .entity		encounter;
 .float		memory_time;
 

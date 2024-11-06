@@ -199,7 +199,8 @@ enemy as activator.
 */
 void() monster_death_use =
 {
-	remove(self.waypoint);
+	//if (self.goalentity.classname == "ai_waypoint")
+	//remove(self.goalentity);
 // fall to ground
 	if (self.flags & FL_FLY)
 		self.flags = self.flags - FL_FLY;

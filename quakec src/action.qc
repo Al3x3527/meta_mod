@@ -19,8 +19,7 @@ void() squad_fight =
 	if (sq.ally) { //was not the problem
 		if (sq.ally.health > 0) {
 			self = sq.ally;
-			create_waypoint();
-			self.waypoint.origin = self.enemy.origin; //squad leader
+			self.goalentity = self.enemy;//squad leader
 			if (self.attack_state == 0) {
 				self.think = self.th_run;// dprint("th_run set\n");
 			}
@@ -33,32 +32,28 @@ void() squad_fight =
 	if (sq.ally1) {
 		if (sq.ally1.health > 0) {
 			self = sq.ally1;
-			create_waypoint();
-			self.waypoint.origin = waypoint_offset(48, self.enemy);
+			create_waypoint(waypoint_offset(48, self.enemy));
 			if (self.attack_state == 0) self.think = self.th_run;
 		}
 	}
 	if (sq.ally2) {
 		if (sq.ally2.health > 0) {
 			self = sq.ally2;
-			create_waypoint();
-			self.waypoint.origin = waypoint_offset(-48, self.enemy);
+			create_waypoint(waypoint_offset(-48, self.enemy));
 			if (self.attack_state == 0) self.think = self.th_run;
 		}
 	}
 	if (sq.ally3) {
 		if (sq.ally3.health > 0) {
 			self = sq.ally3;
-			create_waypoint();
-			self.waypoint.origin = waypoint_offset(48, self.enemy);
+			create_waypoint(waypoint_offset(48, self.enemy));
 			if (self.attack_state == 0) self.think = self.th_run;
 		}
 	}
 	if (sq.ally4) {
 		if (sq.ally4.health > 0) {
 			self = sq.ally4;
-			create_waypoint();
-			self.waypoint.origin = waypoint_offset(-48, self.enemy);
+			create_waypoint(waypoint_offset(-48, self.enemy));
 			if (self.attack_state == 0) self.think = self.th_run;
 		}
 	}
@@ -76,8 +71,7 @@ void() squad_spawn =
 			self = self.ally;
 			self.ideal_yaw = self.angles_y + 70 * random();
 			ChangeYaw();
-			create_waypoint();
-			self.waypoint.origin = waypoint_cast(48); //placeholder
+			create_waypoint(waypoint_cast(48));//placeholder
 			self.think = self.th_walk;
 			self = sq;
 		}
@@ -130,19 +124,76 @@ dprint("squad_charge\n");
 
 if (sq.ally.health > 0) {
 	self = sq.ally;
-	create_waypoint();
+	
 	if (self.target) {
-		if !(self.movetarget) {
-			self.movetarget = find(world, targetname, self.target);
-		}
-		self.waypoint.origin = self.movetarget.origin;
-	}
+		if !(self.movetarget) { self.goalentity = self.movetarget = find(world, targetname, self.target); }} 
+	else if !(self.goalentity) self.goalentity = self.movetarget;
 	else if (self.enemy) {
-		self.waypoint.origin = self.enemy.origin;
+		self.goalentity = self.enemy;
+		self.think = self.th_run; //make charge a permutation of AI_run(). self.th_charge when animations added
+	}
+	else {
+		dprint("nowhere to charge\n");
+	}
+	sq.goalentity = self.goalentity;
+}
+if (sq.ally1.health > 0) {
+	self = sq.ally;
+	if (sq.goalentity) {
+		self.goalentity = sq.goalentity;
+		self.think = self.th_run;
+	}
+	else if (self.target) {
+		if !(self.movetarget) { self.goalentity = self.movetarget = find(world, targetname, self.target); }
+	}
+		else if !(self.goalentity) {self.goalentity = self.movetarget;}
+	else if (self.enemy) {
+		self.goalentity = self.enemy;
 		self.think = self.th_run;
 	}
 }
-
+if (sq.ally2.health > 0) {
+	self = sq.ally;
+	if (sq.goalentity) {
+		self.goalentity = sq.goalentity;
+		self.think = self.th_run;
+	} else if (self.target) {
+		if !(self.movetarget) { self.goalentity = self.movetarget = find(world, targetname, self.target); }
+	}
+		else if !(self.goalentity) self.goalentity = self.movetarget;
+	else if (self.enemy) {
+		self.goalentity = self.enemy;
+		self.think = self.th_run;
+	}
+}
+if (sq.ally3.health > 0) {
+	self = sq.ally;
+	if (sq.goalentity) {
+		self.goalentity = sq.goalentity;
+		self.think = self.th_run;
+	} else if (self.target) {
+		if !(self.movetarget) { self.goalentity = self.movetarget = find(world, targetname, self.target); } 
+		else if !(self.goalentity) self.goalentity = self.movetarget;
+}
+	else if (self.enemy) {
+		self.goalentity = self.enemy;
+		self.think = self.th_run;
+	}
+}
+if (sq.ally4.health > 0) {
+	self = sq.ally;
+	if (sq.goalentity) {
+		self.goalentity = sq.goalentity;
+		self.think = self.th_run;
+	} else if (self.target) {
+		if !(self.movetarget) { self.goalentity = self.movetarget = find(world, targetname, self.target); } 
+		else if !(self.goalentity) self.goalentity = self.movetarget;
+}
+	else if (self.enemy) {
+		self.goalentity = self.enemy;
+		self.think = self.th_run;
+	}
+}
 };
 
 void() squad_action =

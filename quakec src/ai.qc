@@ -857,23 +857,27 @@ else dprint("enemy not visisble\n"); //sometimes in err
 
 //sprint(real, "returned to ai_run\n");
 // see if the enemy is dead
+if (self.squad.attack_state == charge) {
+	if (fake.health <= 0)
+		FindTarget(); //but do not abort
+}
+else { //ignore bad goal when charging
 	if ((fake.health <= 0) || (self.spawnflags & PASSIVE_ALWAYS))
 	{
 		self.enemy = world;
 		//return;
 	// FIXME: look all around for other targets
-	
-			if (self.spawnflags & I_AM_TURRET)
-				{
-					self.th_stand ();
-				}
-			else if (self.movetarget)
-				self.th_walk ();
-			else {
-				self.th_stand();
-				//dprint("self.th_stand from run\n");
-			}
-			return;
+
+		if (self.spawnflags & I_AM_TURRET)
+		{
+			self.th_stand();
+		} else if (self.movetarget)
+			self.th_walk();
+		else {
+			self.th_stand();
+			//dprint("self.th_stand from run\n");
+		}
+		return;
 	}
 	self.show_hostile = time + 1;		// wake up other monsters
 // look for other coop players
@@ -887,10 +891,12 @@ else dprint("enemy not visisble\n"); //sometimes in err
 		}
 		//else sprint(real, "ai_run continued\n");
 	}
+}//end of ignore when charging
+
 	//if (enemy_vis) {
 		enemy_infront = infront(real);
 		enemy_range = range(real);
-		enemy_yaw = vectoyaw(real.origin - self.origin); //monsters still can't aim.
+		enemy_yaw = vectoyaw(real.origin - self.origin);
 	//}
 	//else {
 	//	enemy_infront = infront(fake);
@@ -958,7 +964,7 @@ else dprint("enemy not visisble\n"); //sometimes in err
   if !(self.spawnflags & I_AM_TURRET) // keeps monster from moving to player - dumptruck_ds
   // head straight in
 	  movetogoal(dist);		// done in C code...
-  if !(self.waypoint) dprint("no self.waypoint ai_run\n");
+  if !(self.goalentity) dprint("no self.goalentity ai_run\n");
 };
 /*
 =============

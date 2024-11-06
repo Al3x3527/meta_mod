@@ -590,7 +590,7 @@ void() waypointthink =
 dprint("waypoint expired\n");
 };
 
-void() create_waypoint = 
+void(vector spawnpoint) create_waypoint = 
 {
 	entity new_waypoint = spawn();
 	new_waypoint.classname = "ai_waypoint";
@@ -598,11 +598,12 @@ void() create_waypoint =
 //	setsize(new_waypoint, '-16 -16 0', '16 16 56');
 	new_waypoint.solid = SOLID_NOT;
 	new_waypoint.think = waypointthink;
+	new_waypoint.origin = spawnpoint;
 
-	if (self.waypoint) { remove(self.waypoint); }
+	if (self.movetarget.classname == "ai_waypoint") { remove(self.movetarget); }
 
-	self.waypoint = new_waypoint;
-	self.goalentity = new_waypoint;
+	self.movetarget = new_waypoint; //was self.waypoint
+	self.goalentity = new_waypoint; //what is the difference between goalentity and movetarget?
 	new_waypoint.nextthink = time + 4.9;
 };
 
