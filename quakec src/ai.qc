@@ -116,6 +116,25 @@ local entity	temp;
 	if (other.movetarget != self)
 		return;
 
+	if (other.squad.attack_state == charge) { //ALEX
+		temp = self;
+		self = other;
+		other = temp;
+		self.goalentity = self.movetarget = find(world, targetname, other.target);
+		self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
+		if (!self.movetarget)
+		{
+			if (self.enemy) {
+				self.squad.attack_state = fight;
+				dprint("end charge\n");
+				return;
+			}
+			//self.squad.attack_state = ss_wait; //to end charge --ALEX
+			self.pausetime = time + 999999;
+			self.th_stand();
+			return;
+		}
+	}
 	if (other.enemy)
 		if (other.enemy.health > 0)//more robust --ALEX
 		return;		// fighting, not following a path
@@ -129,10 +148,11 @@ local entity	temp;
 
 //dprint ("t_movetarget\n");
 	
-	self.goalentity = self.movetarget = find (world, targetname, other.target); //use target1 for counters.
+	self.goalentity = self.movetarget = find (world, targetname, other.target);
 	self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 	if (!self.movetarget)
 	{
+		self.squad.attack_state = ss_wait; //to end charge --ALEX
 		self.pausetime = time + 999999;
 		self.th_stand ();
 		return;
@@ -829,6 +849,30 @@ void() ai_run_slide =
 
 /*
 =============
+ai_run_charge
+
+charge directly at the goalentity
+=============
+*/
+void() ai_run_charge =
+{
+	if !(self.movetarget) {
+			self.goalentity = self.movetarget = find(world, targetname, self.target);
+			self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
+		}
+
+	if !(self.goalentity)
+	{
+		self.pausetime = time + 999999;
+		self.th_stand();
+		return;
+	}
+	dprint("ai_run_charge\n");
+	walkmove(self.ideal_yaw, movedist);
+};
+
+/*
+=============
 ai_run
 
 The monster has an enemy it is trying to kill
@@ -837,7 +881,7 @@ The monster has an enemy it is trying to kill
 void(float dist) ai_run =
 {
 //update memory of
-local entity fake, real;
+local entity fake, real, oldtar;
 fake = self.enemy;
 real = fake.enemy;
 
@@ -857,11 +901,22 @@ else dprint("enemy not visisble\n"); //sometimes in err
 
 //sprint(real, "returned to ai_run\n");
 // see if the enemy is dead
-if (self.squad.attack_state == charge) {
-	if (fake.health <= 0)
-		FindTarget(); //but do not abort
+if (self.attack_state == charge) {
+	ai_run_charge ();
+	oldtar = self.movetarget;
+	//if (fake.health <= 0)
+	//	FindTarget(); //but do not abort
+	//else {
+		enemy_infront = infront(real);
+		enemy_range = range(real);
+		enemy_yaw = vectoyaw(real.origin - self.origin);
+		//CheckAnyAttack();
+	//}
+	self.goalentity = self.movetarget = oldtar;
+	self.attack_state = charge; //return to state
+	return;
 }
-else { //ignore bad goal when charging
+
 	if ((fake.health <= 0) || (self.spawnflags & PASSIVE_ALWAYS))
 	{
 		self.enemy = world;
@@ -891,7 +946,7 @@ else { //ignore bad goal when charging
 		}
 		//else sprint(real, "ai_run continued\n");
 	}
-}//end of ignore when charging
+
 
 	//if (enemy_vis) {
 		enemy_infront = infront(real);

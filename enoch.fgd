@@ -3550,3 +3550,30 @@ Default health = 80" [
 keep_ammo(integer) : "Don't drop backpack" : : "Don't drop backpack upon death"
 //snd here
 ]
+
+@SolidClass base(Appearflags) = trigger_monsteract : "Sets Squad attack_state"
+[
+attack_state(choices) : "Attack State" =
+[
+	0:"Default (no effect)"
+	1:"1"
+	2:"2"
+	3:"3"
+	4:"4"
+	5:"5"
+	6:"sleep"
+	7:"alert"
+	8:"fight"
+	9:"flee"
+	10:"uncover"
+	11:"guard"
+	12:"search"
+	13:"wait"
+	14:"vehicle"
+	15:"charge"
+	16:"obey"
+	17:"converse"
+	18:"avoid"
+	19:"spawn"
+]
+]

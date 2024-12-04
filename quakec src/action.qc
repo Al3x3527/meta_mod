@@ -119,93 +119,83 @@ void() squad_wait =
 void() squad_charge = 
 {
 local entity sq = self;
-sq.attack_state = charge;
+//sq.attack_state = charge;
 dprint("squad_charge\n");
 
 if (sq.ally.health > 0) {
 	self = sq.ally;
-	
-	if (self.target) {
-		if !(self.movetarget) { self.goalentity = self.movetarget = find(world, targetname, self.target); }} 
-	else if !(self.goalentity) self.goalentity = self.movetarget;
-	else if (self.enemy) {
-		self.goalentity = self.enemy;
-		self.think = self.th_run; //make charge a permutation of AI_run(). self.th_charge when animations added
+	self.think = self.th_run;
+	self.attack_state = charge; 
+	if (!(self.movetarget) || self.movetarget == self.enemy) {
+		self.goalentity = self.movetarget = find(world, targetname, self.target);
+		self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 	}
-	else {
-		dprint("nowhere to charge\n");
-	}
-	sq.goalentity = self.goalentity;
+	sq.movetarget = self.movetarget;
 }
 if (sq.ally1.health > 0) {
 	self = sq.ally;
-	if (sq.goalentity) {
-		self.goalentity = sq.goalentity;
-		self.think = self.th_run;
-	}
-	else if (self.target) {
-		if !(self.movetarget) { self.goalentity = self.movetarget = find(world, targetname, self.target); }
-	}
-		else if !(self.goalentity) {self.goalentity = self.movetarget;}
-	else if (self.enemy) {
-		self.goalentity = self.enemy;
-		self.think = self.th_run;
-	}
+	self.think = self.th_run;
+	self.attack_state = charge;
+	self.goalentity = self.movetarget = sq.movetarget;
 }
 if (sq.ally2.health > 0) {
 	self = sq.ally;
-	if (sq.goalentity) {
-		self.goalentity = sq.goalentity;
-		self.think = self.th_run;
-	} else if (self.target) {
-		if !(self.movetarget) { self.goalentity = self.movetarget = find(world, targetname, self.target); }
-	}
-		else if !(self.goalentity) self.goalentity = self.movetarget;
-	else if (self.enemy) {
-		self.goalentity = self.enemy;
-		self.think = self.th_run;
-	}
+	self.think = self.th_run;
+	self.attack_state = charge;
+	self.goalentity = self.movetarget = sq.movetarget;
 }
 if (sq.ally3.health > 0) {
 	self = sq.ally;
-	if (sq.goalentity) {
-		self.goalentity = sq.goalentity;
-		self.think = self.th_run;
-	} else if (self.target) {
-		if !(self.movetarget) { self.goalentity = self.movetarget = find(world, targetname, self.target); } 
-		else if !(self.goalentity) self.goalentity = self.movetarget;
-}
-	else if (self.enemy) {
-		self.goalentity = self.enemy;
-		self.think = self.th_run;
-	}
+	self.think = self.th_run;
+	self.attack_state = charge;
+	self.goalentity = self.movetarget = sq.movetarget;
 }
 if (sq.ally4.health > 0) {
 	self = sq.ally;
-	if (sq.goalentity) {
-		self.goalentity = sq.goalentity;
-		self.think = self.th_run;
-	} else if (self.target) {
-		if !(self.movetarget) { self.goalentity = self.movetarget = find(world, targetname, self.target); } 
-		else if !(self.goalentity) self.goalentity = self.movetarget;
+	self.think = self.th_run;
+	self.attack_state = charge;
+	self.goalentity = self.movetarget = sq.movetarget;
 }
-	else if (self.enemy) {
-		self.goalentity = self.enemy;
-		self.think = self.th_run;
-	}
-}
+};
+
+void() squad_guard = 
+{
+
 };
 
 void() squad_action =
 {
 	//dprint("squad_action\n");
-	if !(self.memory.health > 0) {squad_wait(); return;} //default
 	if (self.attack_state == ss_spawn) { squad_spawn(); return; }
 	if (self.attack_state == charge) {squad_charge(); return;}
+	if !(self.memory.health > 0) {squad_wait(); return;} //default
 	if (self.memory.health > 0) { squad_fight(); return; } //should just move waypoint around most of the time.
 	//problem detecting when no enemy
 	dprint("squad_action exception\n");
 };
+
+void() act_touch =
+{
+	//if (self.estate != STATE_ACTIVE) return;
+	if !(other.flags & FL_MONSTER) return;
+local entity sq = other.squad;
+//if !(sq.health > 0) return;
+if (sq.attack_state != self.attack_state)
+sq.attack_state = self.attack_state;
+dprint("act_touch\n");
+};
+
+/*trigger_monsteract (.5 .5 .5) ? X X X X X X X NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER X NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
+forces squad attack_state of any monster that activates the trigger.
+*/
+void() trigger_monsteract = 
+{
+	if (SUB_Inhibit()) return;
+InitTrigger();
+self.touch = act_touch;
+SUB_CheckWaiting();
+};
+
 
 //something has changed, decide what to do next
 //assuming self = a monster
