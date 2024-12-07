@@ -858,15 +858,15 @@ void() ai_run_charge =
 {
 	if !(self.movetarget) {
 			self.goalentity = self.movetarget = find(world, targetname, self.target);
-			self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 		}
-
 	if !(self.goalentity)
 	{
 		self.pausetime = time + 999999;
 		self.th_stand();
 		return;
 	}
+	self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
+	ChangeYaw();
 	dprint("ai_run_charge\n");
 	walkmove(self.ideal_yaw, movedist);
 };
@@ -905,15 +905,16 @@ if (self.attack_state == charge) {
 	ai_run_charge ();
 	oldtar = self.movetarget;
 	//if (fake.health <= 0)
-	//	FindTarget(); //but do not abort
+		FindTarget(); //but do not abort
 	//else {
 		enemy_infront = infront(real);
 		enemy_range = range(real);
 		enemy_yaw = vectoyaw(real.origin - self.origin);
-		//CheckAnyAttack();
+		CheckAnyAttack();
 	//}
-	self.goalentity = self.movetarget = oldtar;
-	self.attack_state = charge; //return to state
+	//self.goalentity = self.movetarget = oldtar;
+	//self.attack_state = charge; //return to state
+		dprint("end run charge\n");
 	return;
 }
 
