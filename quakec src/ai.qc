@@ -115,26 +115,44 @@ local entity	temp;
 
 	if (other.movetarget != self)
 		return;
-
-	if (other.squad.attack_state == charge) { //ALEX
+	dprint("t_movetarget=============================\n");
+	if (other.attack_state == charge) { //ALEX --not squad fix freeze
+		//dprint("squad.attackstate == charge\n"); works
 		temp = self;
 		self = other;
 		other = temp;
 		self.goalentity = self.movetarget = find(world, targetname, other.target);
 		self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
+		if (self.goalentity == self.enemy.enemy)
+		{
+			self.squad.attack_state = fight;
+			self.attack_state = fight;
+			//self.goalentity = self.enemy;
+			dprint("end charge alternate\n");
+			return;
+		}
 		if (!self.movetarget)
 		{
 			if (self.enemy) {
 				self.squad.attack_state = fight;
+				self.goalentity = self.enemy;
 				dprint("end charge\n");
 				return;
 			}
 			//self.squad.attack_state = ss_wait; //to end charge --ALEX
 			self.pausetime = time + 999999;
 			self.th_stand();
+			dprint("self.th_stand from t_movetarget");
 			return;
 		}
+		else {
+			dprint("movetarget found ");
+			dprint(self.movetarget.targetname);
+			dprint(self.movetarget.classname);
+			dprint("\n");
+		}
 	}
+	else dprint("not in a charge.\n");
 	if (other.enemy)
 		if (other.enemy.health > 0)//more robust --ALEX
 		return;		// fighting, not following a path
@@ -861,12 +879,14 @@ void() ai_run_charge =
 		}
 	if !(self.goalentity)
 	{
-		self.pausetime = time + 999999;
+		dprint("ai_run_charge canceled\n");
+	//	self.pausetime = time + 999999;
 		self.th_stand();
 		return;
 	}
 	self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 	ChangeYaw();
+	//self.squad.attack_state = charge; //in case of late merge -- makes things worse.
 	dprint("ai_run_charge\n");
 	walkmove(self.ideal_yaw, movedist);
 };
@@ -888,17 +908,18 @@ real = fake.enemy;
 //dprint("ai_run\n");
 movedist = dist;
 
-// check knowledge of enemy
-enemy_vis = visible(real);// --Alex
-if (enemy_vis) {
-	if (self.memory_time < time) //fixes animations
-	update_memory(real);
-	self.memory_time = time + .5;// +.2 * random();
-	self.search_time = time + 4.9; //originally 5
+if (self.enemy) {
+	// check knowledge of enemy
+	enemy_vis = visible(real);// --Alex
+	if (enemy_vis) {
+		if (self.memory_time < time) //fixes animations
+			update_memory(real);
+		self.memory_time = time + .5;// +.2 * random();
+		self.search_time = time + 4.9; //originally 5
+	} else dprint("enemy not visible\n"); //sometimes in err
+	//visible() being called when no self.enemy >> ai_run() when no enemy
 }
-else dprint("enemy not visisble\n"); //sometimes in err
-//visible() being called when no self.enemy >> ai_run() when no enemy
-
+else dprint("ai_run no enemy\n");
 //sprint(real, "returned to ai_run\n");
 // see if the enemy is dead
 if (self.attack_state == charge) {
@@ -914,7 +935,7 @@ if (self.attack_state == charge) {
 	//}
 	//self.goalentity = self.movetarget = oldtar;
 	//self.attack_state = charge; //return to state
-		dprint("end run charge\n");
+		dprint("run charge\n");
 	return;
 }
 

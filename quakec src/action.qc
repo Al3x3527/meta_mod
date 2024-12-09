@@ -130,31 +130,31 @@ if (sq.ally.health > 0) {
 		self.goalentity = self.movetarget = find(world, targetname, self.target);
 		self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 	}
-	sq.movetarget = self.movetarget;
+	sq.goalentity = self.goalentity;
 }
 if (sq.ally1.health > 0) {
-	self = sq.ally;
+	self = sq.ally1;
 	self.think = self.th_run;
 	self.attack_state = charge;
-	self.goalentity = self.movetarget = sq.movetarget;
+	self.goalentity = self.movetarget = sq.goalentity;
 }
 if (sq.ally2.health > 0) {
-	self = sq.ally;
+	self = sq.ally2;
 	self.think = self.th_run;
 	self.attack_state = charge;
-	self.goalentity = self.movetarget = sq.movetarget;
+	self.goalentity = self.movetarget = sq.goalentity;
 }
 if (sq.ally3.health > 0) {
-	self = sq.ally;
+	self = sq.ally3;
 	self.think = self.th_run;
 	self.attack_state = charge;
-	self.goalentity = self.movetarget = sq.movetarget;
+	self.goalentity = self.movetarget = sq.goalentity;
 }
 if (sq.ally4.health > 0) {
-	self = sq.ally;
+	self = sq.ally4;
 	self.think = self.th_run;
 	self.attack_state = charge;
-	self.goalentity = self.movetarget = sq.movetarget;
+	self.goalentity = self.movetarget = sq.goalentity;
 }
 };
 
