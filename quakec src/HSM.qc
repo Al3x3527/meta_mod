@@ -132,7 +132,6 @@ ONLY ASSIGN DANGER TO HSM
 float(entity oqs, entity sqs) CompareDanger =
 {
 	local float odanger, sdanger = 0;
-local entity temp;
 if (sqs == world) { return FUBAR; } //allies
 if (oqs == world) { return FUBAR; } //enemies
 
@@ -429,15 +428,15 @@ if ((sq.memory1 = FindStrongest(ts)))
 if ((sq.memory2 = FindStrongest(ts)))
 {RemoveMemory(ts, sq.memory2);  sq.memory2.danger = sq.memory2.danger + 0.15; }
 if ((sq.memory3 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory3);  sq.memory3.danger = sq.memory3.danger + 0.14; }
+{RemoveMemory(ts, sq.memory3);  sq.memory3.danger = sq.memory3.danger + 0.14; }
 if ((sq.memory4 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory4);  sq.memory4.danger = sq.memory4.danger + 0.13; }
+{RemoveMemory(ts, sq.memory4);  sq.memory4.danger = sq.memory4.danger + 0.13; }
 if ((sq.memory5 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory5);  sq.memory5.danger = sq.memory5.danger + 0.12; }
+{RemoveMemory(ts, sq.memory5);  sq.memory5.danger = sq.memory5.danger + 0.12; }
 if ((sq.memory6 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory6);  sq.memory6.danger = sq.memory6.danger + 0.11; }
+{RemoveMemory(ts, sq.memory6);  sq.memory6.danger = sq.memory6.danger + 0.11; }
 if ((sq.memory7 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory7);  sq.memory7.danger = sq.memory7.danger + 0.1; }
+{RemoveMemory(ts, sq.memory7);  sq.memory7.danger = sq.memory7.danger + 0.1; }
 sq.memory8 = null;
 remove(null);
 remove(ts);
