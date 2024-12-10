@@ -126,6 +126,9 @@ void() monster_human =
 	if (!self.health) //thanks RennyC -- dumptruck_ds
 		self.health = 80;
 
+	if !(self.danger)
+		self.danger = 1;
+
 	self.th_stand = man_stand1;
 	self.th_walk = man_walk1;
 	self.th_run = man_run1;

@@ -21,13 +21,19 @@ percent = targ.health / 80;
 return percent;
 };
 
-float(entity tother, float f) assign_danger =
+float(entity temp) danger_calc =
+{
+	return ((temp.danger * temp.health / 80) + (temp.weapon / 16));
+};
+
+/*float(entity tother, float f) assign_danger =
 {
 	 float c_factor, h_factor, w_factor;
 	//multiply normalized factors: class*health*weapon
 	//what's more important, finishing off a weak enemy or fighting a strong one?
 		//assign higher danger to hero classes and vehicles
 		//work out a tree when enemies and vehicles are more implemented
+
 if (!tother || tother == world) { 
 	dprint("danger bad target\n");
 	return FALSE; 
@@ -39,6 +45,7 @@ c_factor = 0.55;
 else if (tother.target == "monster_enforcer")
 c_factor = 0.7;
 else c_factor = 1;
+
 h_factor = TargetHealthPercent(tother);
 //if (tother.weapon == 32)
 w_factor = 1;
@@ -46,7 +53,10 @@ w_factor = 1;
 tother.danger = c_factor * h_factor * w_factor + f;
 return TRUE;
 };
+OLD
+*/
 
+/*
 float() prioritize_targets =
 {
 	local entity sq = self;
@@ -86,7 +96,10 @@ if (sq.memory8)
 //dprint("prioritize targets complete\n");
 return TRUE;
 };
+OLD
+*/
 
+/*
 void() find_sdanger =
 {
 local float dcount = FALSE;
@@ -111,14 +124,17 @@ if (!dcount) { //doesn't work
 	remove(sqs);
 }
 };
+ONLY ASSIGN DANGER TO HSM
+*/
 
 
 
 float(entity oqs, entity sqs) CompareDanger =
 {
-	local float odanger, sdanger;
-if (sqs == world) { return FUBAR; }
-if (oqs == world) { return FUBAR; }
+	local float odanger, sdanger = 0;
+local entity temp;
+if (sqs == world) { return FUBAR; } //allies
+if (oqs == world) { return FUBAR; } //enemies
 
 if (oqs.ally) odanger = oqs.ally.danger;
 if (oqs.ally1) odanger = odanger + oqs.ally1.danger;
@@ -128,12 +144,12 @@ if (oqs.ally4) odanger = odanger + oqs.ally4.danger;
 if (oqs.ally5) odanger = odanger + oqs.ally5.danger;
 if (oqs.ally6) odanger = odanger + oqs.ally6.danger;
 if (oqs.ally7) odanger = odanger + oqs.ally7.danger;
-find_sdanger();
-if (sqs.ally) sdanger = sqs.ally.danger;
-if (sqs.ally1) sdanger = sdanger + sqs.ally1.danger;
-if (sqs.ally2) sdanger = sdanger + sqs.ally2.danger;
-if (sqs.ally3) sdanger = sdanger + sqs.ally3.danger;
-if (sqs.ally4) sdanger = sdanger + sqs.ally4.danger;
+//find_sdanger();
+if (sqs.ally) sdanger = danger_calc(sqs.ally);
+if (sqs.ally1) sdanger = sdanger + danger_calc(sqs.ally1);
+if (sqs.ally2) sdanger = sdanger + danger_calc(sqs.ally2);
+if (sqs.ally3) sdanger = sdanger + danger_calc(sqs.ally3);
+if (sqs.ally4) sdanger = sdanger + danger_calc(sqs.ally4);
 dprint("compare danger\n");
 if (sdanger > odanger) return TRUE;
 else return FALSE;
@@ -407,24 +423,22 @@ if (sq.memory7.classname == "ai_memory") ts.memory7 = sq.memory7;
 if (sq.memory8.classname == "ai_memory") ts.memory8 = sq.memory8;
 
 if (!(sq.memory = FindStrongest(ts))) dprint("sq.enemy unfilled by sort\n");
-else RemoveMemory(ts, sq.memory);
+else { RemoveMemory(ts, sq.memory); sq.memory.danger = sq.memory.danger + 0.17; } //updated
 if ((sq.memory1 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory1);
+{RemoveMemory(ts, sq.memory1); sq.memory1.danger = sq.memory1.danger + 0.16; }
 if ((sq.memory2 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory2);
+{RemoveMemory(ts, sq.memory2);  sq.memory2.danger = sq.memory2.danger + 0.15; }
 if ((sq.memory3 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory3);
+RemoveMemory(ts, sq.memory3);  sq.memory3.danger = sq.memory3.danger + 0.14; }
 if ((sq.memory4 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory4);
+RemoveMemory(ts, sq.memory4);  sq.memory4.danger = sq.memory4.danger + 0.13; }
 if ((sq.memory5 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory5);
+RemoveMemory(ts, sq.memory5);  sq.memory5.danger = sq.memory5.danger + 0.12; }
 if ((sq.memory6 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory6);
+RemoveMemory(ts, sq.memory6);  sq.memory6.danger = sq.memory6.danger + 0.11; }
 if ((sq.memory7 = FindStrongest(ts)))
-RemoveMemory(ts, sq.memory7);
-
+RemoveMemory(ts, sq.memory7);  sq.memory7.danger = sq.memory7.danger + 0.1; }
 sq.memory8 = null;
-
 remove(null);
 remove(ts);
 //if (sq.memory.health > 0) dprint("enemies sorted\n");
@@ -477,16 +491,10 @@ if (nm.squad != self) {
 }
 //else dprint("memory8 not set\n");
 
-if (prioritize_targets() == FALSE) {
+/*if (prioritize_targets() == FALSE) {
 	dprint("prioritize targets failed\n");
 	return; //still works
-}
-//dprint("prioritize targets did not fail\n");
-//if (oself.squad) self = oself.squad;
-//else {
-	//dprint("sight update bad squad\n");
-	//return;
-//}
+} */
 if (self.encounter.health > 0) {
 //	dprint("sight update complete\n");
 	self = oself;
@@ -543,11 +551,11 @@ if (sq.memory.enemy == nt) {
 		entity new_memory = spawn();
 		new_memory.classname = "ai_memory";
 		new_memory.think = memorythink;
-	//	setmodel(new_memory, "progs/armor.mdl"); //debug
+	//	setmodel(new_memory, "progs/armor.mdl"); //debug 
 	//	setsize(new_memory, '-16 -16 0', '16 16 56');
 		new_memory.solid = SOLID_NOT;
 		new_memory.movetype = MOVETYPE_NONE;
-		new_memory.target = nt.classname;
+		//new_memory.target = nt.classname;
 		new_memory.enemy = nt;
 		new_memory.team = nt.team;
 		new_memory.flags = FL_NOTARGET;
@@ -563,6 +571,9 @@ if (sq.memory.enemy == nt) {
 	}
 nm.origin = nt.origin + '0 0 12';
 nm.health = nt.health;
+//assign danger here
+nm.danger = danger_calc(nt);
+
 if !(nm.health > 0) { //reducing causes for bad sort
 	dprint("memory update no health\n");
 	remove(nm);

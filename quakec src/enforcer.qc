@@ -964,6 +964,9 @@ void() monster_enforcer =
 	if (!self.health) //thanks RennyC -- dumptruck_ds
 	self.health = 80;
 
+	if !(self.danger)
+		self.danger = 1.25;
+
 	self.th_stand = enf_stand1;
 	self.th_walk = enf_walk1;
 	if (self.spawnflags & I_AM_TURRET)

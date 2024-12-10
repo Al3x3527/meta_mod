@@ -644,6 +644,9 @@ void() monster_army =
 	if (!self.health) //thanks RennyC -- dumptruck_ds
 	self.health = 30;
 
+	if !(self.danger)
+		self.danger = 1;
+
 	self.th_stand = army_stand1;
 	self.th_walk = army_walk1;
 	if (self.spawnflags & I_AM_TURRET)

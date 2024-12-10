@@ -274,6 +274,8 @@ void() PutClientInServer =
 	self.onladder = 0;
 	self.customkeys = 0;  // support for item_key_custom -- iw
 
+	self.danger = 1.2; //class based danger for HSM --ALEX
+
 	if (coop) { self.team = PLAYERS; } //fix encounters
 
 	// Setup cutscene stuff.  Legacy code from Zerstorer. --dumptruck_ds
