@@ -928,10 +928,12 @@ if (self.attack_state == charge) {
 	//if (fake.health <= 0)
 		FindTarget(); //but do not abort
 	//else {
-		enemy_infront = infront(real);
-		enemy_range = range(real);
-		enemy_yaw = vectoyaw(real.origin - self.origin);
-		CheckAnyAttack();
+		if (enemy_vis) { //will this stop the freeze?
+			enemy_infront = infront(real);
+			enemy_range = range(real);
+			enemy_yaw = vectoyaw(real.origin - self.origin);
+			CheckAnyAttack();
+		}
 	//}
 	//self.goalentity = self.movetarget = oldtar;
 	//self.attack_state = charge; //return to state
@@ -1068,3 +1070,35 @@ float (entity targ) visibleToOther =
 };
 
 //----------------------------------------------------------------------------
+
+void() zone_defense =
+{
+	if (self.squad.danger > 1) {
+		//more defensive
+		self.attack_state = AS_AVOID;
+} else {
+		//more aggressive
+		self.attack_state = AS_FIGHT;
+}
+create_waypoint(zone_waypoint());
+};
+
+void() point_defense =
+{
+	if (self.squad.danger > 1) {
+		//more defensive
+		self.attack_state = AS_AVOID;
+} else {
+		//more aggressive
+		self.attack_state = AS_FIGHT;
+}
+create_waypoint(radius_waypoint());
+};
+
+void() ai_run_guard =
+{
+if (self.goalentity.solid == SOLID_TRIGGER)
+zone_defense();
+else
+point_defense(); 
+};

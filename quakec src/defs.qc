@@ -519,20 +519,20 @@ float	AS_TURRET		= 5;
 .entity		encounter;
 .float		memory_time;
 
-float	sleep = 6;
-float	alert = 7;
-float	fight = 8;
-float	flee = 9;
-float	uncover = 10;
-float	guard = 11;
-float	search = 12;
-float	ss_wait = 13; //wait taken
-float	vehicle = 14;
-float	charge = 15;
-float	obey = 16;
-float	converse = 17;
-float	avoid = 18;
-float	ss_spawn = 19;
+float	AS_SLEEP = 6;
+float	AS_ALERT = 7;
+float	AS_FIGHT = 8;
+float	AS_FLEE = 9;
+float	AS_UNCOVER = 10;
+float	AS_GUARD = 11;
+float	AS_SEARCH = 12;
+float	AS_WAIT = 13;
+float	AS_VEHICLE = 14;
+float	AS_CHARGE = 15;
+float	AS_OBEY = 16;
+float	AS_CONVERSE = 17;
+float	AS_AVOID = 18;
+float	AS_SPAWN = 19;
 
 float	PLAYERS = 1;
 float	MONSTERS = 2;

@@ -150,8 +150,9 @@ if (sqs.ally2) sdanger = sdanger + danger_calc(sqs.ally2);
 if (sqs.ally3) sdanger = sdanger + danger_calc(sqs.ally3);
 if (sqs.ally4) sdanger = sdanger + danger_calc(sqs.ally4);
 dprint("compare danger\n");
-if (sdanger > odanger) return TRUE;
-else return FALSE;
+sqs.danger = odanger / sdanger; 
+//if (sdanger > odanger) return TRUE;
+//else return FALSE;
 };
 
 
@@ -617,7 +618,7 @@ void(vector spawnpoint) create_waypoint =
 	new_waypoint.nextthink = time + 4.9;
 };
 
-vector (float dist, entity  target) waypoint_offset = //untested
+vector (float dist, entity  target) waypoint_offset = 
 {
 	local vector vec, d, b;
 vec = target.origin - self.origin;
@@ -632,7 +633,31 @@ vec = target.origin - d + b;
 return vec;
 };
 
-vector (float dist) waypoint_cast =
+vector () zone_waypoint =
+{
+	local vector vec;
+if (self.attack_state == AS_FIGHT) {
+	//vec = intersection of zone boundary and ideal yaw
+}
+else {
+	//vec = intersection of zone boundary and ideal yaw + 180
+}
+return vec;
+};
+
+vector() radius_waypoint =
+{
+	local vector vec;
+local float r = 128;
+if (self.attack_state == AS_FIGHT) {
+	//vec = intersection of target circle and ideal yaw
+} else {
+	//vec = intersection of target circle and ideal yaw + 180
+}
+return vec;
+};
+
+vector (float dist) cast_waypoint =
 {
 	local vector vec;
 local float d;

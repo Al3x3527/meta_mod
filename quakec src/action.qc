@@ -5,12 +5,54 @@ AI behavior tree
 */
 
 
+//check formations
+//check stress (danger balance)
+	//formation fail
+	//defensive
+	//aggressive
+
+//zone defense(modifier)
+	//aggressive
+	//defensive
+//point defense(modifier) path_corner or spawn point
+	//aggressive
+	//defensive
+
+/*float() check_stress =
+{
+	return (balance);
+};
+
+void() zone_defense =
+{
+	if (self.danger > 1) {
+		//more defensive
+		self.attack_state = push;
+} 
+	else {
+		//more aggressive
+		self.attack_state = hold;
+}
+};
+
+void() point_defense =
+{
+	if (self.danger > 1) {
+		//more defensive
+
+}
+	else {
+		//more aggressive
+
+}
+};
+*/
 void() squad_fight =
 {
 	local entity sq;
 	sq = self;
 	
-	sq.attack_state = fight;
+	sq.attack_state = AS_FIGHT;
 	//dprint("squad fight\n");
 	if (!sq) { 
 		dprint("squad failed at ACTION\n");
@@ -61,7 +103,7 @@ void() squad_fight =
 	self = sq;
 };
 
-void() squad_spawn =
+void() squad_spawn = //unneccessary function? handle in ai.qc
 {
 	local entity sq = self;
 	if (self.ally.health > 0) {
@@ -71,7 +113,7 @@ void() squad_spawn =
 			self = self.ally;
 			self.ideal_yaw = self.angles_y + 70 * random();
 			ChangeYaw();
-			create_waypoint(waypoint_cast(48));//placeholder
+			create_waypoint(cast_waypoint(48));//placeholder
 			self.think = self.th_walk;
 			self = sq;
 		}
@@ -83,7 +125,7 @@ void() squad_wait =
 {
 	local entity sq = self;
 
-	sq.attack_state = ss_wait;
+	sq.attack_state = AS_WAIT;
 	//dprint("squad wait\n");
 
 	if (sq.ally.health > 0) {
@@ -125,7 +167,7 @@ dprint("squad_charge\n");
 if (sq.ally.health > 0) {
 	self = sq.ally;
 	self.think = self.th_run;
-	self.attack_state = charge; 
+	self.attack_state = AS_CHARGE; 
 	if (!(self.movetarget) || self.movetarget == self.enemy) {
 		self.goalentity = self.movetarget = find(world, targetname, self.target);
 		self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
@@ -135,39 +177,72 @@ if (sq.ally.health > 0) {
 if (sq.ally1.health > 0) {
 	self = sq.ally1;
 	self.think = self.th_run;
-	self.attack_state = charge;
+	self.attack_state = AS_CHARGE;
 	self.goalentity = self.movetarget = sq.goalentity;
 }
 if (sq.ally2.health > 0) {
 	self = sq.ally2;
 	self.think = self.th_run;
-	self.attack_state = charge;
+	self.attack_state = AS_CHARGE;
 	self.goalentity = self.movetarget = sq.goalentity;
 }
 if (sq.ally3.health > 0) {
 	self = sq.ally3;
 	self.think = self.th_run;
-	self.attack_state = charge;
+	self.attack_state = AS_CHARGE;
 	self.goalentity = self.movetarget = sq.goalentity;
 }
 if (sq.ally4.health > 0) {
 	self = sq.ally4;
 	self.think = self.th_run;
-	self.attack_state = charge;
+	self.attack_state = AS_CHARGE;
 	self.goalentity = self.movetarget = sq.goalentity;
 }
 };
 
 void() squad_guard = 
 {
-
+local entity sq = self;
+dprint("squad_guard\n");
+self.attack_state = as_guard;
+if (sq.ally.health > 0) {
+	self = sq.ally;
+	self.think = self.th_run;
+	if !(sq.goalentity)
+			sq.goalentity = find(world, targetname, self.target);
+}
+if (sq.ally1.health > 0) {
+	self = sq.ally1;
+	self.think = self.th_run;
+	if !(sq.goalentity)
+		sq.goalentity = find(world, targetname, self.target);
+}
+if (sq.ally2.health > 0) {
+	self = sq.ally2;
+	self.think = self.th_run;
+	if !(sq.goalentity)
+		sq.goalentity = find(world, targetname, self.target);
+}
+if (sq.ally3.health > 0) {
+	self = sq.ally3;
+	self.think = self.th_run;
+	if !(sq.goalentity)
+		sq.goalentity = find(world, targetname, self.target);
+}
+if (sq.ally4.health > 0) {
+	self = sq.ally4;
+	self.think = self.th_run;
+	if !(sq.goalentity)
+		sq.goalentity = find(world, targetname, self.target);
+}
+self = sq;
 };
 
 void() squad_action =
 {
 	//dprint("squad_action\n");
-	if (self.attack_state == ss_spawn) { squad_spawn(); return; }
-	if (self.attack_state == charge) {squad_charge(); return;}
+	if (self.attack_state == as_spawn) { squad_spawn(); return; }
+	if (self.attack_state == as_charge) {squad_charge(); return;}
 	if !(self.memory.health > 0) {squad_wait(); return;} //default
 	if (self.memory.health > 0) { squad_fight(); return; } //should just move waypoint around most of the time.
 	//problem detecting when no enemy
