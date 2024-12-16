@@ -129,11 +129,11 @@ ONLY ASSIGN DANGER TO HSM
 
 
 
-float(entity oqs, entity sqs) CompareDanger =
+void(entity oqs, entity sqs) CompareDanger =
 {
 	local float odanger, sdanger = 0;
-if (sqs == world) { return FUBAR; } //allies
-if (oqs == world) { return FUBAR; } //enemies
+//if (sqs == world) { return FUBAR; } //allies
+//if (oqs == world) { return FUBAR; } //enemies
 
 if (oqs.ally) odanger = oqs.ally.danger;
 if (oqs.ally1) odanger = odanger + oqs.ally1.danger;
@@ -618,55 +618,47 @@ void(vector spawnpoint) create_waypoint =
 	new_waypoint.nextthink = time + 4.9;
 };
 
-vector (float dist, entity  target) waypoint_offset = 
-{
+vector (float dist, entity  object) waypoint_offset = 
+{//object probably enemy
 	local vector vec, d, b;
-vec = target.origin - self.origin;
+if (self.squad.attack_state == AS_AVOID)
+dist = dist * -1;
+vec = object.origin - self.origin;
 d = normalize(vec) * dist;
 b_x = -d_y;
 b_y = d_x;
 //offset waypoint.origin by offset normal to vector, abs of offset along vector from target.origin
 if (dist > 0)
-vec = target.origin + d + b;
+vec = object.origin + d + b;
 else
-vec = target.origin - d + b;
+vec = object.origin - d + b;
 return vec;
 };
 
-vector () zone_waypoint =
-{
-	local vector vec;
-	local float d = 48;
-	makevectors(self.ideal_yaw);
-if (self.attack_state == AS_FIGHT) {
-	//vec = intersection of zone boundary and ideal yaw
-	vec = (self.origin + v_forward * d);
-}
-else {
-	//vec = intersection of zone boundary and ideal yaw + 180
-	vec = (self.origin - v_forward * d);
-}
+vector (float dist, entity object) zone_waypoint =
+{//object probably enemy
+	local vector vec, d;
+//	local float dist = 48;
+if (self.attack_state == AS_AVOID)
+	dist = dist *-1;
+d = normalize(object.origin - self.origin) * dist;
+vec = self.origin + d;
 traceline(vec, self.origin, TRUE, self);
 if (trace_ent.targetname == self.target) //volume hit
-vec = trace_endpos;
-else //neither point in volume
+vec = trace_endpos; //vec = intersection of zone boundary and ideal yaw
+else //neither point in volume --QUESTIONABLE
 vec = self.movetarget.origin;
 return vec;
 };
 
-vector() dist_waypoint =
-{
-	//limits waypoints to square area around movetarget
+vector(float dist, entity object) dist_waypoint =
+{//object probably enemy
 	local vector vec, delta;
-local float dist = 48;
-local float d = 96;
-makevectors(self.ideal_yaw);
-if (self.attack_state == AS_FIGHT) {
-	vec = (self.origin + v_forward * dist);
-} else {
-	vec = (self.origin - v_forward * dist);
-}
-delta = vec - self.movetarget.origin;
+	//local float dist = 48;
+	local float d = 96;//limits waypoints to square area around movetarget
+if (self.attack_state == AS_AVOID)
+dist = dist * -1;
+delta = normalize(self.origin - self.movetarget.origin) * dist;
 if (delta_x > -d) {
 	if (delta_x > d)
 		delta_x = d;
@@ -728,7 +720,7 @@ new_squad.ally = mobot;
 new_squad.flags = FL_NOTARGET;//test
 new_squad.solid = SOLID_NOT;
 new_squad.movetype = MOVETYPE_NONE;
-new_squad.attack_state = ss_spawn;
+new_squad.attack_state = AS_SPAWN;
 new_squad.nextthink = time + 0.3 + .5 * random();
 }
 

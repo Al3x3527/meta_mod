@@ -47,12 +47,15 @@ void() point_defense =
 }
 };
 */
-void() squad_fight =
+void() squad_run =
 {
 	local entity sq;
 	sq = self;
 	
-	sq.attack_state = AS_FIGHT;
+	if (sq.danger > 1)
+		sq.attack_state = AS_AVOID;
+	else
+		sq.attack_state = AS_FIGHT;
 	//dprint("squad fight\n");
 	if (!sq) { 
 		dprint("squad failed at ACTION\n");
@@ -117,7 +120,7 @@ void() squad_spawn = //unneccessary function? handle in ai.qc
 			self.think = self.th_walk;
 			self = sq;
 		}
-		else squad_fight();
+		else squad_run();
 }
 };
 
@@ -204,7 +207,7 @@ void() squad_guard =
 {
 local entity sq = self;
 dprint("squad_guard\n");
-self.attack_state = as_guard;
+self.attack_state = AS_GUARD;
 if (sq.ally.health > 0) {
 	self = sq.ally;
 	self.think = self.th_run;
@@ -241,10 +244,10 @@ self = sq;
 void() squad_action =
 {
 	//dprint("squad_action\n");
-	if (self.attack_state == as_spawn) { squad_spawn(); return; }
-	if (self.attack_state == as_charge) {squad_charge(); return;}
+	if (self.attack_state == AS_SPAWN) { squad_spawn(); return; }
+	if (self.attack_state == AS_CHARGE) {squad_charge(); return;}
 	if !(self.memory.health > 0) {squad_wait(); return;} //default
-	if (self.memory.health > 0) { squad_fight(); return; } //should just move waypoint around most of the time.
+	if (self.memory.health > 0) { squad_run(); return; } //should just move waypoint around most of the time.
 	//problem detecting when no enemy
 	dprint("squad_action exception\n");
 };
@@ -390,7 +393,7 @@ void() trigger_monsteraction =
 		 }
 	//defaults here
 	if !(self.attack_state)
-		self.attack_state = ss_wait;
+		self.attack_state = AS_WAIT;
 
 	InitTrigger();
 	self.touch = trigger_monsteraction_touch;

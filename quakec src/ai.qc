@@ -116,7 +116,7 @@ local entity	temp;
 	if (other.movetarget != self)
 		return;
 	dprint("t_movetarget=============================\n");
-	if (other.attack_state == charge) { //ALEX --not squad fix freeze
+	if (other.attack_state == AS_CHARGE) { //ALEX --not squad fix freeze
 		//dprint("squad.attackstate == charge\n"); works
 		temp = self;
 		self = other;
@@ -125,8 +125,8 @@ local entity	temp;
 		self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 		if (self.goalentity == self.enemy.enemy)
 		{
-			self.squad.attack_state = fight;
-			self.attack_state = fight;
+			self.squad.attack_state = AS_FIGHT;
+			self.attack_state = AS_FIGHT;
 			//self.goalentity = self.enemy;
 			dprint("end charge alternate\n");
 			return;
@@ -134,7 +134,7 @@ local entity	temp;
 		if (!self.movetarget)
 		{
 			if (self.enemy) {
-				self.squad.attack_state = fight;
+				self.squad.attack_state = AS_FIGHT;
 				self.goalentity = self.enemy;
 				dprint("end charge\n");
 				return;
@@ -170,7 +170,7 @@ local entity	temp;
 	self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 	if (!self.movetarget)
 	{
-		self.squad.attack_state = ss_wait; //to end charge --ALEX
+		self.squad.attack_state = AS_WAIT; //to end charge --ALEX
 		self.pausetime = time + 999999;
 		self.th_stand ();
 		return;
@@ -922,7 +922,7 @@ if (self.enemy) {
 else dprint("ai_run no enemy\n");
 //sprint(real, "returned to ai_run\n");
 // see if the enemy is dead
-if (self.attack_state == charge) {
+if (self.attack_state == AS_CHARGE) {
 	ai_run_charge ();
 	oldtar = self.movetarget;
 	//if (fake.health <= 0)
@@ -1080,7 +1080,7 @@ void() zone_defense =
 		//more aggressive
 		self.attack_state = AS_FIGHT;
 }
-create_waypoint(zone_waypoint());
+create_waypoint(zone_waypoint(48, self.goalentity));
 };
 
 void() point_defense =
@@ -1092,7 +1092,7 @@ void() point_defense =
 		//more aggressive
 		self.attack_state = AS_FIGHT;
 }
-create_waypoint(dist_waypoint());
+create_waypoint(dist_waypoint(48, self.goalentity));
 };
 
 void() ai_run_guard =
