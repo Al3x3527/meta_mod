@@ -654,15 +654,29 @@ vec = self.movetarget.origin;
 return vec;
 };
 
-vector() radius_waypoint =
+vector() dist_waypoint =
 {
-	local vector vec;
-local float r = 128;
+	//limits waypoints to square area around movetarget
+	local vector vec, delta;
+local float dist = 48;
+local float d = 96;
+makevectors(self.ideal_yaw);
 if (self.attack_state == AS_FIGHT) {
-	//vec = intersection of target circle and ideal yaw
+	vec = (self.origin + v_forward * dist);
 } else {
-	//vec = intersection of target circle and ideal yaw + 180
+	vec = (self.origin - v_forward * dist);
 }
+delta = vec - self.movetarget.origin;
+if (delta_x > -d) {
+	if (delta_x > d)
+		delta_x = d;
+}
+else delta_x = -d;
+if (delta_y > -d) {
+	if (delta_y > d)
+		delta_y = d;
+} else delta_y = -d;
+vec = delta + self.movetarget.origin;
 return vec;
 };
 

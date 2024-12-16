@@ -1092,7 +1092,7 @@ void() point_defense =
 		//more aggressive
 		self.attack_state = AS_FIGHT;
 }
-create_waypoint(radius_waypoint());
+create_waypoint(dist_waypoint());
 };
 
 void() ai_run_guard =
