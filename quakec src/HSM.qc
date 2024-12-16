@@ -636,12 +636,21 @@ return vec;
 vector () zone_waypoint =
 {
 	local vector vec;
+	local float d = 48;
+	makevectors(self.ideal_yaw);
 if (self.attack_state == AS_FIGHT) {
 	//vec = intersection of zone boundary and ideal yaw
+	vec = (self.origin + v_forward * d);
 }
 else {
 	//vec = intersection of zone boundary and ideal yaw + 180
+	vec = (self.origin - v_forward * d);
 }
+traceline(vec, self.origin, TRUE, self);
+if (trace_ent.targetname == self.target) //volume hit
+vec = trace_endpos;
+else //neither point in volume
+vec = self.movetarget.origin;
 return vec;
 };
 
