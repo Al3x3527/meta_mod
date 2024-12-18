@@ -23,7 +23,7 @@ return percent;
 
 float(entity temp) danger_calc =
 {
-	return ((temp.danger * temp.health / 80) + (temp.weapon / 16));
+	return ((temp.danger * temp.health / 80) + (temp.weapon / 2));
 };
 
 /*float(entity tother, float f) assign_danger =
@@ -621,8 +621,10 @@ void(vector spawnpoint) create_waypoint =
 vector (float dist, entity  object) waypoint_offset = 
 {//object probably enemy
 	local vector vec, d, b;
-if (self.squad.attack_state == AS_AVOID)
-dist = dist * -1;
+if (self.squad.attack_state == AS_AVOID) {
+	dist = dist * -1;
+	dprint("avoid waypoint\n");
+}
 vec = object.origin - self.origin;
 d = normalize(vec) * dist;
 b_x = -d_y;

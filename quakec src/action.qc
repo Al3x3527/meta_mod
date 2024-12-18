@@ -52,8 +52,10 @@ void() squad_run =
 	local entity sq;
 	sq = self;
 	
-	if (sq.danger > 1)
+	if (sq.danger > 1) {
 		sq.attack_state = AS_AVOID;
+		dprint("squad_run AS_AVOID\n");
+	}
 	else
 		sq.attack_state = AS_FIGHT;
 	//dprint("squad fight\n");
@@ -246,6 +248,7 @@ void() squad_action =
 	//dprint("squad_action\n");
 	if (self.attack_state == AS_SPAWN) { squad_spawn(); return; }
 	if (self.attack_state == AS_CHARGE) {squad_charge(); return;}
+	if (self.attack_state == AS_AVOID) { self.danger = 2; squad_run(); return; } //forced.
 	if !(self.memory.health > 0) {squad_wait(); return;} //default
 	if (self.memory.health > 0) { squad_run(); return; } //should just move waypoint around most of the time.
 	//problem detecting when no enemy
