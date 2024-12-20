@@ -57,6 +57,7 @@ local entity bot, spawn_spot;
 	bot.target4 = spawn_spot.target4;
 	bot.killtarget = spawn_spot.killtarget;
 	bot.killtarget2 = spawn_spot.killtarget2;
+	bot.run_style = spawn_spot.run_style;
 
 	if (self.style == 1) // spawn a Doggo
 	{
@@ -419,6 +420,9 @@ if (self.style == 12) // spawn a Shalrath
 	// bot.nextthink = time + 0.1 + random();
 	if (!(self.spawnflags & MOBOT_DONT_SPAWN_ANGRY))
 	{
+		if (bot.run_style == 1)
+			bot.goalentity = bot.movetarget = find(world, targetname, bot.target);
+
 		if (bot.classname != "monster_zombie") // required to avoid animation issues -- dumptruck_ds
 			bot.think = monster_use;
 		else

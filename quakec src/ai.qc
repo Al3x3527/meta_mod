@@ -277,9 +277,16 @@ void() ChangeYaw =
 
 void() HuntTarget =
 {
-	self.goalentity = self.enemy;
+	if (self.run_style == 1) {
+		dprint("TO_PATH");
+		dprint(self.goalentity.classname);
+		dprint("\n");
+}
+	else {
+		self.goalentity = self.enemy;
+		self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin);
+}
 	self.think = self.th_run;
-	self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin);
 	self.nextthink = time + 0.1;
 	SUB_AttackFinished (1);	// wait a while before first attack
 };
@@ -437,10 +444,10 @@ float() FindTarget =
 // got one
 //
 	self.enemy = client;
-	if (self.enemy.classname != "player")
+	if (self.enemy.team == self.team) //AI TEAMS
 	{
 		self.enemy = self.enemy.enemy;
-		if (self.enemy.classname != "player")
+		if (self.enemy.team == self.team)
 		{
 			self.enemy = world;
 			return FALSE;
@@ -717,6 +724,30 @@ void() ai_run_slide =
 	walkmove (self.ideal_yaw - ofs, movedist);
 };
 
+void() ai_run_box =
+{
+	local vector vec;
+
+	self.ideal_yaw = enemy_yaw;
+ChangeYaw();
+
+makevectors(self.v_angle);
+vec = v_forward * movedist;
+traceline(vec, self.origin, TRUE, self);
+if (trace_ent.targetname == self.target) {
+	walkmove(self.ideal_yaw, movedist * trace_fraction);
+	dprint("trace entity ");
+	dprint(trace_ent.targetname);
+	dprint(" \n");
+}
+else {
+	movetogoal(movedist);
+	dprint("move to goal ");
+	dprint(self.target);
+	dprint(" \n");
+}
+}
+
 
 /*
 =============
@@ -761,7 +792,7 @@ void(float dist) ai_run =
 		self.search_time = time + 5;
 
 // look for other coop players
-	if (coop && self.search_time < time)
+	if (/*coop && */self.search_time < time) //AI TEAMS
 	{
 		if (FindTarget ())
 			return;
@@ -800,6 +831,12 @@ void(float dist) ai_run =
 		ai_run_slide ();
 		return;
 	}
+
+	if (self.run_style == IN_BOX) { //attack_state over run_style
+		ai_run_box();
+		return;
+	}
+
 	// part of monster face from TheSolipsist
 	// urged to change positions
   if (time < self.t_length) // if orientation is forced

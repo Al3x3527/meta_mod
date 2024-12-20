@@ -1058,6 +1058,17 @@ void(entity client, float density, vector color) csf_set;
 .string a_grn_mdl;
 .string a_ylw_mdl;
 .string a_red_mdl;
-.string e_coin_mdl; //ALEX
+
 
 .entity infight_activator;
+
+/*======================ALEX=========================*/
+.string e_coin_mdl;
+
+.float run_style;
+float TO_PATH = 1;
+float IN_BOX = 2;
+
+float TEAM_MONSTERS = 0;
+float TEAM_PLAYERS = 1;
+float TEAM_OTHER = 2;

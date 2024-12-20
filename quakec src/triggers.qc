@@ -1779,3 +1779,20 @@ void() trigger_monsterface =
   trigger_monsterface_init();
   // InitTrigger();
 }
+
+/*========================================ALEX=========================================*/
+void() trigger_monsterzone_touch =
+{
+	if !(other.flags & FL_MONSTER)
+		return;
+dprint("monsterzone_touch\n");
+	if (other.target == self.targetname)
+		other.run_style = IN_BOX;
+}
+
+void() trigger_monsterzone = {
+	InitTrigger();
+
+	self.touch = trigger_monsterzone_touch;
+	SUB_CheckWaiting();
+};
