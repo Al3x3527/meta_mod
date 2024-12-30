@@ -1066,6 +1066,7 @@ void(entity client, float density, vector color) csf_set;
 .string e_coin_mdl;
 
 .float run_style;
+.float zone_time;
 float TO_PATH = 1;
 float IN_BOX = 2;
 

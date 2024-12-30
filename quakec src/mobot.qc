@@ -422,6 +422,9 @@ if (self.style == 12) // spawn a Shalrath
 	{
 		if (bot.run_style == 1)
 			bot.goalentity = bot.movetarget = find(world, targetname, bot.target);
+		dprint("bot.goalentity.targetname ");
+		dprint(bot.goalentity.targetname);
+		dprint("\n");
 
 		if (bot.classname != "monster_zombie") // required to avoid animation issues -- dumptruck_ds
 			bot.think = monster_use;

@@ -1786,13 +1786,15 @@ void() trigger_monsterzone_touch =
 	if !(other.flags & FL_MONSTER)
 		return;
 dprint("monsterzone_touch\n");
-	if (other.target == self.targetname)
+	if (other.target == self.target)
 		other.run_style = IN_BOX;
+	other.zone_time = time + 1;
 }
 
 void() trigger_monsterzone = {
 	InitTrigger();
-
+	self.solid = SOLID_TRIGGER;
 	self.touch = trigger_monsterzone_touch;
+	self.classname = "trigger_monsterzone";
 	SUB_CheckWaiting();
 };

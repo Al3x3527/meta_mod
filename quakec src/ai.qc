@@ -726,27 +726,15 @@ void() ai_run_slide =
 
 void() ai_run_box =
 {
-	local vector vec;
-
-	self.ideal_yaw = enemy_yaw;
+	if (self.zone_time > time) {
+self.ideal_yaw = enemy_yaw;
 ChangeYaw();
-
-makevectors(self.v_angle);
-vec = v_forward * movedist;
-traceline(vec, self.origin, TRUE, self);
-if (trace_ent.targetname == self.target) {
-	walkmove(self.ideal_yaw, movedist * trace_fraction);
-	dprint("trace entity ");
-	dprint(trace_ent.targetname);
-	dprint(" \n");
+walkmove(self.ideal_yaw, movedist);
+return;
 }
-else {
-	movetogoal(movedist);
-	dprint("move to goal ");
-	dprint(self.target);
-	dprint(" \n");
-}
-}
+self.run_style = 1;
+movetogoal(movedist);
+};
 
 
 /*
@@ -869,6 +857,8 @@ void(float dist) ai_run =
 if !(self.spawnflags & I_AM_TURRET) // keeps monster from moving to player - dumptruck_ds
 // head straight in
 	movetogoal (dist);		// done in C code...
+dprint(self.goalentity.classname);
+dprint(" movetogoal ai_run\n");
 };
 /*
 =============
