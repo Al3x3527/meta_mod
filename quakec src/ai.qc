@@ -86,6 +86,21 @@ void() movetarget_f =
 
 };
 
+void() zone_f =
+{
+entity zone = spawn();
+zone.origin = self.origin + '0,0,12';
+zone.target = self.targetname;
+self = zone;
+
+self.solid = SOLID_TRIGGER;
+setsize(self, '-32 -32 -32', '32 32 32');
+//InitTrigger();
+self.touch = trigger_monsterzone_touch;
+self.classname = "trigger_monsterzone";
+SUB_CheckWaiting();
+};
+
 /*QUAKED path_corner (0.5 0.3 0) (-8 -8 -8) (8 8 8)
 Monsters will continue walking towards the next target corner.
 */
@@ -98,6 +113,7 @@ void() path_corner =
 	if (self.noise2) precache_sound(self.noise2);
 
 	movetarget_f ();
+	zone_f(); //f?
 };
 
 
