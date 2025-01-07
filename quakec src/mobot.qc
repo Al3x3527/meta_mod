@@ -58,6 +58,7 @@ local entity bot, spawn_spot;
 	bot.killtarget = spawn_spot.killtarget;
 	bot.killtarget2 = spawn_spot.killtarget2;
 	bot.run_style = spawn_spot.run_style;
+	bot.team = spawn_spot.team;
 
 	if (self.style == 1) // spawn a Doggo
 	{

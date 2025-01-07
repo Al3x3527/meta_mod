@@ -143,7 +143,23 @@ local entity	temp;
 		sound_misc (self, CHAN_VOICE, "ogre/ogdrag.wav", 1, ATTN_IDLE);// play chainsaw drag sound -- sound_custom -- dumptruck_ds
 
 //dprint ("t_movetarget\n");
-	self.goalentity = self.movetarget = find (world, targetname, other.target);
+	dprint(self.movetarget.classname);
+	dprint("\n");
+	if (other.target != "")
+	{
+		dprint(other.target);
+		dprint(" is target\n");
+		temp = find (world, targetname, other.target);
+		if (temp.classname != "player")
+			self.goalentity = self.movetarget = temp;
+		dprint(self.movetarget.classname);
+		dprint("\n");
+	}
+	else {
+		self.pausetime = time + 999999;
+		self.th_stand(); //ai_walk_box doesn't work with this
+		return;
+	}
 	self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 	if (!self.movetarget)
 	{
@@ -293,7 +309,7 @@ void() ChangeYaw =
 
 void() HuntTarget =
 {
-	if (self.run_style == 1) {
+	if (self.run_style > 0) {
 		dprint("TO_PATH");
 		dprint(self.goalentity.classname);
 		dprint("\n");
@@ -532,6 +548,16 @@ ai_walk
 The monster is walking it's beat
 =============
 */
+
+void() ai_walk_box =
+{
+	if (self.zone_time < time) {
+self.run_style = 1;
+self.goalentity = self.movetarget;
+}
+movetogoal(movedist);
+};
+
 void(float dist) ai_walk =
 {
 
@@ -545,7 +571,11 @@ void(float dist) ai_walk =
 	// check for noticing a player
 	if (FindTarget ())
 		return;
-
+	if (self.run_style == IN_BOX)
+	{
+		ai_walk_box();
+		return;
+	}
 	movetogoal (dist);
 };
 

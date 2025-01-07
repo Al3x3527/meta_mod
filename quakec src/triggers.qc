@@ -1798,3 +1798,42 @@ void() trigger_monsterzone = {
 	self.classname = "trigger_monsterzone";
 	SUB_CheckWaiting();
 };
+
+void() trigger_monsterhate_touch =
+{
+	local entity t, fren;
+	if !(other.flags & FL_MONSTER)
+		return;
+dprint("monsterhate_touch\n");
+if (other.targetname == self.target) //dont activate on own target
+return;
+if (self.wait == 0)
+{
+	self.wait = -1; //use once
+
+	//all targets fight activator
+	t = find(world, targetname, self.target);
+	while (t != world)
+	{
+		t.enemy = other;
+		t = find(t, targetname, self.target);
+	}
+
+	//call to arms (only monsters with the same targetname)
+	fren = find(world, targetname, other.targetname);
+		while (fren != world)
+		{
+			fren.enemy = t;
+			fren = find(fren, targetname, self.target);
+		}
+//infighting is always enabled for monsters of different .team
+}
+};
+
+void() trigger_monsterhate = {
+	InitTrigger();
+	self.solid = SOLID_TRIGGER;
+	self.touch = trigger_monsterhate_touch;
+	self.classname = "trigger_monsterhate";
+	SUB_CheckWaiting();
+};
