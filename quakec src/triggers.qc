@@ -1785,9 +1785,10 @@ void() trigger_monsterzone_touch =
 {
 	if !(other.flags & FL_MONSTER)
 		return;
-dprint("monsterzone_touch\n");
-	if (other.target == self.target)
-		other.run_style = IN_BOX;
+	dprint("monsterzone_touch\n");
+	if (other.target != self.target)
+		return;
+	other.run_style = IN_BOX;
 	other.zone_time = time + 1;
 }
 

@@ -1877,9 +1877,12 @@ t = find(world, targetname, self.target);
 while (t != world)
 {
 	t.target = other.message; //other should be trigger. activator = activator
-	t.goalentity = t.movetarget = find(world, targetname, t.target); //always update goal for now
-	t.pausetime = 0;
-	t.ideal_yaw = vectoyaw(t.goalentity.origin - t.origin);
+	if (t.think != t.th_run) //from walk to not run
+	{
+		t.goalentity = t.movetarget = find(world, targetname, t.target); //always update goal for now
+		t.pausetime = 0;
+		t.ideal_yaw = vectoyaw(t.goalentity.origin - t.origin);
+	}
 	t = find(t, targetname, self.target);
 }
 };
