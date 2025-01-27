@@ -1073,3 +1073,5 @@ float IN_BOX = 2;
 float TEAM_MONSTERS = 0;
 float TEAM_PLAYERS = 1;
 float TEAM_OTHER = 2;
+
+float IT_BATTLERIFLE = 256; //not used by a weapon

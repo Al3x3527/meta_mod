@@ -1329,6 +1329,25 @@ void() weapon_lightning =
 	StartItem ();
 };
 
+/*QUAKED weapon_battlerifle (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
+{	model("progs/e_mdls/ad70.mdl");	}
+Battle rifle
+*/
+
+void() weapon_battlerifle =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+	precache_model("progs/e_mdls/ad70.mdl");
+	setmodel(self, "progs/e_mdls/ad70.mdl");
+	self.weapon = IT_BATTLERIFLE;
+	self.netname = "Battle Rifle";
+	self.touch = weapon_touch;
+	setsize(self, '-16 -16 0', '16 16 56');
+	self.particles_offset = '0 0 31';
+	StartItem();
+};
 
 /*
 ===============================================================================
