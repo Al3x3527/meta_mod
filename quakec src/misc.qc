@@ -1869,3 +1869,27 @@ void() target_textstory = {
 
 	self.use = target_textstory_use;
 };
+
+/*===============================ALEX============================*/
+void() changetargets_use = {
+	local entity t;
+t = find(world, targetname, self.target);
+while (t != world)
+{
+	t.target = other.message; //other should be trigger. activator = activator
+	if (t.think != t.th_run) //from walk to not run
+	{
+		t.goalentity = t.movetarget = find(world, targetname, t.target); //always update goal for now
+		t.pausetime = 0;
+		t.ideal_yaw = vectoyaw(t.goalentity.origin - t.origin);
+	}
+	t = find(t, targetname, self.target);
+}
+};
+
+void() func_changetargets = {
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+self.use = changetargets_use;
+};

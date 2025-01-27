@@ -55,7 +55,7 @@ void()	enf_atk13 = [$attack9, enf_atk14] {ai_face(); };
 void()	enf_atk14 = [$attack10, enf_run1] {ai_face(); SUB_CheckRefire(enf_atk1);
 }; */
 
-void() man_pain = {}
+void(entity attacker, float damage) man_pain = {};
 
 void() human_melee =
 {

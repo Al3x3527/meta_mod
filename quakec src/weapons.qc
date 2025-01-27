@@ -5,7 +5,7 @@ void () player_run;
 void(entity bomb, entity attacker, float rad, entity ignore) T_RadiusDamage;
 void(vector org, vector vel, float damage) SpawnBlood;
 void() SuperDamageSound;
-void() create_mobot; //dumptruck_ds mobot.qc
+//void() create_mobot; //dumptruck_ds mobot.qc
 void(entity mis, float speed) SetupHoming;
 
 void(entity mis, vector dir, float speed) SetSpeed =
@@ -186,6 +186,8 @@ void() W_Precache =
 	precache_sound ("shambler/smack.wav");
 
 	// dumptruck_ds mobot.qc END
+
+	precache_model("progs/e_mdls/v_ad70.mdl");
 };
 
 float() crandom =
@@ -1232,6 +1234,13 @@ void() W_SetCurrentAmmo =
 		self.weaponframe = 0;
 		self.items = self.items | IT_CELLS;
 	}
+	else if (self.weapon == IT_BATTLERIFLE)
+	{
+		self.currentammo = self.ammo_shells;
+		self.weaponmodel = "progs/e_mdls/v_ad70.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_SHELLS;
+	}
 	else
 	{
 		self.currentammo = 0;
@@ -1353,6 +1362,12 @@ void() W_Attack =
 		self.attack_finished = time + 0.1;
 		sound (self, CHAN_AUTO, "weapons/lstart.wav", 1, ATTN_NORM);
 	}
+	else if (self.weapon == IT_BATTLERIFLE)
+	{
+		player_shot1();
+		W_FireShotgun();
+		self.attack_finished = time + 0.5;
+	}
 };
 
 /*
@@ -1412,6 +1427,12 @@ void() W_ChangeWeapon =
 	{
 		fl = IT_LIGHTNING;
 		if (self.ammo_cells < 1)
+			am = 1;
+	}
+	else if (self.impulse == 9) //ALEX
+	{
+		fl = IT_BATTLERIFLE;
+		if (self.ammo_shells < 1)
 			am = 1;
 	}
 	else
@@ -1537,6 +1558,13 @@ void() CycleWeaponCommand =
 		}
 		else if (self.weapon == IT_ROCKET_LAUNCHER)
 		{
+			self.weapon = IT_BATTLERIFLE; //was lightning ALEX
+			if (self.ammo_shells < 1)
+				am = 1;
+		}
+
+		else if (self.weapon == IT_BATTLERIFLE)
+		{
 			self.weapon = IT_LIGHTNING;
 			if (self.ammo_cells < 1)
 				am = 1;
@@ -1570,6 +1598,12 @@ void() CycleWeaponReverseCommand =
 		am = 0;
 
 		if (self.weapon == IT_LIGHTNING)
+		{
+			self.weapon = IT_BATTLERIFLE;
+			if (self.ammo_shells < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_BATTLERIFLE)
 		{
 			self.weapon = IT_ROCKET_LAUNCHER;
 			if (self.ammo_rockets < 1)

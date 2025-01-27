@@ -86,6 +86,21 @@ void() movetarget_f =
 
 };
 
+void() zone_f =
+{
+entity zone = spawn();
+zone.origin = self.origin + '0,0,12';
+zone.target = self.targetname;
+self = zone;
+
+self.solid = SOLID_TRIGGER;
+setsize(self, '-32 -32 -32', '32 32 32');
+//InitTrigger();
+self.touch = trigger_monsterzone_touch;
+self.classname = "trigger_monsterzone";
+SUB_CheckWaiting();
+};
+
 /*QUAKED path_corner (0.5 0.3 0) (-8 -8 -8) (8 8 8)
 Monsters will continue walking towards the next target corner.
 */
@@ -98,6 +113,7 @@ void() path_corner =
 	if (self.noise2) precache_sound(self.noise2);
 
 	movetarget_f ();
+	zone_f(); //f?
 };
 
 
@@ -127,7 +143,23 @@ local entity	temp;
 		sound_misc (self, CHAN_VOICE, "ogre/ogdrag.wav", 1, ATTN_IDLE);// play chainsaw drag sound -- sound_custom -- dumptruck_ds
 
 //dprint ("t_movetarget\n");
-	self.goalentity = self.movetarget = find (world, targetname, other.target);
+	dprint(self.movetarget.classname);
+	dprint("\n");
+	if (other.target != "")
+	{
+		dprint(other.target);
+		dprint(" is target\n");
+		temp = find (world, targetname, other.target);
+		if (temp.classname != "player")
+			self.goalentity = self.movetarget = temp;
+		dprint(self.movetarget.classname);
+		dprint("\n");
+	}
+	else {
+		self.pausetime = time + 999999;
+		self.th_stand(); //ai_walk_box doesn't work with this
+		return;
+	}
 	self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 	if (!self.movetarget)
 	{
@@ -277,9 +309,16 @@ void() ChangeYaw =
 
 void() HuntTarget =
 {
-	self.goalentity = self.enemy;
+	if (self.run_style > 0) {
+		dprint("TO_PATH");
+		dprint(self.goalentity.classname);
+		dprint("\n");
+}
+	else {
+		self.goalentity = self.enemy;
+		self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin);
+}
 	self.think = self.th_run;
-	self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin);
 	self.nextthink = time + 0.1;
 	SUB_AttackFinished (1);	// wait a while before first attack
 };
@@ -437,10 +476,10 @@ float() FindTarget =
 // got one
 //
 	self.enemy = client;
-	if (self.enemy.classname != "player")
+	if (self.enemy.team == self.team) //AI TEAMS
 	{
 		self.enemy = self.enemy.enemy;
-		if (self.enemy.classname != "player")
+		if (self.enemy.team == self.team)
 		{
 			self.enemy = world;
 			return FALSE;
@@ -509,6 +548,16 @@ ai_walk
 The monster is walking it's beat
 =============
 */
+
+void() ai_walk_box =
+{
+	if (self.zone_time < time) {
+self.run_style = 1;
+self.goalentity = self.movetarget;
+}
+movetogoal(movedist);
+};
+
 void(float dist) ai_walk =
 {
 
@@ -522,7 +571,11 @@ void(float dist) ai_walk =
 	// check for noticing a player
 	if (FindTarget ())
 		return;
-
+	if (self.run_style == IN_BOX)
+	{
+		ai_walk_box();
+		return;
+	}
 	movetogoal (dist);
 };
 
@@ -717,6 +770,18 @@ void() ai_run_slide =
 	walkmove (self.ideal_yaw - ofs, movedist);
 };
 
+void() ai_run_box =
+{
+	if (self.zone_time > time) {
+self.ideal_yaw = enemy_yaw;
+ChangeYaw();
+walkmove(self.ideal_yaw, movedist);
+return;
+}
+self.run_style = 1;
+movetogoal(movedist);
+};
+
 
 /*
 =============
@@ -761,7 +826,7 @@ void(float dist) ai_run =
 		self.search_time = time + 5;
 
 // look for other coop players
-	if (coop && self.search_time < time)
+	if (/*coop && */self.search_time < time) //AI TEAMS
 	{
 		if (FindTarget ())
 			return;
@@ -800,6 +865,12 @@ void(float dist) ai_run =
 		ai_run_slide ();
 		return;
 	}
+
+	if (self.run_style == IN_BOX) { //attack_state over run_style
+		ai_run_box();
+		return;
+	}
+
 	// part of monster face from TheSolipsist
 	// urged to change positions
   if (time < self.t_length) // if orientation is forced
@@ -832,6 +903,8 @@ void(float dist) ai_run =
 if !(self.spawnflags & I_AM_TURRET) // keeps monster from moving to player - dumptruck_ds
 // head straight in
 	movetogoal (dist);		// done in C code...
+dprint(self.goalentity.classname);
+dprint(" movetogoal ai_run\n");
 };
 /*
 =============
