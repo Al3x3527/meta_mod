@@ -1348,6 +1348,20 @@ void() weapon_battlerifle =
 	self.particles_offset = '0 0 31';
 	StartItem();
 };
+void() weapon_plasmarifle =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+	precache_model("progs/e_mdls/plasma_rifle.mdl");
+	setmodel(self, "progs/e_mdls/plasma_rifle.mdl");
+	self.weapon = IT_PLASMARIFLE;
+	self.netname = "Plasma Rifle";
+	self.touch = weapon_touch;
+	setsize(self, '-16 -16 0', '16 16 56');
+	self.particles_offset = '0 0 31';
+	StartItem();
+};
 
 /*
 ===============================================================================

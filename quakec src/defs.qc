@@ -1075,3 +1075,4 @@ float TEAM_PLAYERS = 1;
 float TEAM_OTHER = 2;
 
 float IT_BATTLERIFLE = 256; //not used by a weapon
+float IT_PLASMARIFLE = 512;
