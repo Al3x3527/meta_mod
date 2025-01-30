@@ -739,3 +739,62 @@ void() SUB_CheckWaiting = {
 		dprint("\n");
 	}
 };
+
+/*=====================ALEX SUBS=======================*/
+
+entity() getChild =
+{
+	local entity child;
+if (self.flags & FL_MONSTER)
+child = self.weapon;
+else if (self.flags & FL_VEHICLE)
+dprint("self.flags & FL_VEHICLE\n");
+return child;
+}
+
+void() cpymove =
+{
+	local entity oself = self;
+	local entity child = getChild();
+while (child) {
+	child.origin = self.origin;
+	self = child;
+	child = getChild();
+	}
+self = oself;
+return;
+}
+
+void() cpyyaw =
+{
+	local entity oself = self;
+	local entity child = getChild();
+while (child) {
+	child.yaw = self.yaw;
+	self = child;
+	child = getChild();
+	}
+self = oself;
+return;
+}
+
+void(float step) movetogoal =
+{
+	submovetogoal(step);
+cpymove();
+return;
+}
+
+void() ChangeYaw =
+{
+	subChangeYaw();
+cpyyaw();
+return;
+}
+
+float(float yaw, float dist) walkmove =
+{
+	local float value =	subwalkmove(yaw, dist);
+cpymove();
+return value;
+}

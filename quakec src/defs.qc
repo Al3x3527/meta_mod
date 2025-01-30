@@ -134,7 +134,7 @@ void		end_sys_globals;		// flag for structure dumping
 // stats
 .float		health;
 .float		frags;
-.float		weapon;			// one of the IT_SHOTGUN, etc flags
+
 .string		weaponmodel;
 .float		weaponframe;
 .float		currentammo;
@@ -656,7 +656,7 @@ void() coredump						= #28;		// prints all edicts
 void() traceon						= #29;		// turns statment trace on
 void() traceoff						= #30;
 void(entity e) eprint				= #31;		// prints an entire edict
-float(float yaw, float dist) walkmove	= #32;	// returns TRUE or FALSE
+float(float yaw, float dist) subwalkmove	= #32;	// returns TRUE or FALSE
 // #33 was removed
 float() droptofloor= #34;	// TRUE if landed on floor
 void(float style, string value) lightstyle = #35;
@@ -673,7 +673,7 @@ float(string s) cvar = #45;						// return cvar.value
 void(string s) localcmd = #46;					// put string into local que
 entity(entity e) nextent = #47;					// for looping through all ents
 void(vector o, vector d, float color, float count) particle = #48;// start a particle effect
-void() ChangeYaw = #49;						// turn towards self.ideal_yaw
+void() subChangeYaw = #49;						// turn towards self.ideal_yaw
 											// at self.yaw_speed
 // #50 was removed
 vector(vector v) vectoangles			= #51;
@@ -703,7 +703,7 @@ void(float to, entity s) WriteEntity	= #59;
 // void(string s) bWriteString	= #65;
 // void(entity e) bWriteEntity = #66;
 
-void(float step) movetogoal				= #67;
+void(float step) submovetogoal				= #67;
 
 string(string s) precache_file		= #68;	// no effect except for -copy
 void(entity e) makestatic		= #69;
@@ -1076,3 +1076,8 @@ float TEAM_OTHER = 2;
 
 float IT_BATTLERIFLE = 256; //not used by a weapon
 float IT_PLASMARIFLE = 512;
+
+float FL_VEHICLE = 131072; //not implemented yet
+
+.entity	weapon;			// ALEX -- [WAS] one of the IT_SHOTGUN, etc flags
+.entity weapon2;	//inactive weapon

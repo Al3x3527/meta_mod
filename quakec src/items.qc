@@ -1180,7 +1180,7 @@ void() weapon_axe =
 
 	precache_model ("progs/g_axe.mdl");
 	setmodel (self, "progs/g_axe.mdl");
-	self.weapon = IT_AXE;
+	self.items = IT_AXE;
 	self.netname = "Axe";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -1200,7 +1200,7 @@ void() weapon_shotgun =
 
 	precache_model ("progs/g_shotgu.mdl");
 	setmodel (self, "progs/g_shotgu.mdl");	//new shotgun model by Starshipwaters -dumptruck_ds - removed 2 older shotguns that used spawnflags
-	self.weapon = IT_SHOTGUN;
+	self.items = IT_SHOTGUN;
 	self.netname = "Shotgun";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -1220,7 +1220,7 @@ void() weapon_supershotgun =
 
 	precache_model ("progs/g_shot.mdl");
 	setmodel (self, "progs/g_shot.mdl");
-	self.weapon = IT_SUPER_SHOTGUN;
+	self.items = IT_SUPER_SHOTGUN;
 	self.netname = "Double-barrelled Shotgun";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -1240,7 +1240,7 @@ void() weapon_nailgun =
 
 	precache_model ("progs/g_nail.mdl");
 	setmodel (self, "progs/g_nail.mdl");
-	self.weapon = IT_NAILGUN;
+	self.items = IT_NAILGUN;
 	self.netname = "nailgun";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -1260,7 +1260,7 @@ void() weapon_supernailgun =
 
 	precache_model ("progs/g_nail2.mdl");
 	setmodel (self, "progs/g_nail2.mdl");
-	self.weapon = IT_SUPER_NAILGUN;
+	self.items = IT_SUPER_NAILGUN;
 	self.netname = "Super Nailgun";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -1280,7 +1280,7 @@ void() weapon_grenadelauncher =
 
 	precache_model ("progs/g_rock.mdl");
 	setmodel (self, "progs/g_rock.mdl");
-	self.weapon = IT_GRENADE_LAUNCHER;
+	self.items = IT_GRENADE_LAUNCHER;
 	self.netname = "Grenade Launcher";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -1300,7 +1300,7 @@ void() weapon_rocketlauncher =
 
 	precache_model ("progs/g_rock2.mdl");
 	setmodel (self, "progs/g_rock2.mdl");
-	self.weapon = IT_ROCKET_LAUNCHER;
+	self.items = IT_ROCKET_LAUNCHER;
 	self.netname = "Rocket Launcher";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -1321,7 +1321,7 @@ void() weapon_lightning =
 
 	precache_model ("progs/g_light.mdl");
 	setmodel (self, "progs/g_light.mdl");
-	self.weapon = IT_LIGHTNING;
+	self.items = IT_LIGHTNING;
 	self.netname = "Thunderbolt";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -1341,11 +1341,13 @@ void() weapon_battlerifle =
 
 	precache_model("progs/e_mdls/ad70.mdl");
 	setmodel(self, "progs/e_mdls/ad70.mdl");
-	self.weapon = IT_BATTLERIFLE;
+	self.items = IT_BATTLERIFLE;
 	self.netname = "Battle Rifle";
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.particles_offset = '0 0 31';
+	if (self.ammo_shells == 0)
+		self.ammo_shells = 15;
 	StartItem();
 };
 void() weapon_plasmarifle =
@@ -1355,11 +1357,13 @@ void() weapon_plasmarifle =
 
 	precache_model("progs/e_mdls/plasma_rifle.mdl");
 	setmodel(self, "progs/e_mdls/plasma_rifle.mdl");
-	self.weapon = IT_PLASMARIFLE;
+	self.items = IT_PLASMARIFLE;
 	self.netname = "Plasma Rifle";
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.particles_offset = '0 0 31';
+	if (self.ammo_cells == 0)
+		self.ammo_cells = 15;
 	StartItem();
 };
 
@@ -1388,7 +1392,7 @@ local float		best;
 
 
 // shotgun
-	if (self.weapon == 1)
+	if (self.items == 1 || 2)
 	{
 		if (other.ammo_shells >= 100)
 			return;
@@ -1396,7 +1400,7 @@ local float		best;
 	}
 
 // spikes
-	if (self.weapon == 2)
+	if (self.items == 4 || 8)
 	{
 		if (other.ammo_nails >= 200)
 			return;
@@ -1404,7 +1408,7 @@ local float		best;
 	}
 
 //	rockets
-	if (self.weapon == 3)
+	if (self.items == 16 || 32)
 	{
 		if (other.ammo_rockets >= 100)
 			return;
@@ -1412,7 +1416,7 @@ local float		best;
 	}
 
 //	cells
-	if (self.weapon == 4)
+	if (self.items == 64)
 	{
 		if (other.ammo_cells >= 100)
 			return;
@@ -1427,25 +1431,6 @@ local float		best;
 // ammo touch sound
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
-
-/* COMMENTED OUT --ALEX
-// change to a better weapon if appropriate
-
-	if ( other.weapon == best )
-	{
-		stemp = self;
-		self = other;
-		self.weapon = W_BestWeapon();
-		W_SetCurrentAmmo ();
-		self = stemp;
-	}
-
-// if changed current ammo, update it
-	stemp = self;
-	self = other;
-	W_SetCurrentAmmo();
-	self = stemp;
-*/
 
 // remove it in single player, or setup for respawning in deathmatch
 	self.model = string_null;
@@ -1520,7 +1505,7 @@ void() item_shells =
 		self.particles_offset = '12 12 12';
 		self.aflag = 20;
 	}
-	self.weapon = 1;
+//	self.weapon = 1;
 	self.netname = "shells";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
@@ -1580,7 +1565,7 @@ void() item_spikes =
 		self.particles_offset = '12 12 12';
 		self.aflag = 25;
 	}
-	self.weapon = 2;
+//	self.weapon = 2;
 	self.netname = "nails";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
@@ -1637,7 +1622,7 @@ void() item_rockets =
 		self.particles_offset = '8 8 16';
 		self.aflag = 5;
 	}
-	self.weapon = 3;
+//	self.weapon = 3;
 	self.netname = "rockets";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
@@ -1697,7 +1682,7 @@ void() item_cells =
 		self.particles_offset = '12 12 12';
 		self.aflag = 6;
 	}
-	self.weapon = 4;
+//	self.weapon = 4;
 	self.netname = "cells";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
@@ -2292,7 +2277,7 @@ void() BackpackTouch =
 
 	new = self.items;
 	if (!new)
-		new = other.weapon;
+		new = other.weapon.items; //untested 1/30/25
 	old = other.items;
 	other.items = other.items | new;
 
@@ -2634,7 +2619,7 @@ void() DropBackpack =
 };
 */
 //ALEX's DropBackpack*****
-void() DropBackpack =
+/*void() DropBackpack =
 {
 
 local entity	item;
@@ -2695,7 +2680,7 @@ float SHELLS = 2;
 float NAILS = 4;
 float ROCKETS = 8;
 float CELLS = 16;
-
+*/
 void() item_backpack_message =
 {
 

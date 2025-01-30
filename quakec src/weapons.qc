@@ -1300,7 +1300,7 @@ void()	player_nail1;
 void()	player_light1;
 void()	player_rocket1;
 
-void() W_Attack =
+/*void() W_Attack =
 {
 	local	float	r;
 
@@ -1369,6 +1369,7 @@ void() W_Attack =
 		self.attack_finished = time + 0.5;
 	}
 };
+*/
 
 /*
 ============
@@ -1376,6 +1377,7 @@ W_ChangeWeapon
 
 ============
 */
+/*
 void() W_ChangeWeapon =
 {
 	local	float	it, am, fl;
@@ -1463,7 +1465,7 @@ void() W_ChangeWeapon =
 	self.weapon = fl;
 	W_SetCurrentAmmo ();
 };
-
+*/
 /*
 ============
 CheatCommand
@@ -1493,7 +1495,7 @@ void() CheatCommand =
 	self.ammo_cells = 200;
 	self.items = self.items | IT_LIGHTNING;
 
-	self.weapon = IT_ROCKET_LAUNCHER;
+	//self.weapon = IT_ROCKET_LAUNCHER;
 	self.impulse = 0;
 	W_SetCurrentAmmo ();
 };
@@ -1511,7 +1513,7 @@ void() CycleWeaponCommand =
 
 	it = self.items;
 	self.impulse = 0;
-
+	/*
 	while (1)
 	{
 		am = 0;
@@ -1576,7 +1578,7 @@ void() CycleWeaponCommand =
 			return;
 		}
 	}
-
+	*/
 };
 
 /*
@@ -1592,7 +1594,7 @@ void() CycleWeaponReverseCommand =
 
 	it = self.items;
 	self.impulse = 0;
-
+	/*
 	while (1)
 	{
 		am = 0;
@@ -1656,7 +1658,7 @@ void() CycleWeaponReverseCommand =
 			return;
 		}
 	}
-
+	*/
 };
 
 /*
@@ -1718,12 +1720,7 @@ void() ImpulseCommands =
 	// dprint ("Armortype is");
 	// dprint (ftos(self.armortype));
 	// dprint ("\n");
-/* ALEX
-	this didn't work.
-	if (self.impulse == 16)
-		sprint (other, "impulse 16 has been called successfully.");
-		sprint (other, "\n");
-*/
+
 	self.impulse = 0;
 };
 
