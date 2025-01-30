@@ -757,7 +757,7 @@ void() cpymove =
 	local entity oself = self;
 	local entity child = getChild();
 while (child) {
-	child.origin = self.origin;
+	child.origin = self.origin + self.view_ofs - child.view_ofs;
 	self = child;
 	child = getChild();
 	}

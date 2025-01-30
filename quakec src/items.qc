@@ -826,6 +826,55 @@ void(float old, float new) Deathmatch_Weapon =
 	if ( nr < or )
 		self.weapon = new;
 };
+/*===========
+new drop_weapon and get weapon
+==========*/
+
+void(entity drop) drop_weapon =
+{
+	other.items = other.items - drop.items;
+
+	drop.solid = SOLID_TRIGGER;
+	drop.movetype = MOVETYPE_TOSS;
+	drop.origin = self.origin;
+	drop.nextthink = time + 120;	// remove after 2 minutes
+	drop.think = SUB_Remove;
+}
+
+void(float slot) get_weapon =
+{
+	if (slot)
+		other.weapon2 = self;
+	else 
+		other.weapon1 = self;
+	self.wp_switch;
+
+	W_SetCurrentAmmo();
+	bound_other_ammo();
+	sprint(other, "You got the ");
+	sprint(other, self.netname);
+	sprint(other, "\n");
+	sound(other, CHAN_ITEM, "weapons/pkup.wav", 1, ATTN_NORM);
+	stuffcmd(other, "bf\n");
+	/*set up respawning/leave for mp some day
+	if (leave) {
+		return;
+	}*/
+}
+
+void() scavenge_weapon =
+{
+	if (other.weapon1.items == self.items)
+	other.weapon1.ammo = other.weapon1.ammo + self.ammo;
+	else if (other.weapon2.items == self.items)
+		other.weapon2.ammo = other.weapon2.ammo + self.ammo;
+	else return;
+/*set up respawning/leave
+	if (leave) {
+		return;
+	}*/
+remove(self);
+}
 
 /*
 =============
@@ -836,10 +885,9 @@ float() W_BestWeapon;
 
 void() weapon_touch =
 {
-	local	float	hadammo, new, old;
+	local	float	new, old;
 	local	entity	stemp;
-	local	float	leave, countitems;
-	local 	float 	drop, newshells, newnails, newrockets, newcells, playerstuff, last, tlast;
+	local 	float 	playerstuff;
 
 // from Copper -- dumptruck_ds
 	if (!CheckValidTouch()) return;
@@ -862,180 +910,31 @@ if (deathmatch == 2 || coop)
 	}
 
 playerstuff = other.items;
-// johnfitz added for axe, shotgun items --dumptruck_ds from RRP /rubicon2
-if (self.classname == "weapon_axe")
-{
-	if (leave && (playerstuff & IT_AXE) )
-		return;
-	new = IT_AXE;
-}
-else if (self.classname == "weapon_shotgun")
-{
-	if (leave && (playerstuff & IT_SHOTGUN) )
-		return;
-	hadammo = other.ammo_shells;
-	new = IT_SHOTGUN;
-	newshells = self.ammo_shells;
-}
-else if (self.classname == "weapon_nailgun")
-{
-	if (leave && (playerstuff & IT_NAILGUN) )
-		return;
-	hadammo = other.ammo_nails;
-	new = IT_NAILGUN;
-	newnails = self.ammo_nails;
-}
-else if (self.classname == "weapon_supernailgun")
-{
-	if (leave && (playerstuff & IT_SUPER_NAILGUN) )
-		return;
-	hadammo = other.ammo_nails;
-	new = IT_SUPER_NAILGUN;
-	newnails = self.ammo_nails;
-}
-else if (self.classname == "weapon_supershotgun")
-{
-	if (leave && (playerstuff & IT_SUPER_SHOTGUN) )
-		return;
-	hadammo = other.ammo_shells;
-	new = IT_SUPER_SHOTGUN;
-	newshells = self.ammo_shells;
-}
-else if (self.classname == "weapon_rocketlauncher")
-{
-	if (leave && (playerstuff & IT_ROCKET_LAUNCHER) )
-		return;
-	hadammo = other.ammo_rockets;
-	new = IT_ROCKET_LAUNCHER;
-	newrockets = self.ammo_rockets;
-}
-else if (self.classname == "weapon_grenadelauncher")
-{
-	if (leave && (playerstuff & IT_GRENADE_LAUNCHER) )
-		return;
-	hadammo = other.ammo_rockets;
-	new = IT_GRENADE_LAUNCHER;
-	newrockets = self.ammo_rockets;
-}
-else if (self.classname == "weapon_lightning")
-{
-	if (leave && (playerstuff & IT_LIGHTNING) )
-		return;
-	hadammo = other.ammo_cells;
-	new = IT_LIGHTNING;
-	newcells = self.ammo_cells;
-}
-else
-{
-	objerror ("weapon_touch: unknown classname");
-	return;
-}
+new = self.items;
 // CHECK FOR WEAPON IN INVENTORY FOR AUTO PICKUP
 if (!(playerstuff & new)) {
 
-// PROMPT FOR IMPULSE --ALEX
 	if (self.count < time) {
 	sprint (other, "Press E to pick up ");
 	sprint (other, self.netname);
 	sprint (other, " \n"); }
 
 //THEN WAIT FOR BUTTON PRESS --ALEX
-	self.count = time + .02; //THIS NUMBER JUST WORKS. FROM GrenadeTouch
-	if (other.impulse == 16) {
+	self.count = time + .02; 
 
-// CHECK WEAPON COUNT HERE --ALEX
-		countitems = 0;
-		tlast = 0;
-		if (playerstuff & IT_AXE) {
-			countitems = countitems + 1; }
-		if (playerstuff & IT_LIGHTNING) {
-			last = IT_LIGHTNING;
-			if (other.ammo_cells == 0)
-				tlast = last;
-			countitems = countitems + 1; }
-		if (playerstuff & IT_ROCKET_LAUNCHER) {
-			last = IT_ROCKET_LAUNCHER;
-			if (other.ammo_rockets == 0)
-				tlast = last;
-			countitems = countitems + 1; }
-		if (playerstuff & IT_GRENADE_LAUNCHER) {
-			last = IT_GRENADE_LAUNCHER;
-			if (other.ammo_rockets == 0)
-				tlast = last;
-			countitems = countitems + 1; }
-		if (playerstuff & IT_SUPER_NAILGUN) {
-			last = IT_SUPER_NAILGUN;
-			if (other.ammo_nails == 0)
-				tlast = last;
-			countitems = countitems + 1; }
-		if (playerstuff & IT_NAILGUN) {
-			last = IT_NAILGUN;
-			if (other.ammo_nails == 0)
-				tlast = last;
-			countitems = countitems + 1; }
-		if (playerstuff & IT_SUPER_SHOTGUN) {
-			last = IT_SUPER_SHOTGUN;
-			if (other.ammo_shells == 0)
-				tlast = last;
-			countitems = countitems + 1; }
-		if (playerstuff & IT_SHOTGUN) {
-			last = IT_SHOTGUN;
-			if (other.ammo_shells == 0)
-				tlast = last;
-			countitems = countitems + 1; }
-// IF INVENTORY FULL --ALEX
-		if (countitems > 2) {
-			sprint (other, "inventory full. \n"); 
-			if (tlast) {
-				last = tlast;
-				drop = last; }
-//SWITCH WEAPON IF AXE --ALEX
-			if (other.weapon == IT_AXE) {
-				drop = last; }
-// THEN DROP CURRENT WEAPON --ALEX
-			if (!(drop)) {
-				drop = other.weapon; }
-			playerstuff = playerstuff - drop;
-			
-			self.model = string_null;
-			self.solid = SOLID_NOT;
-		} //if inventory full.
-// change to the weapon, when other.weapon becomes new
-		old = playerstuff;
-		other.items = playerstuff | new;
-		other.weapon = new;
+	if (other.impulse == 16) {
+		if !(other.weapon2) {
+			if (other.weapon2 == other.weapon)
+				drop_weapon(other.weapon);
+			get_weapon(1);
+		} else if (other.weapon1 == other.weapon)
+			drop_weapon(other.weapon);
+		get_weapon(0);
 	} //if impulse
-	else {
-		return; } //no impulse
+	else return;//no impulse
 	
 //END OF WEAPON NOT IN INVENTORY --ALEX
-	}
-// remove it in single player, or setup for respawning in deathmatch
-	remove (self);
-	stemp = self;
-	self = other;
-	if (drop) { //--ALEX
-		self.weapon = drop;
-		DropWeapon();
-	}
-// UPDATE AMMO NOW --ALEX
-	self.ammo_shells = self.ammo_shells + newshells;
-	self.ammo_nails = self.ammo_nails + newnails;
-	self.ammo_rockets = self.ammo_rockets + newrockets;
-	self.ammo_cells = self.ammo_cells + newcells;
-	Deathmatch_Weapon (old, new);
-	W_SetCurrentAmmo();
-	self = stemp; ////
-	bound_other_ammo ();
-// ALWAYS SAY WHAT YOU GOT --ALEX
-	sprint (other, "You got the ");
-	sprint (other, self.netname);
-	sprint (other, "\n");
-// weapon touch sound
-	sound (other, CHAN_ITEM, "weapons/pkup.wav", 1, ATTN_NORM);
-	stuffcmd (other, "bf\n");
-	if (leave) {
-		return;
+	scavenge_weapon();
 	}
 
 	// Supa, SP respawning items support
@@ -1047,325 +946,8 @@ if (!(playerstuff & new)) {
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
 self = other;
-}; //new weapon or function?
+}; 
 
-//ALEX'S DROP WEAPON *Based on DropBackpack()
-void() DropWeapon =
-{
-local entity otemp;
-local entity	item;
-item = spawn();
-item.origin = self.origin - '0 0 24';
-if (self.classname == "monster_enforcer") {
-	sprint (other, "monster enforcer"); }
-otemp = other;
-other = self;
-self = item;
-//sprint(other, "drop weapon called \n");
-	
-if (other.weapon == IT_AXE) {
-	self.classname = "weapon_axe";
-	self.netname = "Axe";
-	sprint (other, "the axe was dropped... \n"); 
-	setmodel (self, "progs/backpack.mdl"); 
-	}
-else if (other.weapon == IT_SHOTGUN) {
-	self.classname = "weapon_shotgun";
-	self.netname = "Shotgun"; 
-	setmodel (self, "progs/g_shotgu.mdl"); 
-	if (other.ammo_shells > 4) {
-		other.ammo_shells = other.ammo_shells - 5;
-		self.ammo_shells = 5; }
-	else {
-		self.ammo_shells = other.ammo_shells;
-		other.ammo_shells = 0; }
-	}
-else if (other.weapon == IT_NAILGUN) {
-	self.classname = "weapon_nailgun";
-	self.netname = "Nailgun"; 
-	setmodel (self, "progs/g_nail.mdl");
-	if (other.ammo_nails > 29) {
-		self.ammo_nails = 30;
-		other.ammo_nails = other.ammo_nails - 30; }
-	else {
-		self.ammo_nails = other.ammo_nails;
-		other.ammo_nails = 0; }
-	}
-else if (other.weapon == IT_SUPER_NAILGUN) {
-	self.classname = "weapon_supernailgun";
-	self.netname = "Super Nailgun";
-	setmodel (self, "progs/g_nail2.mdl"); 
-	if (other.ammo_nails > 29) {
-		self.ammo_nails = 30;
-		other.ammo_nails = other.ammo_nails - 30; }
-	else {
-		self.ammo_nails = other.ammo_nails;
-		other.ammo_nails = 0; }
-	}
-else if (other.weapon == IT_SUPER_SHOTGUN) {
-	self.classname = "weapon_supershotgun";
-	self.netname = "Super Shotgun";
-	setmodel (self, "progs/g_shot.mdl"); 
-	if (other.ammo_shells > 4) {
-		other.ammo_shells = other.ammo_shells - 5;
-		self.ammo_shells = 5; }
-	else {
-		self.ammo_shells = other.ammo_shells;
-		other.ammo_shells = 0; }
-	}
-else if (other.weapon == IT_ROCKET_LAUNCHER) {
-	self.classname = "weapon_rocketlauncher";
-	self.netname = "Rocket Launcher";
-	setmodel (self, "progs/g_rock2.mdl");  
-	if (other.ammo_rockets > 4) {
-		self.ammo_rockets = 5;
-		other.ammo_rockets = other.ammo_rockets - 5; }
-	else {
-		self.ammo_rockets = other.ammo_rockets;
-		other.ammo_rockets = 0; }
-	}
-else if (other.weapon == IT_GRENADE_LAUNCHER) {
-	self.classname = "weapon_grenadelauncher";
-	self.netname = "Grenade Launcher";
-	setmodel (self, "progs/g_rock.mdl");   
-	if (other.ammo_rockets > 4) {
-		self.ammo_rockets = 5;
-		other.ammo_rockets = other.ammo_rockets - 5; }
-	else {
-		self.ammo_rockets = other.ammo_rockets;
-		other.ammo_rockets = 0; }
-	}
-else if (other.weapon == IT_LIGHTNING) {
-	self.classname = "weapon_lightning";
-	self.netname = "Thunderbolt";
-	setmodel (self, "progs/g_light.mdl");   
-	if (other.ammo_cells > 14) {
-		self.ammo_cells = 15;
-		other.ammo_cells = other.ammo_cells - 15; }
-	else {
-		self.ammo_cells = other.ammo_cells;
-		other.ammo_cells = 0; }
-	}
-else {
-	//sprint (other,"drop not a weapon");
-	self.netname = "unknown drop";
-	setmodel (self, "progs/backpack.mdl");
-	//self = stemp;
-	//return; 
-	}
-
-item.velocity_z = 300;
-item.velocity_x = -100 + (random() * 200);
-item.velocity_y = -100 + (random() * 200);
-item.flags = FL_ITEM;
-item.solid = SOLID_TRIGGER;
-item.movetype = MOVETYPE_TOSS;
-setsize (item, '-16 -16 0', '16 16 56');
-self.touch = weapon_touch;
-
-//item.nextthink = time + 120;	// remove after 2 minutes
-//item.think = SUB_Remove;
-self = other;
-other = otemp;
-};
-
-// johnfitz new items   -- dumptruck_ds from RRP and rubicon2
-/*QUAKED weapon_axe (0 .5 .8) (-16 -16 0) (16 16 32)
-Axe
-*/
-void() weapon_axe =
-{
-	if (SUB_Inhibit ())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model ("progs/g_axe.mdl");
-	setmodel (self, "progs/g_axe.mdl");
-	self.items = IT_AXE;
-	self.netname = "Axe";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
-	StartItem ();
-};
-/*QUAKED weapon_shotgun (0 .5 .8) (-16 -16 0) (16 16 32) X STYLE_1 STYLE_2 X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
-{	model("progs/g_shotgn.mdl");	}
-This is a pickup model that should be used when you want a player to spawn with only an axe and then later get the shotgun: (trigger_take_weapon or reset_items 2 in worldspawn). There are two models to choose from. Spawnflag 2 (the default) selects an unused “classic look” model from Rubicon 2 by metlslime. Spawnflag 4 is an alternate from Slapmap and has been used in a few mods.
-Single-barrelled Shotgun
-Shotgun
-*/
-
-void() weapon_shotgun =
-{
-	if (SUB_Inhibit ())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model ("progs/g_shotgu.mdl");
-	setmodel (self, "progs/g_shotgu.mdl");	//new shotgun model by Starshipwaters -dumptruck_ds - removed 2 older shotguns that used spawnflags
-	self.items = IT_SHOTGUN;
-	self.netname = "Shotgun";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
-	StartItem ();
-};
-// johnfitz
-
-/*QUAKED weapon_supershotgun (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
-{	model("progs/g_shot.mdl");	}
-Double-barrelled Shotgun
-*/
-
-void() weapon_supershotgun =
-{
-	if (SUB_Inhibit ())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model ("progs/g_shot.mdl");
-	setmodel (self, "progs/g_shot.mdl");
-	self.items = IT_SUPER_SHOTGUN;
-	self.netname = "Double-barrelled Shotgun";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
-	self.particles_offset = '0 0 33';
-	StartItem ();
-};
-
-/*QUAKED weapon_nailgun (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
-{	model("progs/g_nail.mdl");	}
-Nailgun
-*/
-
-void() weapon_nailgun =
-{
-	if (SUB_Inhibit ())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model ("progs/g_nail.mdl");
-	setmodel (self, "progs/g_nail.mdl");
-	self.items = IT_NAILGUN;
-	self.netname = "nailgun";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
-	self.particles_offset = '0 0 31';
-	StartItem ();
-};
-
-/*QUAKED weapon_supernailgun (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
-{	model("progs/g_nail2.mdl");	}
-Perforator
-*/
-
-void() weapon_supernailgun =
-{
-	if (SUB_Inhibit ())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model ("progs/g_nail2.mdl");
-	setmodel (self, "progs/g_nail2.mdl");
-	self.items = IT_SUPER_NAILGUN;
-	self.netname = "Super Nailgun";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
-	self.particles_offset = '0 0 34';
-	StartItem ();
-};
-
-/*QUAKED weapon_grenadelauncher (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
-{	model("progs/g_rock.mdl");	}
-Grenade Launcher
-*/
-
-void() weapon_grenadelauncher =
-{
-	if (SUB_Inhibit ())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model ("progs/g_rock.mdl");
-	setmodel (self, "progs/g_rock.mdl");
-	self.items = IT_GRENADE_LAUNCHER;
-	self.netname = "Grenade Launcher";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
-	self.particles_offset = '0 0 28';
-	StartItem ();
-};
-
-/*QUAKED weapon_rocketlauncher (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
-{	model("progs/g_rock2.mdl");	}
-Rocket Launcher
-*/
-
-void() weapon_rocketlauncher =
-{
-	if (SUB_Inhibit ())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model ("progs/g_rock2.mdl");
-	setmodel (self, "progs/g_rock2.mdl");
-	self.items = IT_ROCKET_LAUNCHER;
-	self.netname = "Rocket Launcher";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
-	self.particles_offset = '0 0 32';
-	StartItem ();
-};
-
-
-/*QUAKED weapon_lightning (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
-{	model("progs/g_light.mdl");	}
-Thunderbolt
-*/
-
-void() weapon_lightning =
-{
-	if (SUB_Inhibit ())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model ("progs/g_light.mdl");
-	setmodel (self, "progs/g_light.mdl");
-	self.items = IT_LIGHTNING;
-	self.netname = "Thunderbolt";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
-	self.particles_offset = '0 0 31';
-	StartItem ();
-};
-
-/*QUAKED weapon_battlerifle (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
-{	model("progs/e_mdls/ad70.mdl");	}
-Battle rifle
-*/
-
-void() weapon_battlerifle =
-{
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model("progs/e_mdls/ad70.mdl");
-	setmodel(self, "progs/e_mdls/ad70.mdl");
-	self.items = IT_BATTLERIFLE;
-	self.netname = "Battle Rifle";
-	self.touch = weapon_touch;
-	setsize(self, '-16 -16 0', '16 16 56');
-	self.particles_offset = '0 0 31';
-	if (self.ammo_shells == 0)
-		self.ammo_shells = 15;
-	StartItem();
-};
-void() weapon_plasmarifle =
-{
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model("progs/e_mdls/plasma_rifle.mdl");
-	setmodel(self, "progs/e_mdls/plasma_rifle.mdl");
-	self.items = IT_PLASMARIFLE;
-	self.netname = "Plasma Rifle";
-	self.touch = weapon_touch;
-	setsize(self, '-16 -16 0', '16 16 56');
-	self.particles_offset = '0 0 31';
-	if (self.ammo_cells == 0)
-		self.ammo_cells = 15;
-	StartItem();
-};
 
 /*
 ===============================================================================
@@ -1373,7 +955,7 @@ void() weapon_plasmarifle =
 AMMO
 
 ===============================================================================
-*/
+
 
 void() ammo_touch =
 {
@@ -1444,7 +1026,7 @@ local float		best;
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
 };
-
+*/
 
 
 
