@@ -765,12 +765,12 @@ self = oself;
 return;
 }
 
-void() cpyyaw =
+void() cpyangles =
 {
 	local entity oself = self;
 	local entity child = getChild();
 while (child) {
-	child.yaw = self.yaw;
+	child.angles = self.angles;
 	self = child;
 	child = getChild();
 	}
@@ -788,7 +788,7 @@ return;
 void() ChangeYaw =
 {
 	subChangeYaw();
-cpyyaw();
+cpyangles();
 return;
 }
 

@@ -134,12 +134,11 @@ void		end_sys_globals;		// flag for structure dumping
 // stats
 .float		health;
 .float		frags;
-
+.entity		weapon;			// ALEX -- [WAS] one of the IT_SHOTGUN, etc flags
 .string		weaponmodel;
 .float		weaponframe;
 .float		currentammo;
 .float		ammo_shells, ammo_nails, ammo_rockets, ammo_cells;
-.float		coin;			//ALEX
 
 .float		items;			// bit flags
 
@@ -1064,6 +1063,8 @@ void(entity client, float density, vector color) csf_set;
 
 /*======================ALEX=========================*/
 .string e_coin_mdl;
+.float		coin;			//ALEX
+
 
 .float run_style;
 .float zone_time;
@@ -1079,7 +1080,7 @@ float IT_PLASMARIFLE = 512;
 
 float FL_VEHICLE = 131072; //not implemented yet
 
-.entity	weapon;			// ALEX -- [WAS] one of the IT_SHOTGUN, etc flags
+//.entity	weapon;			// ALEX -- [WAS] one of the IT_SHOTGUN, etc flags
 .entity weapon1;
 .entity weapon2;	//inactive weapon
 .float ammo; //generic ammo for weapon entity

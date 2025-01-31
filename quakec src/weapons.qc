@@ -763,8 +763,8 @@ void() W_FireLightning =
 
 	if (self.ammo_cells < 1)
 	{
-		self.weapon = W_BestWeapon ();
-		W_SetCurrentAmmo ();
+		//self.weapon = W_BestWeapon ();
+		//W_SetCurrentAmmo ();
 		return;
 	}
 
@@ -1020,7 +1020,7 @@ void(float ox) W_FireSpikes =
 
 	makevectors (self.v_angle);
 
-	if (self.ammo_nails >= 2 && self.weapon == IT_SUPER_NAILGUN)
+	if (self.ammo_nails >= 2 && self.weapon.items == IT_SUPER_NAILGUN)
 	{
 		W_FireSuperSpikes ();
 		return;
@@ -1028,8 +1028,8 @@ void(float ox) W_FireSpikes =
 
 	if (self.ammo_nails < 1)
 	{
-		self.weapon = W_BestWeapon ();
-		W_SetCurrentAmmo ();
+		//self.weapon = W_BestWeapon ();
+		//W_SetCurrentAmmo ();
 		return;
 	}
 
@@ -1273,7 +1273,7 @@ float() W_CheckNoAmmo =
 	if (self.currentammo > 0)
 		return TRUE;
 
-	if (self.weapon == IT_AXE)
+	if (self.weapon.items == IT_AXE)
 		return TRUE;
 
 	//self.weapon = W_BestWeapon ();
@@ -1304,7 +1304,7 @@ void() W_Attack =
 {
 	makevectors(self.v_angle);			// calculate forward angle for velocity
 	self.show_hostile = time + 1;	// wake monsters up
-	self.weapon.wp_atk;
+	self.weapon.wp_atk();
 }
 
 /*void() W_Attack =
@@ -1380,7 +1380,8 @@ void() W_Attack =
 void(entity wp) switch_weapon =
 {
 		self.currentammo = wp.items; //identity
-		wp.wp_switch; //just model and animation data
+		W_SetCurrentAmmo();
+		wp.wp_switch(); //just model and animation data
 }
 
 // johnfitz new items   -- dumptruck_ds from RRP and rubicon2
@@ -1421,8 +1422,8 @@ void() weapon_axe =
 	self.netname = "Axe";
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
-	self.wp_melee = melee_axe();
-	self.wp_switch = switch_axe();
+	self.wp_melee = melee_axe;
+	self.wp_switch = switch_axe;
 	StartItem();
 };
 /*QUAKED weapon_shotgun (0 .5 .8) (-16 -16 0) (16 16 32) X STYLE_1 STYLE_2 X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
@@ -1457,8 +1458,8 @@ void() weapon_shotgun =
 	self.netname = "Shotgun";
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
-	self.wp_atk = atk_shotgun();
-	self.wp_switch = switch_shotgun();
+	self.wp_atk = atk_shotgun;
+	self.wp_switch = switch_shotgun;
 	if !(self.ammo) self.ammo = 30;
 
 	StartItem();
@@ -1734,7 +1735,7 @@ void() CycleWeaponCommand =
 	}
 
 	self.weapon = wp;
-	self.weapon.wp_switch;
+	switch_weapon(wp);
 };
 
 /*

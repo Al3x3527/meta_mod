@@ -775,57 +775,6 @@ WEAPONS
 ===============================================================================
 */
 
-void() bound_other_ammo =
-{
-	if (other.ammo_shells > 100)
-		other.ammo_shells = 100;
-	if (other.ammo_nails > 200)
-		other.ammo_nails = 200;
-	if (other.ammo_rockets > 100)
-		other.ammo_rockets = 100;
-	if (other.ammo_cells > 100)
-		other.ammo_cells = 100;
-};
-
-
-float(float w) RankForWeapon =
-{
-	if (self.waterlevel <= 1 && w == IT_LIGHTNING) // 1997-12-23 Thunderbolt fix by Maddes  recognize waterlevel
-		return 1;
-	if (w == IT_ROCKET_LAUNCHER)
-		return 2;
-	if (w == IT_SUPER_NAILGUN)
-		return 3;
-	if (w == IT_GRENADE_LAUNCHER)
-		return 4;
-	if (w == IT_SUPER_SHOTGUN)
-		return 5;
-	if (w == IT_NAILGUN)
-		return 6;
-	if (w == IT_SHOTGUN)
-		return 7;
-	return 8;
-};
-
-/*
-=============
-Deathmatch_Weapon
-
-Deathmatch weapon change rules for picking up a weapon
-
-.float		ammo_shells, ammo_nails, ammo_rockets, ammo_cells;
-=============
-*/
-void(float old, float new) Deathmatch_Weapon =
-{
-	local float or, nr;
-
-// change self.weapon if desired
-	or = RankForWeapon (self.weapon);
-	nr = RankForWeapon (new);
-	if ( nr < or )
-		self.weapon = new;
-};
 /*===========
 new drop_weapon and get weapon
 ==========*/
@@ -847,19 +796,13 @@ void(float slot) get_weapon =
 		other.weapon2 = self;
 	else 
 		other.weapon1 = self;
-	self.wp_switch;
+	switch_weapon(other);
 
-	W_SetCurrentAmmo();
-	bound_other_ammo();
 	sprint(other, "You got the ");
 	sprint(other, self.netname);
 	sprint(other, "\n");
 	sound(other, CHAN_ITEM, "weapons/pkup.wav", 1, ATTN_NORM);
 	stuffcmd(other, "bf\n");
-	/*set up respawning/leave for mp some day
-	if (leave) {
-		return;
-	}*/
 }
 
 void() scavenge_weapon =
@@ -869,11 +812,7 @@ void() scavenge_weapon =
 	else if (other.weapon2.items == self.items)
 		other.weapon2.ammo = other.weapon2.ammo + self.ammo;
 	else return;
-/*set up respawning/leave
-	if (leave) {
-		return;
-	}*/
-remove(self);
+
 }
 
 /*
@@ -881,7 +820,6 @@ remove(self);
 weapon_touch
 =============
 */
-float() W_BestWeapon;
 
 void() weapon_touch =
 {
@@ -894,20 +832,8 @@ void() weapon_touch =
 
 	if (!(other.flags & FL_CLIENT))
 		return;
-
-if (deathmatch == 2 || coop)
-	{
-		leave = 1;
-
-	// fix weapon items never firing their targets in coop or
-	// "deathmatch 2" -- iw
-		activator = other;
-		SUB_UseAndForgetTargets ();
-	}
-	else
-	{
-		leave = 0;
-	}
+	activator = other;
+	SUB_UseAndForgetTargets ();
 
 playerstuff = other.items;
 new = self.items;
@@ -930,22 +856,23 @@ if (!(playerstuff & new)) {
 		} else if (other.weapon1 == other.weapon)
 			drop_weapon(other.weapon);
 		get_weapon(0);
+		activator = other;
+		SUB_UseTargets();
 	} //if impulse
 	else return;//no impulse
-	
-//END OF WEAPON NOT IN INVENTORY --ALEX
+	}//END OF WEAPON NOT IN INVENTORY --ALEX
 	scavenge_weapon();
-	}
-
+	activator = other;
+	SUB_UseTargets();// fire all targets / killtargets
+	remove(self);
+/*
 	// Supa, SP respawning items support
 	if (!deathmatch)
 		CheckItemRespawn(self, 30);
 	else if (deathmatch == 1)  // weapons never disappear in "deathmatch 2"
 		self.nextthink = time + 30;
 	self.think = SUB_regen;
-	activator = other;
-	SUB_UseTargets();				// fire all targets / killtargets
-self = other;
+	*/			
 }; 
 
 
@@ -956,7 +883,7 @@ AMMO
 
 ===============================================================================
 
-
+*/
 void() ammo_touch =
 {
 local entity	stemp;
@@ -974,7 +901,7 @@ local float		best;
 
 
 // shotgun
-	if (self.items == 1 || 2)
+	if (self.items == 2)
 	{
 		if (other.ammo_shells >= 100)
 			return;
@@ -982,7 +909,7 @@ local float		best;
 	}
 
 // spikes
-	if (self.items == 4 || 8)
+	if (self.items == 3)
 	{
 		if (other.ammo_nails >= 200)
 			return;
@@ -990,7 +917,7 @@ local float		best;
 	}
 
 //	rockets
-	if (self.items == 16 || 32)
+	if (self.items == 4)
 	{
 		if (other.ammo_rockets >= 100)
 			return;
@@ -1005,7 +932,7 @@ local float		best;
 		other.ammo_cells = other.ammo_cells + self.aflag;
 	}
 
-	bound_other_ammo ();
+	//bound_other_ammo ();
 
 	sprint (other, "You got the ");
 	sprint (other, self.netname);
@@ -1026,7 +953,6 @@ local float		best;
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
 };
-*/
 
 
 
@@ -1819,7 +1745,7 @@ PLAYER BACKPACKS
 
 ===============================================================================
 */
-
+/*
 void() BackpackTouch =
 {
 	local string	s;
@@ -1914,18 +1840,17 @@ void() BackpackTouch =
 
 // change to the weapon
 // 1997-12-23 Thunderbolt fix by Maddes  start
-/* don't separate between SinglePlayer/Coop and Deathmatch
-	if (!deathmatch)
-		self.weapon = new;
-	else
-*/
+// don't separate between SinglePlayer/Coop and Deathmatch
+//		self.weapon = new;
+//	else
+
 // 1997-12-23 Thunderbolt fix by Maddes  end
 	Deathmatch_Weapon (old, new);
 
 	W_SetCurrentAmmo ();
 
 };
-
+*/
 /*
 ===============
 DropStuff -- dumptruck_ds
@@ -2288,7 +2213,7 @@ void() item_backpack_message =
 	stuffcmd (other, "bf\n");
 	remove(self);
 	self = other;
-	bound_other_ammo();
+//	bound_other_ammo();
 	W_SetCurrentAmmo ();
 
 };
@@ -2320,6 +2245,7 @@ and the mapper chooses the rest of the message.
 e.g. For 'You got a bunch of rockets!' the netname key would be
 'a bunch of rockets!'
 */
+/*
 void() item_backpack =
 {
 	if (SUB_Inhibit ())  // new spawnflags for all entities -- iw
@@ -2390,3 +2316,4 @@ void() item_backpack =
 	setsize (self, '-16 -16 0', '16 16 56');
 	StartItem ();
 };
+*/
