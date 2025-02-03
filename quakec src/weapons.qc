@@ -1380,15 +1380,13 @@ void() W_Attack =
 */
 void(entity wp) switch_weapon =
 {
-//update ammo counts (touch weapons)
-if (self.weapon1 == wp)
-	self.weapon2.ammo = self.currentammo;
-else
-	self.weapon1.ammo = self.currentammo;
+//update ammo counts
+self.nextchild.ammo = self.currentammo;
 //check for weapon - do not cycle or infinite loop
 	if !(self.items & wp.weapon) {
 		return;
 		}
+	self.nextchild = wp;
 	self.currentammo = wp.ammo; //ammo type quantity
 	wp.wp_switch(); //just model and animation data
 

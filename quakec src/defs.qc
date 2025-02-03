@@ -1080,10 +1080,11 @@ float IT_PLASMARIFLE = 512;
 
 float FL_VEHICLE = 131072; //not implemented yet
 
-//.entity	weapon;			// ALEX -- [WAS] one of the IT_SHOTGUN, etc flags
+//.entity	weapon;			// do not modify
 .entity weapon1;
-.entity weapon2;	//inactive weapon
+.entity weapon2;	//second slot, not innactive
 .float ammo; //generic ammo for weapon entity
 .void() wp_switch; //set view model and animation
-.void() wp_melee;
+.void() wp_melee; //used by player and weapons
 .void() wp_atk;
+.entity nextchild;	//high traffic

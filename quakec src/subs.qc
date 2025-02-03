@@ -742,24 +742,24 @@ void() SUB_CheckWaiting = {
 
 /*=====================ALEX SUBS=======================*/
 
-entity() getChild =
+/*entity() getChild =
 {
 	local entity child;
 if (self.flags & FL_MONSTER)
-child = self.weapon;
+child = self.weapon1;
 else if (self.flags & FL_VEHICLE)
 dprint("self.flags & FL_VEHICLE\n");
 return child;
-}
+}*/
 
 void() cpymove =
 {
 	local entity oself = self;
-	local entity child = getChild();
+	local entity child = self.nextchild;
 while (child) {
 	child.origin = self.origin + self.view_ofs - child.view_ofs;
 	self = child;
-	child = getChild();
+	child = self.nextchild;
 	}
 self = oself;
 return;
@@ -768,11 +768,11 @@ return;
 void() cpyangles =
 {
 	local entity oself = self;
-	local entity child = getChild();
+	local entity child = self.nextchild;
 while (child) {
 	child.angles = self.angles;
 	self = child;
-	child = getChild();
+	child = self.nextchild;
 	}
 self = oself;
 return;

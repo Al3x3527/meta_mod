@@ -794,6 +794,10 @@ void(float slot) get_weapon =
 {
 	local entity get = self;
 	self = other;
+	//if player, hide from first person
+	if (self.classname == "player")
+		self.model = string_null;
+	self.solid = SOLID_NOT;
 	if (slot)
 		self.weapon2 = get;
 	else 
