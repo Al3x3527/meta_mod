@@ -42,7 +42,7 @@ void() SetChangeParms =
 	parm5 = self.ammo_nails;
 	parm6 = self.ammo_rockets;
 	parm7 = self.ammo_cells;
-	parm8 = self.weapon.items; //ALEX
+	parm8 = self.weapon;
 	parm9 = self.armortype * 100;
 };
 

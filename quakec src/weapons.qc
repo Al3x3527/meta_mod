@@ -461,7 +461,8 @@ void() W_FireSuperShotgun =
 
 	self.punchangle_x = -4;
 
-	self.currentammo = self.ammo_shells = self.ammo_shells - 2;
+	//self.currentammo = self.ammo_shells = self.ammo_shells - 2;
+	self.currentammo = self.currentammo - 2;
 	dir = aim (self, 100000);
 	FireBullets (14, dir, '0.14 0.08 0');
 };
@@ -599,7 +600,8 @@ void() W_FireRocket =
 {
 	local	entity missile;
 
-	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
+	//self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
+self.currentammo = self.currentammo - 1;
 
 	sound (self, CHAN_WEAPON, "weapons/sgun1.wav", 1, ATTN_NORM);
 
@@ -786,7 +788,8 @@ void() W_FireLightning =
 	}
 	self.punchangle_x = -2;
 
-	self.currentammo = self.ammo_cells = self.ammo_cells - 1;
+	//self.currentammo = self.ammo_cells = self.ammo_cells - 1;
+	self.currentammo = self.currentammo - 1;
 
 	org = self.origin + '0 0 16';
 
@@ -916,7 +919,8 @@ void() W_FireGrenade =
 {
 	local	entity missile;
 
-	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
+	//self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
+self.currentammo = self.currentammo - 1;
 
 	sound (self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
 
@@ -1006,7 +1010,8 @@ void() W_FireSuperSpikes =
 
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
 	self.attack_finished = time + 0.2;
-	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
+	//self.currentammo = self.ammo_nails = self.ammo_nails - 2;
+	self.currentammo = self.currentammo - 1;
 	dir = aim (self, 1000);
 	launch_spike (self.origin + '0 0 16', dir);
 	newmis.touch = superspike_touch;
@@ -1021,13 +1026,13 @@ void(float ox) W_FireSpikes =
 
 	makevectors (self.v_angle);
 
-	if (self.ammo_nails >= 2 && self.weapon.items == IT_SUPER_NAILGUN)
+	if (self.currentammo >= 2 && self.weapon == IT_SUPER_NAILGUN)
 	{
 		W_FireSuperSpikes ();
 		return;
 	}
 
-	if (self.ammo_nails < 1)
+	if (self.currentammo < 1)
 	{
 		//self.weapon = W_BestWeapon ();
 		//W_SetCurrentAmmo ();
@@ -1036,7 +1041,8 @@ void(float ox) W_FireSpikes =
 
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
 	self.attack_finished = time + 0.2;
-	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
+	//self.currentammo = self.ammo_nails = self.ammo_nails - 1;
+	self.currentammo = self.currentammo - 1;
 	dir = aim (self, 1000);
 	// launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
 	launch_spike (self.origin + self.view_ofs + v_up * -8 + v_right*ox, dir); //seven Nailgun position fix - thanks to Greenwood -- dumptruck_ds
@@ -1173,12 +1179,18 @@ PLAYER WEAPON USE
 
 ===============================================================================
 */
-/*
+
 void() W_SetCurrentAmmo =
 {
 	player_run ();		// get out of any weapon firing states
 
 	self.items = self.items - ( self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS) );
+
+	if (self.weapon1.items == self.weapon)
+		self.currentammo = self.weapon1.ammo;
+	else self.currentammo = self.weapon2.ammo;
+};
+	/*
 
 	if (self.weapon.items == IT_AXE)
 	{
@@ -1274,7 +1286,7 @@ float() W_CheckNoAmmo =
 	if (self.currentammo > 0)
 		return TRUE;
 
-	if (self.weapon.items == IT_AXE)
+	if (self.weapon == IT_AXE)
 		return TRUE;
 
 	//self.weapon = W_BestWeapon ();
@@ -1390,12 +1402,12 @@ self.nextchild.ammo = self.currentammo;
 	self.currentammo = wp.ammo; //ammo type quantity
 	wp.wp_switch(); //just model and animation data
 
-	self.weapon = wp.weapon;
-	self.wp_atk = wp.wp_atk();
+	self.weapon = wp.items;
+	self.wp_atk = wp.wp_atk;
 	if (wp.wp_melee)
-	self.wp_melee = wp.wp_melee();
+	self.wp_melee = wp.wp_melee;
 	else
-	self.wp_melee = melee_axe();
+	self.wp_melee = melee_axe;
 }
 
 // johnfitz new items   -- dumptruck_ds from RRP and rubicon2
@@ -1484,6 +1496,17 @@ void() weapon_shotgun =
 {	model("progs/g_shot.mdl");	}
 Double-barrelled Shotgun
 */
+void() atk_supershotgun =
+{
+	player_shot1();
+		W_FireSuperShotgun();
+		self.attack_finished = time + 0.7;
+}
+
+void() switch_supershotgun = {
+	self.weaponmodel = "progs/v_shot2.mdl";
+		self.weaponframe = 0;
+}
 
 void() weapon_supershotgun =
 {
@@ -1497,6 +1520,8 @@ void() weapon_supershotgun =
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.particles_offset = '0 0 33';
+	self.wp_atk = atk_supershotgun;
+	self.wp_switch = switch_supershotgun;
 	if !(self.ammo) self.ammo = 30;
 
 	StartItem();
@@ -1506,6 +1531,14 @@ void() weapon_supershotgun =
 {	model("progs/g_nail.mdl");	}
 Nailgun
 */
+void() switch_nailgun = {
+	self.weaponmodel = "progs/v_nail.mdl";
+	self.weaponframe = 0;
+}
+
+void() atk_nailgun = {
+	player_nail1();
+}
 
 void() weapon_nailgun =
 {
@@ -1519,6 +1552,8 @@ void() weapon_nailgun =
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.particles_offset = '0 0 31';
+	self.wp_switch = switch_nailgun;
+	self.wp_atk = atk_nailgun;
 	if !(self.ammo) self.ammo = 30;
 
 	StartItem();
@@ -1528,6 +1563,10 @@ void() weapon_nailgun =
 {	model("progs/g_nail2.mdl");	}
 Perforator
 */
+void() switch_supernailgun = {
+	self.weaponmodel = "progs/v_nail2.mdl";
+	self.weaponframe = 0;
+}
 
 void() weapon_supernailgun =
 {
@@ -1541,6 +1580,8 @@ void() weapon_supernailgun =
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.particles_offset = '0 0 34';
+	self.wp_switch = switch_supernailgun;
+	self.wp_atk = atk_nailgun;
 	if !(self.ammo) self.ammo = 30;
 
 	StartItem();
@@ -1550,6 +1591,15 @@ void() weapon_supernailgun =
 {	model("progs/g_rock.mdl");	}
 Grenade Launcher
 */
+void() switch_grenade = {
+	self.weaponmodel = "progs/v_rock.mdl";
+	self.weaponframe = 0;
+}
+void() atk_grenade = {
+	player_rocket1();
+		W_FireGrenade();
+		self.attack_finished = time + 0.6;
+}
 
 void() weapon_grenadelauncher =
 {
@@ -1563,6 +1613,8 @@ void() weapon_grenadelauncher =
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.particles_offset = '0 0 28';
+	self.wp_switch = switch_grenade;
+	self.wp_atk = atk_grenade;
 	if !(self.ammo) self.ammo = 5;
 
 	StartItem();
@@ -1572,6 +1624,15 @@ void() weapon_grenadelauncher =
 {	model("progs/g_rock2.mdl");	}
 Rocket Launcher
 */
+void() switch_rocket = {
+	self.weaponmodel = "progs/v_rock2.mdl";
+	self.weaponframe = 0;
+}
+void() atk_rocket = {
+	player_rocket1();
+		W_FireRocket();
+		self.attack_finished = time + 0.8;
+}
 
 void() weapon_rocketlauncher =
 {
@@ -1585,6 +1646,8 @@ void() weapon_rocketlauncher =
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.particles_offset = '0 0 32';
+	self.wp_switch = switch_rocket;
+	self.wp_atk = atk_rocket;
 	if !(self.ammo) self.ammo = 5;
 
 	StartItem();
@@ -1595,6 +1658,15 @@ void() weapon_rocketlauncher =
 {	model("progs/g_light.mdl");	}
 Thunderbolt
 */
+void() switch_light = {
+	self.weaponmodel = "progs/v_light.mdl";
+	self.weaponframe = 0;
+}
+void() atk_light = {
+	player_light1();
+		self.attack_finished = time + 0.1;
+		sound(self, CHAN_AUTO, "weapons/lstart.wav", 1, ATTN_NORM);
+}
 
 void() weapon_lightning =
 {
@@ -1608,6 +1680,8 @@ void() weapon_lightning =
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.particles_offset = '0 0 31';
+	self.wp_switch = switch_light;
+	self.wp_atk = atk_light;
 	if !(self.ammo) self.ammo = 30;
 
 	StartItem();
@@ -1617,7 +1691,10 @@ void() weapon_lightning =
 {	model("progs/e_mdls/ad70.mdl");	}
 Battle rifle
 */
-
+void() switch_battle = {
+	self.weaponmodel = "progs/v_ad70.mdl";
+	self.weaponframe = 0;
+}
 void() weapon_battlerifle =
 {
 	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
@@ -1630,10 +1707,18 @@ void() weapon_battlerifle =
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.particles_offset = '0 0 31';
+	self.wp_switch = switch_battle;
+	self.wp_atk = atk_shotgun;
 	if !(self.ammo) self.ammo = 30;
 
 	StartItem();
 };
+
+void() switch_plasma = {
+	self.weaponmodel = "progs/v_plasma.mdl";
+	self.weaponframe = 0;
+}
+
 void() weapon_plasmarifle =
 {
 	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
@@ -1646,6 +1731,8 @@ void() weapon_plasmarifle =
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.particles_offset = '0 0 31';
+	self.wp_switch = switch_plasma;
+	self.wp_atk = atk_light;
 	if !(self.ammo) self.ammo = 30;
 
 	StartItem();
@@ -1689,7 +1776,7 @@ void() W_ChangeWeapon =
 		return;
 	}
 
-	self.weapon = wp;
+	//self.weapon = wp.items;
 	switch_weapon(wp);
 };
 
@@ -1738,7 +1825,7 @@ void() CycleWeaponCommand =
 {
 	local entity wp;
 	self.impulse = 0;
-	if (self.weapon == self.weapon2)
+	if (self.weapon == self.weapon2.items)
 		wp = self.weapon1;
 	else wp = self.weapon2;
 
@@ -1748,7 +1835,7 @@ void() CycleWeaponCommand =
 		return;
 	}
 
-	self.weapon = wp;
+	//self.weapon = wp.items;
 	switch_weapon(wp);
 };
 

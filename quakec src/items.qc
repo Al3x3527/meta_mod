@@ -1,5 +1,5 @@
 void (vector org) spawn_tfog;
-void() W_SetCurrentAmmo;
+//void() W_SetCurrentAmmo;
 /* ALL LIGHTS SHOULD BE 0 1 0 IN COLOR ALL OTHER ITEMS SHOULD
 BE .8 .3 .4 IN COLOR */
 
@@ -802,7 +802,7 @@ void(float slot) get_weapon =
 		self.weapon2 = get;
 	else 
 		self.weapon1 = get;
-	self.items =self.items + get.weapon;
+	self.items = self.items + get.items;
 	switch_weapon(get);
 
 	other = self;
@@ -867,8 +867,7 @@ weapon_touch
 
 void() weapon_touch =
 {
-	local	float	new, old;
-	local	entity	stemp;
+	local	float	new;
 	local 	float 	playerstuff;
 
 // from Copper -- dumptruck_ds
@@ -2118,6 +2117,15 @@ if (!self.drop_item)
 DropBackpack
 ===============
 */
+//new weapon system
+void() DropBackpack =
+{
+	if(self.weapon1.ammo)
+		drop_weapon(self.weapon1);
+	if(self.weapon2.ammo)
+		drop_weapon(self.weapon2);
+}
+
 /*
 void() DropBackpack =
 {
@@ -2258,7 +2266,7 @@ void() item_backpack_message =
 	remove(self);
 	self = other;
 //	bound_other_ammo();
-	W_SetCurrentAmmo ();
+	//W_SetCurrentAmmo ();
 
 };
 // Some of this text is from Drake -- dumptruck_ds
