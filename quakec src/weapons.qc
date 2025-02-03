@@ -435,7 +435,8 @@ void() W_FireShotgun =
 
 	self.punchangle_x = -2;
 
-	self.currentammo = self.ammo_shells = self.ammo_shells - 1;
+	//self.currentammo = self.ammo_shells = self.ammo_shells - 1;
+	self.currentammo = self.currentammo - 1;
 	dir = aim (self, 100000);
 	FireBullets (6, dir, '0.04 0.04 0');
 };
@@ -1278,7 +1279,7 @@ float() W_CheckNoAmmo =
 
 	//self.weapon = W_BestWeapon ();
 
-	W_SetCurrentAmmo ();
+	//W_SetCurrentAmmo ();
 
 // drop the weapon down
 	return FALSE;
@@ -1304,7 +1305,7 @@ void() W_Attack =
 {
 	makevectors(self.v_angle);			// calculate forward angle for velocity
 	self.show_hostile = time + 1;	// wake monsters up
-	self.weapon.wp_atk();
+	self.wp_atk();
 }
 
 /*void() W_Attack =
@@ -1379,9 +1380,24 @@ void() W_Attack =
 */
 void(entity wp) switch_weapon =
 {
-		self.currentammo = wp.items; //identity
-		W_SetCurrentAmmo();
-		wp.wp_switch(); //just model and animation data
+//update ammo counts (touch weapons)
+if (self.weapon1 == wp)
+	self.weapon2.ammo = self.currentammo;
+else
+	self.weapon1.ammo = self.currentammo;
+//check for weapon - do not cycle or infinite loop
+	if !(self.items & wp.weapon) {
+		return;
+		}
+	self.currentammo = wp.ammo; //ammo type quantity
+	wp.wp_switch(); //just model and animation data
+
+	self.weapon = wp.weapon;
+	self.wp_atk = wp.wp_atk();
+	if (wp.wp_melee)
+	self.wp_melee = wp.wp_melee();
+	else
+	self.wp_melee = melee_axe();
 }
 
 // johnfitz new items   -- dumptruck_ds from RRP and rubicon2

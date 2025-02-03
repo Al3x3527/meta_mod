@@ -782,22 +782,27 @@ new drop_weapon and get weapon
 void(entity drop) drop_weapon =
 {
 	other.items = other.items - drop.items;
-
+	
 	drop.solid = SOLID_TRIGGER;
 	drop.movetype = MOVETYPE_TOSS;
 	drop.origin = self.origin;
 	drop.nextthink = time + 120;	// remove after 2 minutes
 	drop.think = SUB_Remove;
-}
+}//does not switch weapon automatically here.
 
 void(float slot) get_weapon =
 {
+	local entity get = self;
+	self = other;
 	if (slot)
-		other.weapon2 = self;
+		self.weapon2 = get;
 	else 
-		other.weapon1 = self;
-	switch_weapon(other);
+		self.weapon1 = get;
+	self.items =self.items + get.weapon;
+	switch_weapon(get);
 
+	other = self;
+	self = get;
 	sprint(other, "You got the ");
 	sprint(other, self.netname);
 	sprint(other, "\n");
@@ -807,12 +812,47 @@ void(float slot) get_weapon =
 
 void() scavenge_weapon =
 {
-	if (other.weapon1.items == self.items)
-	other.weapon1.ammo = other.weapon1.ammo + self.ammo;
-	else if (other.weapon2.items == self.items)
-		other.weapon2.ammo = other.weapon2.ammo + self.ammo;
+	local entity primary = other.weapon1;
+	local entity secondary = other.weapon2;
+	if (primary.weapon == self.weapon)
+	primary.ammo = primary.ammo + self.ammo;
+	else if (secondary.weapon == self.weapon)
+		secondary.ammo = secondary.ammo + self.ammo;
 	else return;
 
+}
+
+void(float item) give_weapon =
+{
+	entity get;
+	other = self;
+	self = get = spawn();
+	//float to weapon
+	if (item == IT_AXE)
+		weapon_axe();
+	else if (item == IT_SHOTGUN)
+		weapon_shotgun();
+	else if (item == IT_SUPER_SHOTGUN)
+		weapon_supershotgun();
+	else if (item == IT_NAILGUN)
+		weapon_nailgun();
+	else if (self.weapon == IT_SUPER_NAILGUN)
+		weapon_supernailgun();
+	else if (item == IT_GRENADE_LAUNCHER)
+		weapon_grenadelauncher();
+	else if (item == IT_ROCKET_LAUNCHER)
+		weapon_rocketlauncher();
+	else if (self.weapon == IT_LIGHTNING)
+		weapon_lightning();
+	else if (self.weapon == IT_BATTLERIFLE)
+		weapon_battlerifle();
+	else if (self.weapon == IT_PLASMARIFLE)
+		weapon_plasmarifle();
+	//else unhandled get empty
+
+	get_weapon(0);
+	self = other;
+	return;
 }
 
 /*
@@ -850,11 +890,11 @@ if (!(playerstuff & new)) {
 
 	if (other.impulse == 16) {
 		if !(other.weapon2) {
-			if (other.weapon2 == other.weapon)
-				drop_weapon(other.weapon);
+			if (other.weapon2.weapon == other.weapon)
+				drop_weapon(other.weapon2);
 			get_weapon(1);
-		} else if (other.weapon1 == other.weapon)
-			drop_weapon(other.weapon);
+		} else if (other.weapon1.weapon == other.weapon)
+			drop_weapon(other.weapon1);
 		get_weapon(0);
 		activator = other;
 		SUB_UseTargets();
