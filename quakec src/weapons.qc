@@ -1416,7 +1416,7 @@ Axe
 */
 void() switch_axe =
 {
-		//self.currentammo = 0;
+		self.currentammo = 0;
 		self.weaponmodel = "progs/v_axe.mdl";
 		self.weaponframe = 0;
 }
@@ -1425,6 +1425,7 @@ void() melee_axe =
 {
 	local float r;
 	sound(self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);
+	switch_axe();
 		r = random();
 		if (r < 0.25)
 			player_axe1();
@@ -1759,6 +1760,11 @@ void() W_ChangeWeapon =
 	else if (self.impulse == 2)
 	{
 		wp = self.weapon2;
+	}
+	else if (self.impulse == 3)
+	{
+		switch_axe();
+		return;
 	}
 	else
 	{

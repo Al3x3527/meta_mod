@@ -134,7 +134,7 @@ void		end_sys_globals;		// flag for structure dumping
 // stats
 .float		health;
 .float		frags;
-.float		weapon;			// ALEX -- [WAS] one of the IT_SHOTGUN, etc flags
+.float		weapon;			// one of the IT_SHOTGUN, etc flags
 .string		weaponmodel;
 .float		weaponframe;
 .float		currentammo;
