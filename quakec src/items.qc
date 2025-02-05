@@ -781,11 +781,15 @@ new drop_weapon and get weapon
 
 void(entity drop) drop_weapon =
 {
+dprint("drop ");
+dprint(drop.netname);
+dprint("\n");
 	other.items = other.items - drop.items;
-	
+	if !(drop.modelindex)
+		setmodel(drop, drop.model);
 	drop.solid = SOLID_TRIGGER;
 	drop.movetype = MOVETYPE_TOSS;
-	drop.origin = self.origin;
+	setorigin(drop, self.origin);
 	drop.nextthink = time + 120;	// remove after 2 minutes
 	drop.think = SUB_Remove;
 }//does not switch weapon automatically here.
@@ -794,17 +798,19 @@ void(float slot) get_weapon =
 {
 	local entity get = self;
 	self = other;
-	//if player, hide from first person
-	if (self.classname == "player")
-		self.model = string_null;
-	self.solid = SOLID_NOT;
+	get.solid = SOLID_NOT;
 	if (slot)
-		self.weapon2 = get;
+		{self.weapon2 = get; dprint("slot 2\n");}
 	else 
-		self.weapon1 = get;
+		{self.weapon1 = get; dprint("slot 1\n");}
 	self.items = self.items + get.items;
+	//if player, hide from first person
+	if (self.classname == "player") {
+		//get.origmodel = get.model;
+		get.modelindex = 0;
+	}
+	
 	switch_weapon(get);
-
 	other = self;
 	self = get;
 	sprint(other, "You got the ");
@@ -881,7 +887,7 @@ void() weapon_touch =
 playerstuff = other.items;
 new = self.items;
 // CHECK FOR WEAPON IN INVENTORY FOR AUTO PICKUP
-if (!(playerstuff & new)) {
+//if (!(playerstuff & new)) {
 
 	if (self.count < time) {
 	sprint (other, "Press E to pick up ");
@@ -892,22 +898,35 @@ if (!(playerstuff & new)) {
 	self.count = time + .02; 
 
 	if (other.impulse == 16) {
-		if !(other.weapon2) {
-			if (other.weapon2.weapon == other.weapon)
-				drop_weapon(other.weapon2);
+	self.impulse = 0;
+		dprint("impulse 16\n");
+		if !(other.weapon1) {
+			get_weapon(0);
+			dprint("no primary\n");
+			}
+		else if !(other.weapon2){
 			get_weapon(1);
-		} else if (other.weapon1.weapon == other.weapon)
+			dprint("no secondary\n");
+			}
+		else if (other.weapon1.items == other.weapon){
 			drop_weapon(other.weapon1);
-		get_weapon(0);
-		activator = other;
-		SUB_UseTargets();
+			get_weapon(0);
+			}
+		else {
+			drop_weapon(other.weapon2);
+			get_weapon(1);
+			}
 	} //if impulse
 	else return;//no impulse
-	}//END OF WEAPON NOT IN INVENTORY --ALEX
-	scavenge_weapon();
+	//}//END OF WEAPON NOT IN INVENTORY --ALEX
+	//else
+		//{
+		//scavenge_weapon();
+		//remove(self);
+		//}
 	activator = other;
 	SUB_UseTargets();// fire all targets / killtargets
-	remove(self);
+	
 /*
 	// Supa, SP respawning items support
 	if (!deathmatch)

@@ -188,6 +188,7 @@ void() W_Precache =
 	// dumptruck_ds mobot.qc END
 
 	precache_model("progs/e_mdls/v_ad70.mdl");
+	precache_model("progs/e_mdls/v_plasma_rifle.mdl");
 };
 
 float() crandom =
@@ -1172,6 +1173,33 @@ void() superduperspike_touch = //dumptruck_ds for Style 2 Ogre see ogre.qc
 	remove(self);
 };
 
+void(vector org, vector dir) LaunchLaser2 = {
+local float speed = 1200;
+
+	newmis = spawn();
+	newmis.owner = self;
+	newmis.movetype = MOVETYPE_FLYMISSILE;
+	newmis.solid = SOLID_BBOX;
+
+	newmis.angles = vectoangles(dir);
+
+	newmis.touch = Laser_Touch;
+	newmis.classname = "laser";
+	if (self.homing > 0)
+	{
+		SetupHoming(newmis, speed);
+	} else
+	{
+		newmis.think = SUB_Remove;
+		newmis.nextthink = time + 6;
+	}
+	setmodel(newmis, "progs/laser.mdl");
+	setsize(newmis, VEC_ORIGIN, VEC_ORIGIN);
+	setorigin(newmis, org);
+
+	SetSpeed(newmis, dir, speed * (self.proj_speed_mod ? self.proj_speed_mod : 1));
+};
+
 /*
 ===============================================================================
 
@@ -1315,6 +1343,10 @@ void()	player_rocket1;
 
 void() W_Attack =
 {
+	if !(self.wp_atk) {
+	//self.wp_melee();
+	return;
+	}
 	makevectors(self.v_angle);			// calculate forward angle for velocity
 	self.show_hostile = time + 1;	// wake monsters up
 	self.wp_atk();
@@ -1393,13 +1425,16 @@ void() W_Attack =
 void(entity wp) switch_weapon =
 {
 //update ammo counts
-self.nextchild.ammo = self.currentammo;
+if (self.nextchild)
+	self.nextchild.ammo = self.currentammo;
 //check for weapon - do not cycle or infinite loop
-	if !(self.items & wp.weapon) {
+	if !(wp) {
+		dprint("no weapon\n");
 		return;
 		}
 	self.nextchild = wp;
 	self.currentammo = wp.ammo; //ammo type quantity
+	dprint("switch weapon\n");
 	wp.wp_switch(); //just model and animation data
 
 	self.weapon = wp.items;
@@ -1414,18 +1449,22 @@ self.nextchild.ammo = self.currentammo;
 /*QUAKED weapon_axe (0 .5 .8) (-16 -16 0) (16 16 32)
 Axe
 */
-void() switch_axe =
+void() switch_axe = 
 {
-		self.currentammo = 0;
 		self.weaponmodel = "progs/v_axe.mdl";
 		self.weaponframe = 0;
+//special because not a real entity
+		self.currentammo = 0;
+		self.wp_atk = melee_axe;
+		self.weapon = IT_AXE;
 }
 
 void() melee_axe =
 {
+	if !(self.weapon == IT_AXE)
+		switch_axe();
 	local float r;
 	sound(self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);
-	switch_axe();
 		r = random();
 		if (r < 0.25)
 			player_axe1();
@@ -1450,7 +1489,9 @@ void() weapon_axe =
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.wp_melee = melee_axe;
+	self.wp_atk = melee_axe;
 	self.wp_switch = switch_axe;
+	self.ammo = 0;
 	StartItem();
 };
 /*QUAKED weapon_shotgun (0 .5 .8) (-16 -16 0) (16 16 32) X STYLE_1 STYLE_2 X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
@@ -1470,8 +1511,8 @@ void() switch_shotgun =
 void() atk_shotgun =
 {
 	player_shot1();
-		W_FireShotgun();
-		self.attack_finished = time + 0.5;
+	W_FireShotgun();
+	self.attack_finished = time + 0.5;
 }
 
 void() weapon_shotgun =
@@ -1693,7 +1734,7 @@ void() weapon_lightning =
 Battle rifle
 */
 void() switch_battle = {
-	self.weaponmodel = "progs/v_ad70.mdl";
+	self.weaponmodel = "progs/e_mdls/v_ad70.mdl";
 	self.weaponframe = 0;
 }
 void() weapon_battlerifle =
@@ -1716,9 +1757,24 @@ void() weapon_battlerifle =
 };
 
 void() switch_plasma = {
-	self.weaponmodel = "progs/v_plasma.mdl";
+	self.weaponmodel = "progs/e_mdls/v_plasma_rifle.mdl";
 	self.weaponframe = 0;
 }
+
+void() plasma_fire =
+{
+	local vector org, dir;
+
+	self.effects = self.effects | EF_MUZZLEFLASH;
+	sound_attack(self, CHAN_WEAPON, "enforcer/enfire.wav", 1, ATTN_NORM);
+
+	makevectors(self.v_angle);
+	org = self.origin + self.view_ofs + v_up * -8 + v_forward * 30;
+	dir = aim(self, 1000);
+	self.punchangle_x = -2;
+	LaunchLaser2(org, dir);
+	self.attack_finished = time + 0.5;
+}; 
 
 void() weapon_plasmarifle =
 {
@@ -1733,7 +1789,7 @@ void() weapon_plasmarifle =
 	setsize(self, '-16 -16 0', '16 16 56');
 	self.particles_offset = '0 0 31';
 	self.wp_switch = switch_plasma;
-	self.wp_atk = atk_light;
+	self.wp_atk = plasma_fire;
 	if !(self.ammo) self.ammo = 30;
 
 	StartItem();
@@ -1775,13 +1831,13 @@ void() W_ChangeWeapon =
 	}
 
 	self.impulse = 0;
-
+	/*
 	if (!(self.items & wp.items))
 	{	// don't have the weapon or the ammo
 		sprint (self, "no weapon.\n");
 		return;
 	}
-
+*/
 	//self.weapon = wp.items;
 	switch_weapon(wp);
 };
@@ -1834,13 +1890,13 @@ void() CycleWeaponCommand =
 	if (self.weapon == self.weapon2.items)
 		wp = self.weapon1;
 	else wp = self.weapon2;
-
+	/*
 	if (!(self.items & wp.items))
 	{	// don't have the weapon or the ammo
 		sprint(self, "no weapon.\n");
 		return;
 	}
-
+	*/
 	//self.weapon = wp.items;
 	switch_weapon(wp);
 };

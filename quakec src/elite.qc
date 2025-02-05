@@ -25,6 +25,7 @@ void() elite_fire =
 	org = self.origin + v_forward * 30 + v_right * 8.5 + '0 0 16';
 
 	LaunchLaser(org, self.enemy.origin - self.origin);
+	self.attack_finished = time + 0.5;
 };
 
 void()	elite_stand1 = [$stand1, elite_stand1] {ai_stand(); };
@@ -115,6 +116,10 @@ void() monster_elite =
 	body_model("progs/e_mdls/elite.mdl");
 	setsize(self, '-16 -16 0', '16 16 96');
 
+	if (!self.proj_speed_mod)
+	{
+		self.proj_speed_mod = 1;
+	}
 	if (!self.health) //thanks RennyC -- dumptruck_ds
 		self.health = 80;
 

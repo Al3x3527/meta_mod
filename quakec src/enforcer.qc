@@ -75,11 +75,13 @@ void(vector org, vector vec) LaunchLaser =
 {
 
 	local float projspeed = self.proj_speed_mod * 600;
+	if (projspeed == 0)
+		projspeed = 600;
 
 	//if (self.classname == "monster_enforcer" || self.classname == "monster_army") --commented out ALEX
 		sound_attack (self, CHAN_WEAPON, "enforcer/enfire.wav", 1, ATTN_NORM);
 
-	vec = normalize(vec);
+	//vec = normalize(vec);
 
 	newmis = spawn();
 	newmis.snd_hit = self.snd_hit; // dumptruck_ds
