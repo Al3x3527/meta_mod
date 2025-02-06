@@ -1428,7 +1428,7 @@ void(entity wp) switch_weapon =
 if (self.nextchild)
 	self.nextchild.ammo = self.currentammo;
 //check for weapon - do not cycle or infinite loop
-	if !(wp) {
+	if !(wp.wp_switch) {
 		dprint("no weapon\n");
 		return;
 		}

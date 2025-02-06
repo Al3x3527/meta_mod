@@ -824,12 +824,23 @@ void() scavenge_weapon =
 {
 	local entity primary = other.weapon1;
 	local entity secondary = other.weapon2;
-	if (primary.weapon == self.weapon)
-	primary.ammo = primary.ammo + self.ammo;
-	else if (secondary.weapon == self.weapon)
-		secondary.ammo = secondary.ammo + self.ammo;
-	else return;
-
+	local entity addto;
+	if (primary.items == self.items)
+		addto = primary;
+	else if (secondary.items == self.items)
+		addto = secondary;
+	else {
+		dprint("scavenge weapon failed\n");
+		return;
+		}
+	sound(other, CHAN_ITEM, "weapons/pkup.wav", 1, ATTN_NORM);
+	sprint(other, "You got the ");
+	sprint(other, self.netname);
+	sprint(other, "\n");
+	if (other.weapon == addto.items)
+		addto.ammo = other.currentammo = other.currentammo + self.ammo;
+	else
+		addto.ammo = addto.ammo + self.ammo;
 }
 
 void(float item) give_weapon =
@@ -881,13 +892,11 @@ void() weapon_touch =
 
 	if (!(other.flags & FL_CLIENT))
 		return;
-	activator = other;
-	SUB_UseAndForgetTargets ();
-
+	
 playerstuff = other.items;
 new = self.items;
 // CHECK FOR WEAPON IN INVENTORY FOR AUTO PICKUP
-//if (!(playerstuff & new)) {
+if (!(playerstuff & new)) {
 
 	if (self.count < time) {
 	sprint (other, "Press E to pick up ");
@@ -918,14 +927,14 @@ new = self.items;
 			}
 	} //if impulse
 	else return;//no impulse
-	//}//END OF WEAPON NOT IN INVENTORY --ALEX
-	//else
-		//{
-		//scavenge_weapon();
-		//remove(self);
-		//}
+		}
+		else //new is in inventory
+			{
+			scavenge_weapon();
+			remove(self);
+			}
 	activator = other;
-	SUB_UseTargets();// fire all targets / killtargets
+	SUB_UseAndForgetTargets();// fire all targets / killtargets
 	
 /*
 	// Supa, SP respawning items support
