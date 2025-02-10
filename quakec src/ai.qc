@@ -414,6 +414,8 @@ float() FindTarget =
 	local entity	client;
 	local float		r;
 
+	
+
 // if the first spawnflag bit is set, the monster will only wake up on
 // really seeing the player, not another monster getting angry
 
@@ -576,6 +578,7 @@ void(float dist) ai_walk =
 		ai_walk_box();
 		return;
 	}
+	//dprint("movetogoal called from ai_walk\n");
 	movetogoal (dist);
 };
 
@@ -779,6 +782,7 @@ walkmove(self.ideal_yaw, movedist);
 return;
 }
 self.run_style = 1;
+//dprint("movetogoal from ai_run_box\n");
 movetogoal(movedist);
 };
 
@@ -826,7 +830,7 @@ void(float dist) ai_run =
 		self.search_time = time + 5;
 
 // look for other coop players
-	if (/*coop && */self.search_time < time) //AI TEAMS
+	else if (/*coop && */self.search_time < time) //AI TEAMS
 	{
 		if (FindTarget ())
 			return;
@@ -903,8 +907,8 @@ void(float dist) ai_run =
 if !(self.spawnflags & I_AM_TURRET) // keeps monster from moving to player - dumptruck_ds
 // head straight in
 	movetogoal (dist);		// done in C code...
-dprint(self.goalentity.classname);
-dprint(" movetogoal ai_run\n");
+//dprint(self.goalentity.classname);
+//dprint("movetogoal ai_run\n");
 };
 /*
 =============

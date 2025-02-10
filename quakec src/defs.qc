@@ -1088,3 +1088,5 @@ float FL_VEHICLE = 131072; //not implemented yet
 .void() wp_melee; //used by player and weapons
 .void() wp_atk;
 .entity nextchild;	//high traffic
+
+.void(entity attacker, float damage) sub_th_pain;

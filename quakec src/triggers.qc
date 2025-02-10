@@ -1785,7 +1785,7 @@ void() trigger_monsterzone_touch =
 {
 	if !(other.flags & FL_MONSTER)
 		return;
-	dprint("monsterzone_touch\n");
+	//dprint("monsterzone_touch\n");
 	if (other.target != self.target)
 		return;
 	other.run_style = IN_BOX;
@@ -1800,32 +1800,62 @@ void() trigger_monsterzone = {
 	SUB_CheckWaiting();
 };
 
+void(entity attacker, float damage) hate_pain =
+{
+dprint("hate_pain\n");
+attacker.sub_th_pain = attacker.th_pain;
+attacker.th_pain = hate_pain;
+	local entity fren = find(world, targetname, self.targetname);
+		while (fren != world)
+		{
+			if (fren != self) {
+				fren.enemy = attacker;
+				fren.think = fren.th_run;
+				fren.nextthink = time + 0.1;
+				dprint("monsterhate fren found\n");
+				}
+			fren = find(fren, targetname, self.targetname);
+		}
+		self.sub_th_pain(attacker, damage);
+		return;
+}
+
 void() trigger_monsterhate_touch =
 {
 	local entity t, fren;
 	if !(other.flags & FL_MONSTER)
 		return;
-dprint("monsterhate_touch\n");
 if (other.targetname == self.target) //dont activate on own target
 return;
 if (self.wait == 0)
 {
 	self.wait = -1; //use once
-
+	dprint("monsterhate_touch\n");
+	//other.sub_th_pain = other.th_pain;
+	//other.th_pain = hate_pain;
 	//all targets fight activator
 	t = find(world, targetname, self.target);
 	while (t != world)
 	{
 		t.enemy = other;
+		other.enemy = t; //valid t
+		t.think = t.th_run;
+		t.nextthink = time + 0.1;
 		t = find(t, targetname, self.target);
+		dprint("monsterhate target found\n"); //one who shoots first
 	}
 
 	//call to arms (only monsters with the same targetname)
 	fren = find(world, targetname, other.targetname);
 		while (fren != world)
 		{
-			fren.enemy = t;
-			fren = find(fren, targetname, self.target);
+			fren.enemy = other.enemy;
+			fren.think = fren.th_run;
+			fren.nextthink = time + 0.1;
+			if (fren == other)
+				dprint("fren == other :(\n");
+			fren = find(fren, targetname, other.targetname);
+			dprint("monsterhate fren found\n");
 		}
 //infighting is always enabled for monsters of different .team
 }

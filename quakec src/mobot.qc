@@ -429,7 +429,7 @@ local entity bot;
 			dprint("\n");
 
 			if (bot.classname != "monster_zombie") // required to avoid animation issues -- dumptruck_ds
-				bot.think = monster_use;
+				bot.think = monster_use; //only good for angry at player
 			else
 				bot.think = bot.th_walk;
 		} else

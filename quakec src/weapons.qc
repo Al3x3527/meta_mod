@@ -1532,7 +1532,6 @@ void() weapon_shotgun =
 
 	StartItem();
 };
-// johnfitz
 
 /*QUAKED weapon_supershotgun (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
 {	model("progs/g_shot.mdl");	}
@@ -1768,7 +1767,7 @@ void() plasma_fire =
 	self.effects = self.effects | EF_MUZZLEFLASH;
 	sound_attack(self, CHAN_WEAPON, "enforcer/enfire.wav", 1, ATTN_NORM);
 
-	makevectors(self.v_angle);
+	//makevectors(self.v_angle);
 	org = self.origin + self.view_ofs + v_up * -8 + v_forward * 30;
 	dir = aim(self, 1000);
 	self.punchangle_x = -2;
@@ -1778,7 +1777,7 @@ void() plasma_fire =
 
 void() weapon_plasmarifle =
 {
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+	if (SUB_Inhibit())
 		return;
 
 	precache_model("progs/e_mdls/plasma_rifle.mdl");

@@ -887,8 +887,7 @@ void() weapon_touch =
 	local	float	new;
 	local 	float 	playerstuff;
 
-// from Copper -- dumptruck_ds
-	if (!CheckValidTouch()) return;
+	if (!CheckValidTouch()) return;// from Copper -- dumptruck_ds
 
 	if (!(other.flags & FL_CLIENT))
 		return;
@@ -903,7 +902,7 @@ if (!(playerstuff & new)) {
 	sprint (other, self.netname);
 	sprint (other, " \n"); }
 
-//THEN WAIT FOR BUTTON PRESS --ALEX
+//THEN WAIT FOR BUTTON PRESS
 	self.count = time + .02; 
 
 	if (other.impulse == 16) {

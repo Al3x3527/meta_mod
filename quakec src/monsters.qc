@@ -166,6 +166,8 @@ Using a monster makes it angry at the current activator
 */
 void() monster_use =
 {
+	self.nextthink = time + 0.1;
+	self.think = self.th_run; //monster still "activated" if no activator
 	if (self.enemy)
 		return;
 	if (self.health <= 0)
@@ -183,7 +185,7 @@ void() monster_use =
 // delay reaction so if the monster is teleported, its sound is still
 // heard
 	self.enemy = activator;
-	self.nextthink = time + 0.1;
+	//self.nextthink = time + 0.1;
 	self.think = FoundTarget;
 };
 
