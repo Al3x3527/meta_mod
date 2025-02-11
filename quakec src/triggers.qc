@@ -1802,22 +1802,33 @@ void() trigger_monsterzone = {
 
 void(entity attacker, float damage) hate_pain =
 {
-dprint("hate_pain\n");
-attacker.sub_th_pain = attacker.th_pain;
-attacker.th_pain = hate_pain;
-	local entity fren = find(world, targetname, self.targetname);
+	self.sub_th_pain(attacker, damage);
+	if (self.team == attacker.team)
+		return;
+	dprint("hate_pain\n");
+	if !(attacker.sub_th_pain) {
+		attacker.sub_th_pain = attacker.th_pain;
+		attacker.th_pain = hate_pain;
+		}
+//	local entity fren = find(world, targetname, self.targetname);
+	local entity fren = nextent(world);
 		while (fren != world)
 		{
-			if (fren != self) {
-				fren.enemy = attacker;
+			if ((fren.flags & FL_MONSTER)
+			&& (fren.team == self.team)
+			&& (fren != self)
+			&& (range(fren) != RANGE_FAR)) {
+				if (fren.enemy.health <= 0)
+					fren.enemy = attacker;
+				else fren.oldenemy = attacker;
 				fren.think = fren.th_run;
+				if (fren.nextthink > (time + 1))
 				fren.nextthink = time + 0.1;
-				dprint("monsterhate fren found\n");
+				dprint("hate pain fren found\n");
 				}
-			fren = find(fren, targetname, self.targetname);
+			//fren = find(fren, targetname, self.targetname);
+			fren = nextent(fren);
 		}
-		self.sub_th_pain(attacker, damage);
-		return;
 }
 
 void() trigger_monsterhate_touch =
@@ -1831,31 +1842,48 @@ if (self.wait == 0)
 {
 	self.wait = -1; //use once
 	dprint("monsterhate_touch\n");
-	//other.sub_th_pain = other.th_pain;
-	//other.th_pain = hate_pain;
 	//all targets fight activator
 	t = find(world, targetname, self.target);
+	t.enemy = other;
+	other.enemy = t; //valid t
+	t.think = t.th_run;
+	t.nextthink = time + 0.1;
+	//t = find(t, targetname, self.target);
+	self = t;
+	t = nextent(world);
 	while (t != world)
 	{
-		t.enemy = other;
-		other.enemy = t; //valid t
-		t.think = t.th_run;
-		t.nextthink = time + 0.1;
-		t = find(t, targetname, self.target);
-		dprint("monsterhate target found\n"); //one who shoots first
+		if ((t.flags & FL_MONSTER)
+		&& (t.team == self.team)
+		&& (t.health > 0)
+		&& (t != self)
+		&& (range(t) != RANGE_FAR)) {
+			t.enemy = other;
+			t.think = t.th_run;
+			t.nextthink = time + 0.1;
+			dprint("monsterhate target found\n");
+			}
+		//t = find(t, targetname, self.target);
+		t = nextent(t);
 	}
 
-	//call to arms (only monsters with the same targetname)
-	fren = find(world, targetname, other.targetname);
-		while (fren != world)
-		{
+	self = other;
+	//fren = find(world, targetname, other.targetname);
+	fren = nextent(world);
+	while (fren != world)
+	{
+		if ((fren.flags & FL_MONSTER)
+		&& (fren.team == self.team)
+		&& (fren.health > 0)
+		&& (fren != self)
+		&& (range(fren) != RANGE_FAR)) {
 			fren.enemy = other.enemy;
 			fren.think = fren.th_run;
 			fren.nextthink = time + 0.1;
-			if (fren == other)
-				dprint("fren == other :(\n");
-			fren = find(fren, targetname, other.targetname);
 			dprint("monsterhate fren found\n");
+			}
+		//fren = find(fren, targetname, other.targetname);
+		fren = nextent(fren);
 		}
 //infighting is always enabled for monsters of different .team
 }

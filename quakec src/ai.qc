@@ -310,9 +310,9 @@ void() ChangeYaw =
 void() HuntTarget =
 {
 	if (self.run_style > 0) {
-		dprint("TO_PATH");
-		dprint(self.goalentity.classname);
-		dprint("\n");
+	//	dprint("TO_PATH");
+	//	dprint(self.goalentity.classname);
+	//	dprint("\n");
 }
 	else {
 		self.goalentity = self.enemy;
@@ -592,6 +592,10 @@ The monster is staying in one place for a while, with slight angle turns
 */
 void() ai_stand =
 {
+	if (self.health <= 0) {
+		dprint("people die when they are killed.\n");
+		Killed(self, world, world);
+}
 	if (FindTarget ())
 		return;
 
@@ -806,7 +810,7 @@ void(float dist) ai_run =
 		if (self.oldenemy.health > 0)
 		{
 			self.enemy = self.oldenemy;
-			HuntTarget ();
+			//HuntTarget ();
 		}
 		else
 		{

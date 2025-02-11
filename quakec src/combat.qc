@@ -299,13 +299,33 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 				self.pain_finished = time + 5;
 		}
 
-		if (self.enemy != attacker) {
-			if (attacker.team != self.team) {
-				self.enemy = attacker;
-				FoundTarget();
+		
+		if (attacker.team == self.team) 
+		return;
+		//ALEX's infighting
+		local entity fren = nextent(world);
+		while (fren != world)
+		{
+			if ((fren.flags & FL_MONSTER)
+				&& (fren.team == self.team)
+				&& (fren.health > 0)
+				&& (fren != self)
+				&& (range(fren) != RANGE_FAR)) {
+				if (fren.enemy.health <= 0)
+					fren.enemy = attacker;
+				else fren.oldenemy = attacker;
+				fren.think = fren.th_run;
+				if (fren.nextthink > (time + 1))
+					fren.nextthink = time + 0.1;
+				dprint("hate pain fren found\n");
 			}
-				
+			//fren = find(fren, targetname, self.targetname);
+			fren = nextent(fren);
 		}
+		if (self.enemy == attacker) 
+		return;
+		self.enemy = attacker;
+		FoundTarget();
 	}
 
 	self = oldself;
