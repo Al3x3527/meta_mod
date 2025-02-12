@@ -50,7 +50,8 @@ void()	elite_atk13 = [$stand1, elite_atk14] {ai_face(); };
 void()	elite_atk14 = [$stand1, elite_run1] {ai_face(); SUB_CheckRefire(enf_atk1);
 };
 
-void(entity attacker, float damage) elite_pain = {};
+void(entity attacker, float damage) elite_pain = {
+return;};
 
 void() elite_die =
 {
@@ -110,7 +111,13 @@ void() monster_elite =
 	precache_gib2("progs/gib2.mdl");
 	precache_gib3("progs/gib3.mdl");
 
-	self.solid = SOLID_SLIDEBOX;
+	spawn_monster_elite();
+	walkmonster_start();
+};
+
+void() spawn_monster_elite =
+{
+self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
 	body_model("progs/e_mdls/elite.mdl");
@@ -120,7 +127,7 @@ void() monster_elite =
 	{
 		self.proj_speed_mod = 1;
 	}
-	if (!self.health) //thanks RennyC -- dumptruck_ds
+	if (!self.health)
 		self.health = 80;
 
 	self.th_stand = elite_stand1;
@@ -132,5 +139,35 @@ void() monster_elite =
 	else
 		self.th_pain = SUB_NullPain;
 	self.th_die = elite_die;
-	walkmonster_start();
-};
+
+	self.classname = "monster_elite";
+	self.ideal_yaw = self.angles * '0 1 0';
+	self.yaw_speed = 120;
+	//if !(self.view_ofs)
+		self.view_ofs = '0 0 80';
+}
+
+void() func_spawn_elite_use =
+{
+	think_respawn(spawn_monster_elite);
+}
+
+/*QUAKED func_spawn_elite (.75 0 .75) (-8 -8 -8) (8 8 8) REUSABLE X X X X X X X NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER X NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
+Spawns monsters to targeted info_monster_spawnpoint
+*/
+void() func_spawn_elite =
+{
+	precache_body_model2("progs/e_mdls/elite.mdl");  // custom_mdls function -- dumptruck_ds
+	precache_proj_model2("progs/laser.mdl");
+	precache_sound2_attack("enforcer/enfire.wav");
+
+	precache_gib1("progs/gib1.mdl");
+	precache_gib2("progs/gib2.mdl");
+	precache_gib3("progs/gib3.mdl");
+
+	if (SUB_Inhibit ())
+		return;
+
+	self.use = self.think = func_spawn_elite_use;
+	func_spawn_start();
+}

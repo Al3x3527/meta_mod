@@ -240,6 +240,7 @@ void() monster_pain_use =
 
 void() walkmonster_start_go =
 {
+dprint("walkmonster start go\n");
 	self.origin_z = self.origin_z + 1;	// raise off floor a bit
 //Preach's "check" here
 
@@ -270,6 +271,7 @@ if(!(self.spawnflags & 8))
 	self.use = monster_use;
 
 	self.flags = self.flags | FL_MONSTER;
+	dprint("monster flag set\n");
 
 	if (self.target != "")
 	{

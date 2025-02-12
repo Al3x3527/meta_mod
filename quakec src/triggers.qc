@@ -1799,7 +1799,7 @@ void() trigger_monsterzone = {
 	self.classname = "trigger_monsterzone";
 	SUB_CheckWaiting();
 };
-
+/*
 void(entity attacker, float damage) hate_pain =
 {
 	self.sub_th_pain(attacker, damage);
@@ -1830,7 +1830,7 @@ void(entity attacker, float damage) hate_pain =
 			fren = nextent(fren);
 		}
 }
-
+*/
 void() trigger_monsterhate_touch =
 {
 	local entity t, fren;

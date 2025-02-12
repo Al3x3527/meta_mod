@@ -284,12 +284,17 @@ style(Choices) =
 	10 : "Spawn"
 	11 : "Zombie"
 	12 : "Shalrath"
+	13 : "Goblin"
 ]
 style2(integer) : "Overrides Style and selects random monster"
 wait(integer) : "Wait this long between spawns (default 5)"
 count(integer) : "How many monsters to spawn (default 5)"
 ]
-@PointClass base(MonsterClass, OneTargetname) = info_monster_spawnpoint : "Destination for func_monster_spawner" []
+@PointClass base(MonsterClass, OneTarget, OneTargetname) = info_monster_spawnpoint : "Destination for func_monster_spawner" 
+[
+	message(string) : "bot.targetname"
+	team(integer) : "0 MONSTERS 1 PLAYERS 2 OTHER"
+]
 @PointClass base(PlayerClass) = info_player_start : "Player 1 start" []
 @PointClass base(PlayerClass) = info_player_coop : "Player cooperative start" []
 @PointClass base(PlayerClass) = info_player_start2 : "Player episode return point" []
@@ -3518,4 +3523,118 @@ style(Choices) : "Attack type" =
 	5 : "nails (rapid fire)"
 ]
 //snd here
+]
+
+@PointClass base(Appearflags, OneTargetname, Effects) size(-16 -16 0, 16 16 32) color(80 0 200)  model(
+	{{
+		mdl_body -> {"path" : mdl_body, "skin" : skin}, {"path": "progs/e_mdls/oil.mdl" , "skin" : skin}
+	}}
+) = item_oil
+	:"Motor Oil"
+
+[
+skin(Choices):"oil skin" : 0 =
+	[
+		0:"Default"
+	]
+spawnflags(Flags) =
+[
+	1:"Not in coop" : 0
+]
+]
+
+// @PointClass base(Monster, Berserk, CustomMdls) size(-16 -16 16, 16 16 56) model({ "path": ":progs/e_mdls/goblin.mdl" }) = monster_goblin : "goblin
+@PointClass base(Monster, Berserk, CustomMdls, Turret) size(-16 -16 16, 16 16 56) model(
+	{{
+		mdl_body -> {"path" : mdl_body, "skin" : skin}, {"path": "progs/e_mdls/goblin.mdl" , "skin" : skin}
+	}}
+) = monster_goblin
+: "goblin
+Default health = 80" [
+keep_ammo(integer) : "Don't drop backpack" : : "Don't drop backpack upon death"
+//snd here
+]
+
+@SolidClass base(Appearflags) = trigger_monsteract : "Sets Squad attack_state"
+[
+attack_state(choices) : "Attack State" =
+[
+	0:"Default (no effect)"
+	1:"1"
+	2:"2"
+	3:"3"
+	4:"4"
+	5:"5"
+	6:"sleep"
+	7:"alert"
+	8:"fight"
+	9:"flee"
+	10:"uncover"
+	11:"guard"
+	12:"search"
+	13:"wait"
+	14:"vehicle"
+	15:"charge"
+	16:"obey"
+	17:"converse"
+	18:"avoid"
+	19:"spawn"
+]
+]
+
+@SolidClass base(Appearflags, OneTargetName) = trigger_monsterzone : "Zone for monster pathing."
+[
+]
+
+@SolidClass base(Appearflags, Targetname, Target) = trigger_monsterhate : "causes group infighting. 
+targeted entities fight activator and same targetname. 
+put monsters on different teams."
+[
+]
+
+@PointClass size(-8 -8 -8, 8 8 8) color(115 100 240) base(Appearflags, Targetname, Target) = func_changetargets : "target entities .target changes to other (trigger) .message"
+[
+]
+
+@PointClass base(Monster, Berserk, CustomMdls, Turret) size(-16 -16 0, 16 16 96) model(
+	{{
+		mdl_body -> {"path" : mdl_body, "skin" : skin}, {"path": "progs/e_mdls/elite.mdl" , "skin" : skin}
+	}}
+) = monster_elite
+: "lemurian
+Default health = 80" [
+keep_ammo(integer) : "Don't drop backpack" : : "Don't drop backpack upon death"
+//snd here
+]
+@PointClass base(Weapon) size(-16 -16 0, 16 16 56) model({ "path": ":progs/e_mdls/AD70.mdl" }) =
+	weapon_battlerifle : "Battle Rifle"
+[
+ammo(integer) : "(default 30)"
+]
+@PointClass base(Weapon) size(-16 -16 0, 16 16 56) model({ "path": ":progs/e_mdls/plasma_rifle.mdl" }) =
+	weapon_plasmarifle : "Plasma Rifle"
+[
+ammo(integer) : "(default 30)"
+]
+@PointClass base(OneTarget, OneTargetname, Berserk, Appearflags) size(-16 -16 0, 16 16 96) model(
+	{{
+		mdl_body -> {"path" : mdl_body, "skin" : skin}, {"path": "progs/e_mdls/elite.mdl" , "skin" : skin}
+	}}
+) = func_spawn_elite : "Spawns monster_elite
+
+Default time between spawns is 5 seconds
+
+Can set Berserk to 1 to skip most pain animations.
+"
+[
+	spawnflags(flags) =
+		[
+		1: "Reset after completion" : 0
+		2: "Don't spawn angry" : 0
+		4: "Don't add to count" : 0
+		16: "Place monster at start" : 0
+		32: "Silent spawn" : 0
+		]
+wait(integer) : "Wait this long between spawns (default 5)"
+count(integer) : "How many monsters to spawn (default 5)"
 ]

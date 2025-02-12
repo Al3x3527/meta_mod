@@ -1089,4 +1089,8 @@ float FL_VEHICLE = 131072; //not implemented yet
 .void() wp_atk;
 .entity nextchild;	//high traffic
 
-.void(entity attacker, float damage) sub_th_pain;
+//.void(entity attacker, float damage) sub_th_pain;
+
+//.float respawn_time; //minimum interval between spawns (use wait)
+.float runtime_maximum; //maximum number of concurrent spawns
+.float runtime_count; //concurrent spawns

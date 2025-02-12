@@ -395,7 +395,7 @@ local entity bot;
 			setmodel(bot, "progs/shalrath.mdl");
 			setsize(bot, VEC_HULL2_MIN, VEC_HULL2_MAX);
 			bot.flags = bot.flags | FL_MONSTER;
-			bot.takedamage = DAMAGE_AIM;
+			bot.takedamage = DAMAGE_AIM; 
 
 			// define his animation
 			bot.th_stand = shal_stand;
@@ -554,3 +554,129 @@ void() func_monster_spawner =
 
 	self.use = think_mobot;
 };
+
+//think_respawn ADAPTED FROM think_mobot AND create_mobot FROM progs_dump
+//FROM dumptruck_ds:
+// Using "bot" creation code for func_monster_spawner
+// most of the code is from a tutorial on creating a bot monster found here:
+// https://www.quaddicted.com/webarchive/minion.planetquake.gamespy.com/tutorial/tutor9.htm
+// I added the MobotSpawnPoint, retriggering and random gen with help from
+// kreathor, 4LT, Paril, Spoike and others on the Quake Mapping Discord.
+// ===================================================================
+// Big thanks to ryanscissorhands for helping fix telefragging issues!
+// ===================================================================
+
+float BOT_PLACE_AT_START = 16; //different from trigger spawn
+
+void(void() monster_type) think_respawn =
+{
+	dprint("func_spawn thinking\n");
+	local entity  nearby, oself; // telefrag check thanks to ryanscissorhands for this code! -- dumptruck_ds
+
+	nearby = findradius(self.origin, 128); // findradius (vector origin, float radius in Quake units)
+
+	while (nearby)
+	{
+		if (nearby.takedamage)
+		{
+			dprint("monster waiting to spawn\n");
+			self.think = self.use; // qss crash fix from paavohuhtala -- dumptruck_ds
+			self.nextthink = time + 1; //delay the spawn by some amount;
+			return;
+		}
+		nearby = nearby.chain;
+	}
+
+	self.count = self.count - 1;
+
+	if (self.count < 0)
+	{
+		return;
+	}
+	if (self.count != 0)
+	{
+		dprint("create monster\n");
+		self.nextthink = time + self.wait;
+		//create monster here
+		local entity bot = spawn();
+		bot.origin = self.origin + '0 0 1';
+		bot.angles = self.angles;
+		bot.fixangle = TRUE;
+		bot.proj_speed_mod = 1;
+		if (!(self.spawnflags & MOBOT_SILENT_SPAWN)) 			// SILENT
+			spawn_tfog(bot.origin);
+		spawn_tdeath(bot.origin, bot);
+		bot.targetname = self.message;
+		bot.target = self.target;
+		bot.target2 = self.target2;
+		bot.target3 = self.target3;
+		bot.target4 = self.target4;
+		bot.killtarget = self.killtarget;
+		bot.killtarget2 = self.killtarget2;
+
+		bot.run_style = self.run_style;
+		bot.team = self.team;
+		bot.style = self.style;
+		bot.weapon = self.weapon;
+		bot.skin = self.skin;
+		if (self.health)
+			bot.health = self.health;
+
+		//bot.flags = bot.flags | FL_MONSTER; //walkmonster start go
+		//bot.takedamage = DAMAGE_AIM;
+
+		oself = self;
+		self = bot;
+		monster_type();
+		self = oself;
+
+		// begin his thinking
+		bot.nextthink = time + 0.2; // this seems better with monster_use -- dumptruck_ds
+		// bot.nextthink = time + 0.1 + random();
+		if (!(self.spawnflags & MOBOT_DONT_SPAWN_ANGRY))
+		{
+			self.spawn_angry = 1;
+			if (bot.run_style == 1)
+				bot.goalentity = bot.movetarget = find(world, targetname, bot.target);
+			dprint("bot.goalentity.targetname ");
+			dprint(bot.goalentity.targetname);
+			dprint("\n");
+
+			if (bot.classname != "monster_zombie") // required to avoid animation issues -- dumptruck_ds
+				bot.think = walkmonster_start_go; //changed from monster use
+			else
+				bot.think = self.th_walk;
+		} else
+		{
+			bot.think = walkmonster_start_go;
+		}
+		if (!(self.spawnflags & MOBOT_DONT_ADD_KILL_COUNT))
+		{
+			monster_update_total(1); // repacement function from iw -- dumptruck_ds
+		}
+	} else {
+		if (self.spawnflags & MOBOT_SPAWNER_RESET)
+		{
+			self.count = self.cnt;
+			self.think = SUB_Null;
+		}
+	}
+
+	self.think = self.use;
+}
+
+void() func_spawn_start =
+{
+	if (!self.count)
+		self.count = 1;
+	self.count = self.count + 1; // fixes count display
+	self.cnt = self.count; // hold original count
+
+	if !(self.wait) //minimum interval between spawns
+		self.wait = 5;
+	if !(self.runtime_maximum) //maximum number of concurrent spawns
+		self.runtime_maximum = 1; //wait to implement
+
+	if (self.spawnflags & BOT_PLACE_AT_START) //trigger spawn
+		self.think();
+}
