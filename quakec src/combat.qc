@@ -87,18 +87,8 @@ void(entity targ, entity inflictor, entity attacker) Killed =
 	monster_death_use();
 	self.th_die ();
 
-	/*
-	//ALEX -- Giving attacker health here.
-	if (attacker.health < 100) {
-		if (attacker.health < 95) {
-			attacker.health = attacker.health + 5;}
-		else attacker.health = 100;}
-	else if (attacker.armorvalue < 100){
-		if (attacker.armorvalue < 95)
-			attacker.armorvalue = attacker.armorvalue + 5;
-		else attacker.armorvalue = 100;}
 	self = oself;
-	*/
+
 };
 
 
@@ -192,7 +182,6 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 		targ.dmg_save = targ.dmg_save + save;
 		targ.dmg_inflictor = inflictor;
 	}
-
 // figure momentum add
 	if ( (inflictor != world) && (targ.movetype == MOVETYPE_WALK) )
 	{
@@ -246,51 +235,8 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 // react to the damage
 	oldself = self;
 	self = targ;
-
 	if ((self.flags & FL_MONSTER) && attacker != world)
 	{
-		/*
-	// get mad unless of the same class (except for soldiers)
-		if (self != attacker && attacker != self.enemy)
-		{
-			local float mode;
-			mode = 0;
-			// take highest mode so infighting happens consistently
-			if (self.infight_mode == -1 || self.infight_mode > mode)
-			{
-				mode = self.infight_mode;
-			}
-			if (mode != -1 && attacker.infight_mode > mode)
-			{
-				mode = attacker.infight_mode;
-			}
-			//soldiers of the same style will infight -- dumptruck_ds - thanks for c0burn and Shamblernaut for your help!
-			if (mode == -1)
-			{
-				if (attacker.classname == "player")
-				{
-					if (self.enemy.classname == "player")
-						self.oldenemy = self.enemy;
-					self.enemy = attacker;
-					FoundTarget ();
-				}
-			}
-			else if (
-				(self.classname != attacker.classname) ||
-			  ((self.classname == "monster_army") && (self.style == attacker.style)) ||
-				(mode > 0 && self.mdl_body != attacker.mdl_body) || // infight if different models
-				(mode > 1 && self.skin != attacker.skin) || // infight if different skin
-				(mode > 2) // always infight
-			)
-			{
-				if (self.enemy.classname == "player")
-					self.oldenemy = self.enemy;
-				self.enemy = attacker;
-				FoundTarget ();
-			}
-		}
-	}
-	*/
 		if (self.th_pain)
 		{
 			self.th_pain(attacker, take);
@@ -298,36 +244,33 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 			if (skill == 3)
 				self.pain_finished = time + 5;
 		}
-
-		
-		if (attacker.team == self.team) 
-		return;
 		//ALEX's infighting
-		local entity fren = nextent(world);
-		while (fren != world)
-		{
-			if ((fren.flags & FL_MONSTER)
-				&& (fren.team == self.team)
-				&& (fren.health > 0)
-				&& (fren != self)
-				&& (range(fren) != RANGE_FAR)) {
-				if (fren.enemy.health <= 0)
-					fren.enemy = attacker;
-				else fren.oldenemy = attacker;
-				fren.think = fren.th_run;
-				if (fren.nextthink > (time + 1))
-					fren.nextthink = time + 0.1;
-				dprint("hate pain fren found\n");
+		if (attacker.team != self.team) 
+		{ 
+			local entity fren = nextent(world);
+			while (fren != world)
+			{
+				if ((fren.flags & FL_MONSTER)
+					&& (fren.team == self.team)
+					&& (fren.health > 0)
+					&& (fren != self)
+					&& (range(fren) != RANGE_FAR)) {
+					if (fren.enemy.health <= 0)
+						fren.enemy = attacker;
+					else fren.oldenemy = attacker;
+					fren.think = fren.th_run;
+					if (fren.nextthink > (time + 1))
+						fren.nextthink = time + 0.1;
+					dprint("hate pain fren found\n");
+				}
+				fren = nextent(fren);
 			}
-			//fren = find(fren, targetname, self.targetname);
-			fren = nextent(fren);
+			if (self.enemy != attacker) {
+				self.enemy = attacker;
+				FoundTarget();
+			}
 		}
-		if (self.enemy == attacker) 
-		return;
-		self.enemy = attacker;
-		FoundTarget();
 	}
-
 	self = oldself;
 };
 

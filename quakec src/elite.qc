@@ -53,46 +53,53 @@ void()	elite_atk14 = [$stand1, elite_run1] {ai_face(); SUB_CheckRefire(enf_atk1)
 void(entity attacker, float damage) elite_pain = {
 return;};
 
+void() elite_die1 = [$stand1, elite_die1] {
+	self.solid = SOLID_NOT;
+};
+
 void() elite_die =
 {
 
-if (self.health < -35)
-{
-	sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-	if (self.mdl_head != "") //dumptruck_ds custom_mdls
+	if (self.health < -35)
 	{
-		ThrowHead(self.mdl_head, self.health);
-	} else
-	{
-		ThrowHead("progs/h_mega.mdl", self.health);
-	}
-	if (self.mdl_gib1 != "") // custom models -- dumptruck_ds
-	{
-		ThrowGib(self.mdl_gib1, self.health);
-	} else
-	{
-		ThrowGib("progs/gib1.mdl", self.health);
-	}
-	if (self.mdl_gib2 != "")
-	{
-		ThrowGib(self.mdl_gib2, self.health);
-	} else
-	{
-		ThrowGib("progs/gib2.mdl", self.health);
-	}
-	if (self.mdl_gib3 != "")
-	{
-		ThrowGib(self.mdl_gib3, self.health);
-	} else
-	{
-		ThrowGib("progs/gib3.mdl", self.health);
-	}
+		sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		dprint("elite gib\n");
+		if (self.mdl_head != "") //dumptruck_ds custom_mdls
+		{
+			ThrowHead(self.mdl_head, self.health);
+		} else
+		{
+			ThrowHead("progs/h_mega.mdl", self.health);
+		}
+		if (self.mdl_gib1 != "") // custom models -- dumptruck_ds
+		{
+			ThrowGib(self.mdl_gib1, self.health);
+		} else
+		{
+			ThrowGib("progs/gib1.mdl", self.health);
+		}
+		if (self.mdl_gib2 != "")
+		{
+			ThrowGib(self.mdl_gib2, self.health);
+		} else
+		{
+			ThrowGib("progs/gib2.mdl", self.health);
+		}
+		if (self.mdl_gib3 != "")
+		{
+			ThrowGib(self.mdl_gib3, self.health);
+		} else
+		{
+			ThrowGib("progs/gib3.mdl", self.health);
+		}
 
-	//DropStuff();
-	return;
-}
-else
-self.solid = SOLID_NOT;
+		//DropStuff();
+		return;
+	}
+	sound_death(self, CHAN_VOICE, "enforcer/death1.wav", 1, ATTN_NORM);
+	dprint("elite die\n");
+	elite_die1 ();
+	//self.solid = SOLID_NOT;
 }
 
 void() monster_elite =

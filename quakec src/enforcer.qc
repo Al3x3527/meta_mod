@@ -41,7 +41,6 @@ $frame paind17 paind18 paind19
 void() Laser_Touch =
 {
 	local vector org;
-
 	if (other == self.owner)
 		return;		// don't explode on owner
 
@@ -67,8 +66,7 @@ void() Laser_Touch =
 		WriteCoord (MSG_BROADCAST, org_y);
 		WriteCoord (MSG_BROADCAST, org_z);
 	}
-
-	remove(self);
+	remove(self); //self = targ when killed, otherwise laser
 };
 
 void(vector org, vector vec) LaunchLaser =
