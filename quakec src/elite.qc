@@ -124,7 +124,7 @@ void() monster_elite =
 
 void() spawn_monster_elite =
 {
-self.solid = SOLID_SLIDEBOX;
+	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
 	body_model("progs/e_mdls/elite.mdl");
@@ -151,7 +151,7 @@ self.solid = SOLID_SLIDEBOX;
 	self.ideal_yaw = self.angles * '0 1 0';
 	self.yaw_speed = 120;
 	//if !(self.view_ofs)
-		self.view_ofs = '0 0 80';
+		self.view_ofs = '2 0 80';
 }
 
 void() func_spawn_elite_use =

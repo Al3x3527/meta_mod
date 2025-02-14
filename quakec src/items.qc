@@ -785,8 +785,7 @@ dprint("drop ");
 dprint(drop.netname);
 dprint("\n");
 	other.items = other.items - drop.items;
-	if !(drop.modelindex)
-		setmodel(drop, drop.model);
+	setmodel(drop, drop.origmodel);
 	drop.solid = SOLID_TRIGGER;
 	drop.touch = weapon_touch;
 	drop.movetype = MOVETYPE_TOSS;
@@ -798,23 +797,23 @@ dprint("\n");
 void(float slot) get_weapon =
 {
 	local entity get = self;
-	self = other;
+	self = other; //for switch
 	get.solid = SOLID_NOT;
 	get.touch = SUB_Null;
+	get.think = cpyset;
+	//self.pausetime = time + 999999;
 	if (slot)
 		{self.weapon2 = get; dprint("slot 2\n");}
 	else 
 		{self.weapon1 = get; dprint("slot 1\n");}
 	self.items = self.items + get.items;
-	//if player, hide from first person
-	if (self.classname == "player") {
-		//get.origmodel = get.model;
-		get.modelindex = 0;
-	}
-	
+
 	switch_weapon(get);
-	other = self;
+	cpymove();
 	self = get;
+	if !(other.flags & FL_CLIENT)
+		return;
+	
 	sprint(other, "You got the ");
 	sprint(other, self.netname);
 	sprint(other, "\n");
@@ -850,7 +849,8 @@ void(float item) give_weapon =
 	entity get;
 	other = self;
 	self = get = spawn();
-	self.origin = other.origin + '0 0 1'; //don't fall out of map
+	//self.origin = other.origin + other.view_ofs - self.view_ofs; //don't fall out of map
+	self.movetype = MOVETYPE_NOCLIP;
 	//float to weapon
 	if (item == IT_AXE)
 		spawn_weapon_axe();

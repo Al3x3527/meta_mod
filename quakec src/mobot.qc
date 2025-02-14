@@ -617,7 +617,7 @@ void(void() monster_type) think_respawn =
 		bot.run_style = self.run_style;
 		bot.team = self.team;
 		bot.style = self.style;
-		bot.weapon = self.weapon;
+		//bot.weapon = self.weapon;
 		bot.skin = self.skin;
 		if (self.health)
 			bot.health = self.health;
@@ -628,6 +628,8 @@ void(void() monster_type) think_respawn =
 		oself = self;
 		self = bot;
 		monster_type();
+		if (oself.weapon)
+			give_weapon(oself.weapon);
 		self = oself;
 
 		// begin his thinking

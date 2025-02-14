@@ -1062,35 +1062,43 @@ void(entity client, float density, vector color) csf_set;
 .entity infight_activator;
 
 /*======================ALEX=========================*/
+//coin stuff
 .string e_coin_mdl;
-.float		coin;			//ALEX
 
+.float		coin;	
 
+//navigation
 .float run_style;
 .float zone_time;
-float TO_PATH = 1;
+
+float TO_PATH = 1; //run styles
 float IN_BOX = 2;
 
-float TEAM_MONSTERS = 0;
-float TEAM_PLAYERS = 1;
+//monster fighting
+float TEAM_MONSTERS = 0; //default team no team
+float TEAM_PLAYERS = 1; //default client team
 float TEAM_OTHER = 2;
 
-float IT_BATTLERIFLE = 256; //not used by a weapon
+//new weapons
+float IT_BATTLERIFLE = 256;
 float IT_PLASMARIFLE = 512;
+
+//new weapon system
+.entity weapon1;
+.entity weapon2;	//second slot, not innactive
+
+.float ammo; //generic ammo for weapon entity
+
+.void() wp_switch; //set view model and animation
+.void() wp_melee;
+.void() wp_atk;
+
+//entity parenting
+.entity nextchild;	//high traffic
 
 float FL_VEHICLE = 131072; //not implemented yet
 
-//.entity	weapon;			// do not modify
-.entity weapon1;
-.entity weapon2;	//second slot, not innactive
-.float ammo; //generic ammo for weapon entity
-.void() wp_switch; //set view model and animation
-.void() wp_melee; //used by player and weapons
-.void() wp_atk;
-.entity nextchild;	//high traffic
-
-//.void(entity attacker, float damage) sub_th_pain;
-
+//entity spawning
 //.float respawn_time; //minimum interval between spawns (use wait)
 .float runtime_maximum; //maximum number of concurrent spawns
 .float runtime_count; //concurrent spawns

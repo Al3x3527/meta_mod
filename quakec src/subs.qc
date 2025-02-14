@@ -742,22 +742,43 @@ void() SUB_CheckWaiting = {
 
 /*=====================ALEX SUBS=======================*/
 
-/*entity() getChild =
+void() cpyset
 {
-	local entity child;
-if (self.flags & FL_MONSTER)
-child = self.weapon1;
-else if (self.flags & FL_VEHICLE)
-dprint("self.flags & FL_VEHICLE\n");
-return child;
-}*/
+	local entity child, oself = child = self;
+	local vector vec;
+	
+	while (child) {
+		dprint("copy set\n");
+		vec = self.origin + self.view_ofs - child.view_ofs;
+		child.velocity = '0 0 0';
+		//setorigin(child, vec);
+		self = child;
+		child = self.nextchild;
+	}
+	self = oself;
+	return;
+}
 
 void() cpymove =
 {
 	local entity oself = self;
 	local entity child = self.nextchild;
+	local vector vec;
+
 while (child) {
-	child.origin = self.origin + self.view_ofs - child.view_ofs;
+	dprint("child cpymove\n");
+	vec = self.origin + self.view_ofs - child.view_ofs - child.origin;
+	if (!(self.velocity) && (vlen(vec) < 0.1))
+	{
+		dprint("child set origin\n");
+		child.velocity = '0 0 0';
+		vec = vec + child.origin;
+		setorigin(child, vec);
+	} else {
+	child.velocity = vec * 9;
+	//child.think = cpymove; call elsewhere
+	child.nextthink = time + 0.12; // 0.06 17 updates per second
+	}
 	self = child;
 	child = self.nextchild;
 	}

@@ -1431,14 +1431,17 @@ if (self.nextchild)
 	self.nextchild.ammo = self.currentammo;
 //check for weapon - do not cycle or infinite loop
 	if !(wp.wp_switch) {
-		dprint("no weapon\n");
+		//dprint("no weapon\n");
 		return;
 		}
 	self.nextchild = wp;
 	self.currentammo = wp.ammo; //ammo type quantity
-	dprint("switch weapon\n");
+	//dprint("switch weapon\n");
 	wp.wp_switch(); //just model and animation data
-
+	if (other.flags & FL_CLIENT)
+		wp.modelindex = 0;
+	else
+		setmodel(wp, self.weaponmodel);
 	self.weapon = wp.items;
 	self.wp_atk = wp.wp_atk;
 	if (wp.wp_melee)
@@ -1480,7 +1483,7 @@ void() melee_axe =
 }
 void() spawn_weapon_axe =
 {
-	setmodel(self, "progs/g_axe.mdl");
+	setmodel(self, self.origmodel = "progs/g_axe.mdl");
 	self.items = IT_AXE;
 	self.netname = "Axe";
 	self.touch = weapon_touch;
@@ -1522,7 +1525,7 @@ void() atk_shotgun =
 }
 void() spawn_weapon_shotgun =
 {
-	setmodel(self, "progs/g_shotgu.mdl");	//new shotgun model by Starshipwaters -dumptruck_ds - removed 2 older shotguns that used spawnflags
+	setmodel(self, self.origmodel = "progs/g_shotgu.mdl");	//new shotgun model by Starshipwaters -dumptruck_ds - removed 2 older shotguns that used spawnflags
 	self.items = IT_SHOTGUN;
 	self.netname = "Shotgun";
 	self.touch = weapon_touch;
@@ -1559,7 +1562,7 @@ void() switch_supershotgun = {
 }
 void() spawn_weapon_supershotgun =
 {
-	setmodel(self, "progs/g_shot.mdl");
+	setmodel(self, self.origmodel = "progs/g_shot.mdl");
 	self.items = IT_SUPER_SHOTGUN;
 	self.netname = "Double-barrelled Shotgun";
 	self.touch = weapon_touch;
@@ -1594,7 +1597,7 @@ void() atk_nailgun = {
 }
 void() spawn_weapon_nailgun =
 {
-	setmodel(self, "progs/g_nail.mdl");
+	setmodel(self, self.origmodel = "progs/g_nail.mdl");
 	self.items = IT_NAILGUN;
 	self.netname = "nailgun";
 	self.touch = weapon_touch;
@@ -1625,7 +1628,7 @@ void() switch_supernailgun = {
 }
 void() spawn_weapon_supernailgun =
 {
-	setmodel(self, "progs/g_nail2.mdl");
+	setmodel(self, self.origmodel = "progs/g_nail2.mdl");
 	self.items = IT_SUPER_NAILGUN;
 	self.netname = "Super Nailgun";
 	self.touch = weapon_touch;
@@ -1661,7 +1664,7 @@ void() atk_grenade = {
 }
 void() spawn_weapon_grenadelauncher =
 {
-	setmodel(self, "progs/g_rock.mdl");
+	setmodel(self, self.origmodel = "progs/g_rock.mdl");
 	self.items = IT_GRENADE_LAUNCHER;
 	self.netname = "Grenade Launcher";
 	self.touch = weapon_touch;
@@ -1697,7 +1700,7 @@ void() atk_rocket = {
 }
 void() spawn_weapon_rocketlauncher =
 {
-	setmodel(self, "progs/g_rock2.mdl");
+	setmodel(self, self.origmodel = "progs/g_rock2.mdl");
 	self.classname = "weapon_rocketlauncher";
 	self.items = IT_ROCKET_LAUNCHER;
 	self.netname = "Rocket Launcher";
@@ -1735,7 +1738,7 @@ void() atk_light = {
 }
 void() spawn_weapon_lightning =
 {
-	setmodel(self, "progs/g_light.mdl");
+	setmodel(self, self.origmodel = "progs/g_light.mdl");
 	self.classname = "weapon_lightning";
 	self.items = IT_LIGHTNING;
 	self.netname = "Thunderbolt";
@@ -1766,7 +1769,7 @@ void() switch_battle = {
 }
 void() spawn_weapon_battlerifle =
 {
-	setmodel(self, "progs/e_mdls/ad70.mdl");
+	setmodel(self, self.origmodel = "progs/e_mdls/ad70.mdl");
 	self.items = IT_BATTLERIFLE;
 	self.classname = "weapon_battlerifle";
 	self.netname = "Battle Rifle";
@@ -1808,7 +1811,7 @@ void() plasma_fire =
 void() spawn_weapon_plasmarifle =
 {
 	self.classname = "weapon_plasmarifle";
-	setmodel(self, "progs/e_mdls/plasma_rifle.mdl");
+	setmodel(self, self.origmodel = "progs/e_mdls/plasma_rifle.mdl");
 	self.items = IT_PLASMARIFLE;
 	self.netname = "Plasma Rifle";
 	self.touch = weapon_touch;
