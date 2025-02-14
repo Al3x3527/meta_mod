@@ -1896,3 +1896,26 @@ void() trigger_monsterhate = {
 	self.classname = "trigger_monsterhate";
 	SUB_CheckWaiting();
 };
+
+void() give_weapon_touch =
+{
+	if !(CheckValidTouch() && (other.flags & FL_CLIENT))//&&(self.count < time)
+		return;
+	self.wait = self.wait - 1;
+	if (self.wait != -1)
+		return;
+	//self.count = time + .02;
+
+	local entity oself = self;
+	self = other;
+	give_weapon(oself.weapon);
+}
+
+void() trigger_give_weapon =
+{
+	InitTrigger();
+	self.solid = SOLID_TRIGGER;
+	self.touch = give_weapon_touch;
+	self.classname = "trigger_get_weapon";
+	SUB_CheckWaiting();
+}

@@ -788,6 +788,7 @@ dprint("\n");
 	if !(drop.modelindex)
 		setmodel(drop, drop.model);
 	drop.solid = SOLID_TRIGGER;
+	drop.touch = weapon_touch;
 	drop.movetype = MOVETYPE_TOSS;
 	setorigin(drop, self.origin);
 	drop.nextthink = time + 120;	// remove after 2 minutes
@@ -799,6 +800,7 @@ void(float slot) get_weapon =
 	local entity get = self;
 	self = other;
 	get.solid = SOLID_NOT;
+	get.touch = SUB_Null;
 	if (slot)
 		{self.weapon2 = get; dprint("slot 2\n");}
 	else 
@@ -848,29 +850,33 @@ void(float item) give_weapon =
 	entity get;
 	other = self;
 	self = get = spawn();
+	self.origin = other.origin + '0 0 1'; //don't fall out of map
 	//float to weapon
 	if (item == IT_AXE)
-		weapon_axe();
+		spawn_weapon_axe();
 	else if (item == IT_SHOTGUN)
-		weapon_shotgun();
+		spawn_weapon_shotgun();
 	else if (item == IT_SUPER_SHOTGUN)
-		weapon_supershotgun();
+		spawn_weapon_supershotgun();
 	else if (item == IT_NAILGUN)
-		weapon_nailgun();
+		spawn_weapon_nailgun();
 	else if (self.weapon == IT_SUPER_NAILGUN)
-		weapon_supernailgun();
+		spawn_weapon_supernailgun();
 	else if (item == IT_GRENADE_LAUNCHER)
-		weapon_grenadelauncher();
+		spawn_weapon_grenadelauncher();
 	else if (item == IT_ROCKET_LAUNCHER)
-		weapon_rocketlauncher();
-	else if (self.weapon == IT_LIGHTNING)
-		weapon_lightning();
-	else if (self.weapon == IT_BATTLERIFLE)
-		weapon_battlerifle();
-	else if (self.weapon == IT_PLASMARIFLE)
-		weapon_plasmarifle();
-	//else unhandled get empty
-
+		spawn_weapon_rocketlauncher();
+	else if (item == IT_LIGHTNING)
+		spawn_weapon_lightning();
+	else if (item == IT_BATTLERIFLE)
+		spawn_weapon_battlerifle();
+	else if (item == IT_PLASMARIFLE)
+		spawn_weapon_plasmarifle();
+	else  {
+		dprint("invalid weapon: ");
+		dprint(ftos(item));
+		dprint("\n");
+		}
 	get_weapon(0);
 	self = other;
 	return;
@@ -944,7 +950,6 @@ if (!(playerstuff & new)) {
 	self.think = SUB_regen;
 	*/			
 }; 
-
 
 /*
 ===============================================================================

@@ -188,7 +188,9 @@ void() W_Precache =
 	// dumptruck_ds mobot.qc END
 
 	precache_model("progs/e_mdls/v_ad70.mdl");
+	precache_model("progs/e_mdls/ad70.mdl");
 	precache_model("progs/e_mdls/v_plasma_rifle.mdl");
+	precache_model("progs/e_mdls/plasma_rifle.mdl");
 };
 
 float() crandom =
@@ -1476,13 +1478,8 @@ void() melee_axe =
 			player_axed1();
 		self.attack_finished = time + 0.5;
 }
-
-void() weapon_axe =
+void() spawn_weapon_axe =
 {
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model("progs/g_axe.mdl");
 	setmodel(self, "progs/g_axe.mdl");
 	self.items = IT_AXE;
 	self.netname = "Axe";
@@ -1492,7 +1489,16 @@ void() weapon_axe =
 	self.wp_atk = melee_axe;
 	self.wp_switch = switch_axe;
 	self.ammo = 0;
+	self.classname = "weapon_axe";
 	StartItem();
+}
+void() weapon_axe =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+	precache_model("progs/g_axe.mdl");
+	spawn_weapon_axe();
 };
 /*QUAKED weapon_shotgun (0 .5 .8) (-16 -16 0) (16 16 32) X STYLE_1 STYLE_2 X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
 {	model("progs/g_shotgn.mdl");	}
@@ -1514,13 +1520,8 @@ void() atk_shotgun =
 	W_FireShotgun();
 	self.attack_finished = time + 0.5;
 }
-
-void() weapon_shotgun =
+void() spawn_weapon_shotgun =
 {
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model("progs/g_shotgu.mdl");
 	setmodel(self, "progs/g_shotgu.mdl");	//new shotgun model by Starshipwaters -dumptruck_ds - removed 2 older shotguns that used spawnflags
 	self.items = IT_SHOTGUN;
 	self.netname = "Shotgun";
@@ -1529,8 +1530,16 @@ void() weapon_shotgun =
 	self.wp_atk = atk_shotgun;
 	self.wp_switch = switch_shotgun;
 	if !(self.ammo) self.ammo = 30;
-
+	self.classname = "weapon_shotgun";
 	StartItem();
+}
+void() weapon_shotgun =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+	precache_model("progs/g_shotgu.mdl");
+	spawn_weapon_shotgun();
 };
 
 /*QUAKED weapon_supershotgun (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
@@ -1548,13 +1557,8 @@ void() switch_supershotgun = {
 	self.weaponmodel = "progs/v_shot2.mdl";
 		self.weaponframe = 0;
 }
-
-void() weapon_supershotgun =
+void() spawn_weapon_supershotgun =
 {
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model("progs/g_shot.mdl");
 	setmodel(self, "progs/g_shot.mdl");
 	self.items = IT_SUPER_SHOTGUN;
 	self.netname = "Double-barrelled Shotgun";
@@ -1564,8 +1568,16 @@ void() weapon_supershotgun =
 	self.wp_atk = atk_supershotgun;
 	self.wp_switch = switch_supershotgun;
 	if !(self.ammo) self.ammo = 30;
-
+	self.classname = "weapon_supershotgun";
 	StartItem();
+}
+void() weapon_supershotgun =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+	precache_model("progs/g_shot.mdl");
+	spawn_weapon_supershotgun();
 };
 
 /*QUAKED weapon_nailgun (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
@@ -1580,13 +1592,8 @@ void() switch_nailgun = {
 void() atk_nailgun = {
 	player_nail1();
 }
-
-void() weapon_nailgun =
+void() spawn_weapon_nailgun =
 {
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model("progs/g_nail.mdl");
 	setmodel(self, "progs/g_nail.mdl");
 	self.items = IT_NAILGUN;
 	self.netname = "nailgun";
@@ -1596,8 +1603,16 @@ void() weapon_nailgun =
 	self.wp_switch = switch_nailgun;
 	self.wp_atk = atk_nailgun;
 	if !(self.ammo) self.ammo = 30;
-
+	self.classname = "weapon_nailgun";
 	StartItem();
+}
+void() weapon_nailgun =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+	precache_model("progs/g_nail.mdl");
+	spawn_weapon_nailgun();
 };
 
 /*QUAKED weapon_supernailgun (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
@@ -1608,13 +1623,8 @@ void() switch_supernailgun = {
 	self.weaponmodel = "progs/v_nail2.mdl";
 	self.weaponframe = 0;
 }
-
-void() weapon_supernailgun =
+void() spawn_weapon_supernailgun =
 {
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model("progs/g_nail2.mdl");
 	setmodel(self, "progs/g_nail2.mdl");
 	self.items = IT_SUPER_NAILGUN;
 	self.netname = "Super Nailgun";
@@ -1624,8 +1634,16 @@ void() weapon_supernailgun =
 	self.wp_switch = switch_supernailgun;
 	self.wp_atk = atk_nailgun;
 	if !(self.ammo) self.ammo = 30;
-
+	self.classname = "weapon_supernailgun";
 	StartItem();
+}
+void() weapon_supernailgun =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+	precache_model("progs/g_nail2.mdl");
+	spawn_weapon_supernailgun();
 };
 
 /*QUAKED weapon_grenadelauncher (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
@@ -1641,13 +1659,8 @@ void() atk_grenade = {
 		W_FireGrenade();
 		self.attack_finished = time + 0.6;
 }
-
-void() weapon_grenadelauncher =
+void() spawn_weapon_grenadelauncher =
 {
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model("progs/g_rock.mdl");
 	setmodel(self, "progs/g_rock.mdl");
 	self.items = IT_GRENADE_LAUNCHER;
 	self.netname = "Grenade Launcher";
@@ -1657,8 +1670,16 @@ void() weapon_grenadelauncher =
 	self.wp_switch = switch_grenade;
 	self.wp_atk = atk_grenade;
 	if !(self.ammo) self.ammo = 5;
-
+	self.classname = "weapon_grenadelauncher";
 	StartItem();
+}
+void() weapon_grenadelauncher =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+	precache_model("progs/g_rock.mdl");
+	spawn_weapon_grenadelauncher();
 };
 
 /*QUAKED weapon_rocketlauncher (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
@@ -1674,14 +1695,10 @@ void() atk_rocket = {
 		W_FireRocket();
 		self.attack_finished = time + 0.8;
 }
-
-void() weapon_rocketlauncher =
+void() spawn_weapon_rocketlauncher =
 {
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model("progs/g_rock2.mdl");
 	setmodel(self, "progs/g_rock2.mdl");
+	self.classname = "weapon_rocketlauncher";
 	self.items = IT_ROCKET_LAUNCHER;
 	self.netname = "Rocket Launcher";
 	self.touch = weapon_touch;
@@ -1692,6 +1709,14 @@ void() weapon_rocketlauncher =
 	if !(self.ammo) self.ammo = 5;
 
 	StartItem();
+}
+void() weapon_rocketlauncher =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+
+	precache_model("progs/g_rock2.mdl");
+	spawn_weapon_rocketlauncher();
 };
 
 
@@ -1708,14 +1733,10 @@ void() atk_light = {
 		self.attack_finished = time + 0.1;
 		sound(self, CHAN_AUTO, "weapons/lstart.wav", 1, ATTN_NORM);
 }
-
-void() weapon_lightning =
+void() spawn_weapon_lightning =
 {
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model("progs/g_light.mdl");
 	setmodel(self, "progs/g_light.mdl");
+	self.classname = "weapon_lightning";
 	self.items = IT_LIGHTNING;
 	self.netname = "Thunderbolt";
 	self.touch = weapon_touch;
@@ -1726,6 +1747,13 @@ void() weapon_lightning =
 	if !(self.ammo) self.ammo = 30;
 
 	StartItem();
+}
+void() weapon_lightning =
+{
+	precache_model("progs/g_light.mdl");
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+	spawn_weapon_lightning();
 };
 
 /*QUAKED weapon_battlerifle (0 .5 .8) (-16 -16 0) (16 16 32) X X X X X SPAWN_SILENT TRIGGER_SPAWNED SUSPENDED_IN_AIR NOT_ON_EASY NOT_ON_NORMAL NOT_ON_HARD_OR_NIGHTMARE NOT_IN_DEATHMATCH NOT_IN_COOP NOT_IN_SINGLEPLAYER RESPAWN_WITH_DM_EFFECTS NOT_ON_HARD_ONLY NOT_ON_NIGHTMARE_ONLY
@@ -1736,14 +1764,11 @@ void() switch_battle = {
 	self.weaponmodel = "progs/e_mdls/v_ad70.mdl";
 	self.weaponframe = 0;
 }
-void() weapon_battlerifle =
+void() spawn_weapon_battlerifle =
 {
-	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
-		return;
-
-	precache_model("progs/e_mdls/ad70.mdl");
 	setmodel(self, "progs/e_mdls/ad70.mdl");
 	self.items = IT_BATTLERIFLE;
+	self.classname = "weapon_battlerifle";
 	self.netname = "Battle Rifle";
 	self.touch = weapon_touch;
 	setsize(self, '-16 -16 0', '16 16 56');
@@ -1751,8 +1776,13 @@ void() weapon_battlerifle =
 	self.wp_switch = switch_battle;
 	self.wp_atk = atk_shotgun;
 	if !(self.ammo) self.ammo = 30;
-
 	StartItem();
+}
+void() weapon_battlerifle =
+{
+	if (SUB_Inhibit())  // new spawnflags for all entities -- iw
+		return;
+	spawn_weapon_battlerifle();
 };
 
 void() switch_plasma = {
@@ -1775,12 +1805,9 @@ void() plasma_fire =
 	self.attack_finished = time + 0.5;
 }; 
 
-void() weapon_plasmarifle =
+void() spawn_weapon_plasmarifle =
 {
-	if (SUB_Inhibit())
-		return;
-
-	precache_model("progs/e_mdls/plasma_rifle.mdl");
+	self.classname = "weapon_plasmarifle";
 	setmodel(self, "progs/e_mdls/plasma_rifle.mdl");
 	self.items = IT_PLASMARIFLE;
 	self.netname = "Plasma Rifle";
@@ -1792,10 +1819,14 @@ void() weapon_plasmarifle =
 	if !(self.ammo) self.ammo = 30;
 
 	StartItem();
+}
+
+void() weapon_plasmarifle =
+{
+	if (SUB_Inhibit())
+		return;
+	spawn_weapon_plasmarifle();
 };
-
-
-
 
 /*
 ============
