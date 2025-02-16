@@ -810,6 +810,7 @@ void(float slot) get_weapon =
 
 	switch_weapon(get);
 	cpymove();
+	cpyangles();
 	self = get;
 	if !(other.flags & FL_CLIENT)
 		return;

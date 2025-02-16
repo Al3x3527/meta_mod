@@ -748,10 +748,13 @@ void() cpyset
 	local vector vec;
 	
 	while (child) {
-		dprint("copy set\n");
+		//dprint("copy set\n");
 		vec = self.origin + self.view_ofs - child.view_ofs;
-		child.velocity = '0 0 0';
-		//setorigin(child, vec);
+		//child.velocity = '0 0 0';
+		child.velocity = self.velocity;
+		setorigin(child, vec);
+		child.angles = self.angles + child.v_angle;
+		child.avelocity = self.avelocity;
 		self = child;
 		child = self.nextchild;
 	}
@@ -766,18 +769,19 @@ void() cpymove =
 	local vector vec;
 
 while (child) {
-	dprint("child cpymove\n");
+	//dprint("child cpymove\n");
 	vec = self.origin + self.view_ofs - child.view_ofs - child.origin;
-	if (!(self.velocity) && (vlen(vec) < 0.1))
+	if (!(self.velocity)/* && (vlen(vec) < 0.1)*/)
 	{
 		dprint("child set origin\n");
 		child.velocity = '0 0 0';
 		vec = vec + child.origin;
 		setorigin(child, vec);
 	} else {
-	child.velocity = vec * 9;
+	//child.velocity = vec * 17;
+	child.velocity = self.velocity + vec;
 	//child.think = cpymove; call elsewhere
-	child.nextthink = time + 0.12; // 0.06 17 updates per second
+	child.nextthink = time + 0.06; // 0.06 17 updates per second
 	}
 	self = child;
 	child = self.nextchild;
@@ -790,8 +794,17 @@ void() cpyangles =
 {
 	local entity oself = self;
 	local entity child = self.nextchild;
+	local vector avec;
 while (child) {
-	child.angles = self.angles;
+	avec = self.angles - child.angles + child.v_angle;
+	if !(self.avelocity)
+		child.angles = self.angles + child.v_angle;
+	else {
+		child.avelocity = self.avelocity + avec;
+		child.nextthink = time + 0.06;
+		}
+	//child.ideal_yaw = self.ideal_yaw + child.v_angle.x;
+	//subChangeYaw();
 	self = child;
 	child = self.nextchild;
 	}
