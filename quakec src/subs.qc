@@ -746,13 +746,14 @@ void() cpyset
 {
 	local entity child, oself = child = self;
 	local vector vec;
-	
+	if (self.owner)
+		self = self.owner; //make this function useful
 	while (child) {
-		//dprint("copy set\n");
-		vec = self.origin + self.view_ofs - child.view_ofs;
-		//child.velocity = '0 0 0';
+		vec = self.origin - child.origin + self.view_ofs - child.view_ofs;
+		dprint(vtos(vec));
+		dprint("cpyset vec\n");
 		child.velocity = self.velocity;
-		setorigin(child, vec);
+		setorigin(child, (vec + child.origin));// works for client
 		child.angles = self.angles + child.v_angle;
 		child.avelocity = self.avelocity;
 		self = child;
@@ -762,7 +763,8 @@ void() cpyset
 	return;
 }
 
-void() cpymove =
+//monster movement may not create velocity
+void(float step) cpymove =
 {
 	local entity oself = self;
 	local entity child = self.nextchild;
@@ -770,19 +772,10 @@ void() cpymove =
 
 while (child) {
 	//dprint("child cpymove\n");
-	vec = self.origin + self.view_ofs - child.view_ofs - child.origin;
-	if (!(self.velocity)/* && (vlen(vec) < 0.1)*/)
-	{
-		dprint("child set origin\n");
-		child.velocity = '0 0 0';
-		vec = vec + child.origin;
-		setorigin(child, vec);
-	} else {
-	//child.velocity = vec * 17;
+	makevectors(self.angles);
+	vec = v_forward * step * 10; //buttery
 	child.velocity = self.velocity + vec;
-	//child.think = cpymove; call elsewhere
-	child.nextthink = time + 0.06; // 0.06 17 updates per second
-	}
+	child.nextthink = time + 0.1; // default monster upadates 10 per second
 	self = child;
 	child = self.nextchild;
 	}
@@ -801,7 +794,7 @@ while (child) {
 		child.angles = self.angles + child.v_angle;
 	else {
 		child.avelocity = self.avelocity + avec;
-		child.nextthink = time + 0.06;
+		child.nextthink = time + 0.1;
 		}
 	//child.ideal_yaw = self.ideal_yaw + child.v_angle.x;
 	//subChangeYaw();
@@ -815,7 +808,7 @@ return;
 void(float step) movetogoal =
 {
 	submovetogoal(step);
-cpymove();
+cpymove(step);
 return;
 }
 
@@ -829,6 +822,6 @@ return;
 float(float yaw, float dist) walkmove =
 {
 	local float value =	subwalkmove(yaw, dist);
-cpymove();
+cpymove(dist);
 return value;
 }

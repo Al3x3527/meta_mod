@@ -801,6 +801,7 @@ void(float slot) get_weapon =
 	get.solid = SOLID_NOT;
 	get.touch = SUB_Null;
 	get.think = cpyset;
+	get.owner = self;
 	//self.pausetime = time + 999999;
 	if (slot)
 		{self.weapon2 = get; dprint("slot 2\n");}
@@ -809,7 +810,7 @@ void(float slot) get_weapon =
 	self.items = self.items + get.items;
 
 	switch_weapon(get);
-	cpymove();
+	cpymove(0);
 	cpyangles();
 	self = get;
 	if !(other.flags & FL_CLIENT)

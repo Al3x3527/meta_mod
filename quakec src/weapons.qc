@@ -1438,9 +1438,9 @@ if (self.nextchild)
 	self.currentammo = wp.ammo; //ammo type quantity
 	//dprint("switch weapon\n");
 	wp.wp_switch(); //just model and animation data
-	if (other.flags & FL_CLIENT)
-		wp.modelindex = 0;
-	else
+	//if (other.flags & FL_CLIENT)
+		//wp.modelindex = 0;
+	//else
 		setmodel(wp, self.weaponmodel);
 	self.weapon = wp.items;
 	self.wp_atk = wp.wp_atk;
