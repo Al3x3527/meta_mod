@@ -745,19 +745,24 @@ void() SUB_CheckWaiting = {
 void() cpyset
 {
 	local entity child, oself = child = self;
+	local entity parent = self.owner;
 	local vector vec;
-	if (self.owner)
-		self = self.owner; //make this function useful
 	while (child) {
-		vec = self.origin - child.origin + self.view_ofs - child.view_ofs;
+		vec = parent.origin - child.origin + parent.view_ofs - child.view_ofs;
 		dprint(vtos(vec));
 		dprint("cpyset vec\n");
-		child.velocity = self.velocity;
+		//child.velocity = parent.velocity;
+		child.velocity = '0 0 0';
 		setorigin(child, (vec + child.origin));// works for client
-		child.angles = self.angles + child.v_angle;
-		child.avelocity = self.avelocity;
-		self = child;
-		child = self.nextchild;
+		//angles
+		//avec = parent.angles - child.angles + child.v_angle;
+		//avec.y = avec.y + parent.ideal_yaw - parent.angles.y;
+		//child.avelocity = avec * 10;
+		child.angles = parent.angles + child.v_angle;
+		//child.avelocity = parent.avelocity;
+		child.nextthink = 0.1;
+		parent = child;
+		child = parent.nextchild;
 	}
 	self = oself;
 	return;
@@ -775,7 +780,8 @@ while (child) {
 	makevectors(self.angles);
 	vec = v_forward * step * 10; //buttery
 	child.velocity = self.velocity + vec;
-	child.nextthink = time + 0.1; // default monster upadates 10 per second
+	//if (child.nextthink <= time)
+		child.nextthink = time + 0.1; // default monster upadates 10 per second
 	self = child;
 	child = self.nextchild;
 	}
@@ -788,40 +794,36 @@ void() cpyangles =
 	local entity oself = self;
 	local entity child = self.nextchild;
 	local vector avec;
-while (child) {
-	avec = self.angles - child.angles + child.v_angle;
-	if !(self.avelocity)
-		child.angles = self.angles + child.v_angle;
-	else {
-		child.avelocity = self.avelocity + avec;
-		child.nextthink = time + 0.1;
+	while (child) {
+		avec = self.avelocity + (self.angles - child.angles + child.v_angle) * 10;
+		child.ideal_yaw = self.ideal_yaw - child.v_angle.y;
+		avec.y = (child.ideal_yaw - child.angles.y) * 10;
+		child.avelocity = avec;
+		self = child;
+		//ChangeYaw();
+		child = self.nextchild;
 		}
-	//child.ideal_yaw = self.ideal_yaw + child.v_angle.x;
-	//subChangeYaw();
-	self = child;
-	child = self.nextchild;
-	}
-self = oself;
-return;
+	self = oself;
+	return;
 }
 
 void(float step) movetogoal =
 {
 	submovetogoal(step);
-cpymove(step);
-return;
+	cpymove(step);
+	return;
 }
 
 void() ChangeYaw =
 {
 	subChangeYaw();
-cpyangles();
-return;
+	cpyangles();
+	return;
 }
 
 float(float yaw, float dist) walkmove =
 {
 	local float value =	subwalkmove(yaw, dist);
-cpymove(dist);
-return value;
+	cpymove(dist);
+	return value;
 }
