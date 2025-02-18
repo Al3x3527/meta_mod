@@ -746,22 +746,25 @@ void() cpyset
 {
 	local entity child, oself = child = self;
 	local entity parent = self.owner;
-	local vector vec;
+	local vector vec, view;
 	while (child) {
-		vec = parent.origin - child.origin + parent.view_ofs - child.view_ofs;
-		dprint(vtos(vec));
-		dprint("cpyset vec\n");
+		makevectors(parent.angles);
+		view = parent.view_ofs - child.view_ofs;
+		vec = v_forward * view.y + v_right * view.x + v_up * view.z;
+		//dprint(vtos(vec));
+		//dprint("cpyset vec\n");
+		//if !(parent.view_ofs) dprint("no parent view ofs\n");
+		//else {dprint(vtos(parent.view_ofs)); dprint(" parent view ofs\n");}
 		//child.velocity = parent.velocity;
 		child.velocity = '0 0 0';
-		setorigin(child, (vec + child.origin));// works for client
+		setorigin(child, (parent.origin + vec));// works for client
 		//angles
-		//avec = parent.angles - child.angles + child.v_angle;
-		//avec.y = avec.y + parent.ideal_yaw - parent.angles.y;
-		//child.avelocity = avec * 10;
 		child.angles = parent.angles + child.v_angle;
+		//child.ideal_yaw = parent.ideal_yaw - child.v_angle.y;
 		//child.avelocity = parent.avelocity;
 		child.nextthink = 0.1;
 		parent = child;
+		//ChangeYaw();
 		child = parent.nextchild;
 	}
 	self = oself;
@@ -776,10 +779,12 @@ void(float step) cpymove =
 	local vector vec;
 
 while (child) {
+	if (step) {
 	//dprint("child cpymove\n");
-	makevectors(self.angles);
-	vec = v_forward * step * 10; //buttery
-	child.velocity = self.velocity + vec;
+		makevectors(self.angles);
+		vec = v_forward * step * 10; //buttery
+		child.velocity = self.velocity + vec;
+	}
 	//if (child.nextthink <= time)
 		child.nextthink = time + 0.1; // default monster upadates 10 per second
 	self = child;

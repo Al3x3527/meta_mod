@@ -267,7 +267,7 @@ if(!(self.spawnflags & 8))
 	self.ideal_yaw = self.angles * '0 1 0';
 	if (!self.yaw_speed)
 		self.yaw_speed = 20;
-	self.view_ofs = '0 0 25';
+	//self.view_ofs = '0 0 25'; //THE CULPRIT
 	self.use = monster_use;
 
 	self.flags = self.flags | FL_MONSTER;

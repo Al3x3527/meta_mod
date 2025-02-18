@@ -151,7 +151,7 @@ void() spawn_monster_elite =
 	self.ideal_yaw = self.angles * '0 1 0';
 	self.yaw_speed = 120;
 	//if !(self.view_ofs)
-		self.view_ofs = '2 0 80';
+	self.view_ofs = '10 20 60';
 }
 
 void() func_spawn_elite_use =
