@@ -17,14 +17,14 @@ $frame stand1
 
 void() elite_fire =
 {
-	local vector org;
+	local vector org, view = self.view_ofs;
 
 	self.effects = self.effects | EF_MUZZLEFLASH;
 	makevectors(self.angles);
 
-	org = self.origin + v_forward * 30 + v_right * 8.5 + '0 0 16';
-
-	LaunchLaser(org, self.enemy.origin - self.origin);
+	org = self.origin + v_forward * view.y + v_right * view.x + v_up * view.z;
+	
+	LaunchLaser(org, self.enemy.origin - org);
 	self.attack_finished = time + 0.5;
 };
 
