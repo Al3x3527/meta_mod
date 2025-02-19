@@ -1100,6 +1100,8 @@ float IT_PLASMARIFLE = 512;
 
 float FL_VEHICLE = 131072; //not implemented yet
 
+.vector flyhack; //negate engine clamping
+
 //entity spawning
 //.float respawn_time; //minimum interval between spawns (use wait)
 .float runtime_maximum; //maximum number of concurrent spawns

@@ -604,7 +604,7 @@ void() PlayerJump =
 		if ( !(self.flags & FL_JUMPRELEASED) ) return;		// don't pogo stick
 		if (!(self.flags & FL_ONGROUND)) {
 			if (self.flags & FL_JUMPBOOSTED) {
-				dprint("already boosted\n");
+			//	dprint("already boosted\n");
 				return;
 			}
 				
@@ -613,9 +613,8 @@ void() PlayerJump =
 				if (self.velocity.z < 0) self.velocity.z = 0;
 				self.velocity = self.velocity + (normalize(self.velocity) * 270);
 				if !(self.velocity) self.velocity_z = 270;
-
-				dprint(vtos(self.velocity));
-				dprint(" double jump \n");
+			//	dprint(vtos(self.velocity));
+			//	dprint(" double jump \n");
 				self.flags = self.flags | FL_JUMPBOOSTED;
 			}
 		// player jumping sound
@@ -787,6 +786,9 @@ void() PlayerPreThink =
 {
 	local float do_ladder_physics;
 
+//	dprint(vtos(self.velocity));
+//	dprint(" pre think velocity\n");
+
 	if (intermission_running)
 	{
 		IntermissionThink ();	// otherwise a button could be missed between
@@ -865,6 +867,10 @@ if (do_ladder_physics)
 }
 else
 {
+	if !(self.flags & FL_ONGROUND) {
+		self.velocity_x = self.flyhack_x;
+		self.velocity_y = self.flyhack_y;
+		}
 	if (self.button2)
 		PlayerJump ();
 	else
@@ -872,8 +878,10 @@ else
 } //johnfitz
 
 // teleporters can force a non-moving pause time
-	if (time < self.pausetime)
+	if (time < self.pausetime) {
 		self.velocity = '0 0 0';
+		//dprint("tp velocity reset\n");
+		}
 
 	if(time > self.attack_finished && self.currentammo == 0 && self.weapon != IT_AXE)
 	{
@@ -1050,7 +1058,6 @@ Called every frame after physics are run
 */
 void() PlayerPostThink =
 {
-
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
 	if (self.deadflag)
@@ -1078,8 +1085,10 @@ void() PlayerPostThink =
 		self.jump_flag = 0;
 	}
 
-	if (!(self.flags & FL_ONGROUND))
+	if (!(self.flags & FL_ONGROUND)) {
 		self.jump_flag = self.velocity_z;
+		self.flyhack = self.velocity;
+		}
 
 	if (self.health > self.max_health) //dumptruck_ds --  this replaces item_megahealth_rot in items.qc
 
@@ -1100,7 +1109,8 @@ if (self.movetype != MOVETYPE_NOCLIP)
 {
 	self.flags = not(self.flags, FL_FLY);
 }
-
+//dprint(vtos(self.velocity));
+//dprint(" post think velocity\n");
 };
 
 
