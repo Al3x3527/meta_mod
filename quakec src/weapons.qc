@@ -1438,9 +1438,9 @@ if (self.nextchild)
 	self.currentammo = wp.ammo; //ammo type quantity
 	//dprint("switch weapon\n");
 	wp.wp_switch(); //just model and animation data
-	//if (other.flags & FL_CLIENT)
-		//wp.modelindex = 0;
-	//else
+	if (self.flags & FL_CLIENT)
+		wp.modelindex = 0;
+	else
 		setmodel(wp, self.weaponmodel);
 	self.weapon = wp.items;
 	self.wp_atk = wp.wp_atk;
@@ -1456,12 +1456,15 @@ Axe
 */
 void() switch_axe = 
 {
-		self.weaponmodel = "progs/v_axe.mdl";
-		self.weaponframe = 0;
+	if (self.nextchild)
+		self.nextchild.ammo = self.currentammo;
+	self.weaponmodel = "progs/v_axe.mdl";
+	self.weaponframe = 0;
 //special because not a real entity
-		self.currentammo = 0;
-		self.wp_atk = melee_axe;
-		self.weapon = IT_AXE;
+	self.currentammo = 0;
+	self.wp_atk = melee_axe;
+	self.weapon = IT_AXE;
+	self.nextchild = world;
 }
 
 void() melee_axe =

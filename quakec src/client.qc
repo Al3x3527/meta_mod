@@ -92,6 +92,8 @@ void() DecodeLevelParms =
 	self.ammo_cells = parm7;
 	self.weapon = parm8;
 	self.armortype = parm9 * 0.01;
+
+	give_weapon(parm8);
 };
 
 void(entity client, string savename) autosave =
@@ -598,27 +600,44 @@ void() PlayerJump =
 	// refactoring from Copper -- dumptruck_ds
 	if (self.movetype != MOVETYPE_NOCLIP)
 	{
-		if (!(self.flags & FL_ONGROUND)) return;
+	
 		if ( !(self.flags & FL_JUMPRELEASED) ) return;		// don't pogo stick
+		if (!(self.flags & FL_ONGROUND)) {
+			if (self.flags & FL_JUMPBOOSTED) {
+				dprint("already boosted\n");
+				return;
+			}
+				
+			else {
+				//air dash
+				if (self.velocity.z < 0) self.velocity.z = 0;
+				self.velocity = self.velocity + (normalize(self.velocity) * 270);
+				if !(self.velocity) self.velocity_z = 270;
+
+				dprint(vtos(self.velocity));
+				dprint(" double jump \n");
+				self.flags = self.flags | FL_JUMPBOOSTED;
+			}
 		// player jumping sound
+		}
+		else {
+			//normal jump only
+			self.velocity_z = self.velocity_z + 270;
+			self.flags = self.flags - (self.flags & FL_JUMPBOOSTED);
+		}
+		//normal or double
 		sound (self, CHAN_BODY, "player/plyrjmp8.wav", 1, ATTN_NORM);	// h00rt
+		
 	}
-
-	// if (!(self.flags & FL_ONGROUND))
-	// 	return;
-	//
-	// if ( !(self.flags & FL_JUMPRELEASED) )
-	// 	return;		// don't pogo stick
-	// refactoring from Copper -- dumptruck_ds
-	// self.flags = not(self.flags, FL_JUMPRELEASED | FL_ONGROUND);	// don't stairwalk
-
-	self.flags = self.flags - (self.flags & FL_JUMPRELEASED);
-
-	self.flags = self.flags - FL_ONGROUND;	// don't stairwalk
-
-	self.button2 = 0;
-	// sound (self, CHAN_AUTO, "player/plyrjmp8.wav", 1, ATTN_NORM);
+	else {
+		//noclip jump
 	self.velocity_z = self.velocity_z + 270;
+	}
+	//even if NOCLIP
+	self.flags = self.flags - FL_ONGROUND;	// don't stairwalk
+	self.flags = self.flags - (self.flags & FL_JUMPRELEASED);
+	self.button2 = 0;
+	
 };
 
 
