@@ -772,10 +772,10 @@ void() cpyset
 }
 
 //monster movement may not create velocity
-void(float step) cpymove =
+void(entity child, float step) cpymove =
 {
 	local entity oself = self;
-	local entity child = self.nextchild;
+	//local entity child = self.nextchild;
 	local vector vec;
 
 while (child) {
@@ -794,10 +794,10 @@ self = oself;
 return;
 }
 
-void() cpyangles =
+void(entity start) cpyangles =
 {
 	local entity oself = self;
-	local entity child = self.nextchild;
+	local entity child = self = start;
 	local vector avec;
 	while (child) {
 		avec = self.avelocity + (self.angles - child.angles + child.v_angle) * 10;
@@ -812,23 +812,52 @@ void() cpyangles =
 	return;
 }
 
+void(entity next, float dist) cpyall =
+{
+	cpymove(next, dist);
+	cpyangles(next);
+}
+
 void(float step) movetogoal =
 {
 	submovetogoal(step);
-	cpymove(step);
+	cpymove(self.nextchild, step);
 	return;
 }
 
 void() ChangeYaw =
 {
 	subChangeYaw();
-	cpyangles();
+	cpyangles(self);
 	return;
 }
 
 float(float yaw, float dist) walkmove =
 {
 	local float value =	subwalkmove(yaw, dist);
-	cpymove(dist);
+	cpymove(self.nextchild, dist);
 	return value;
 }
+
+//try to walkmove if on ground, call traceline if flying
+void() cpywalk =
+{
+	local vector delta;
+	local float dist, yaw;
+	delta = self.owner.origin + self.owner.velocity * 0.1 - self.origin;
+	if (self.flags & FL_ONGROUND) {
+		yaw = vectoyw(delta);
+		makevectors(self.owner.angles);
+		dist = v_forward * delta;
+		subwalkmove(yaw, dist);
+		}
+	else {
+		traceline(self, delta);
+		if (trace_frac) {
+			self.velocity = delta * 10;
+			delta = delta * trace_frac;
+			self.nextthink = time + 10 * trace_frac;
+			}
+		else self.velocity = '0 0 0';
+	}
+};
