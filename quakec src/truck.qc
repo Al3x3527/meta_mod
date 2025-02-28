@@ -6,6 +6,13 @@ Vehicle_Truck
 ============================================================
 */
 
+//forwards
+$frame forward1 forward2
+//right
+$frame right1 right2
+//left
+$frame left1 left2
+
 //calculate vehicle_truck velocity and avelocity from wheels post engine physics
 void() truck_physics =
 {
@@ -15,19 +22,21 @@ void() truck_physics =
 	//get input vectors
 	local vector dir = aim(self.owner.driver, 1000);
 	local float steer_yaw = vectoyaw(dir);
+	dir = normalize(dir);
 	//clamp steer yaw to +- 85 degrees from current yaw
 	local float dist = 10; //temp
 
 	//truck vectors - velocity from wheels vs gravity, est grip
 	local vector svec = truck.velocity;
 	local vector avec = truck.avelocity;
+	local vector fakevelocity = dist * 10 * dir;
 	
 	//front wheels
 	self = truck.wheel1;
 	subwalkmove(steer_yaw, dist);
 	vec1 = self.view_ofs - (self.owner.origin - self.origin);
 	vec1 = 10 * vec1;
-	vec1.z = .6 * vec1.z;
+	vec1.z = .6 * vec1.z; //damped spring ratio
 
 	self = truck.wheel2;
 	subwalkmove(steer_yaw, dist);
@@ -35,14 +44,15 @@ void() truck_physics =
 	vec2 = 10 * vec2;
 	vec2.z = .6 * vec2.z;
 
-	//truck yaw
-	local vector axel = truck.wheel1.origin - truck.wheel2.origin;
+	//truck yaw (ideal)
+	local vector axel = truck.wheel1.origin - truck.wheel2.origin; //lateral vec
 	local float axel_yaw = vectoyaw(axel) + 90;
 	local float truck_yaw = vectoyaw(truck.angles);
 	local vector pivot = (truck.wheel1.origin + truck.wheel2.origin) * 0.5;
-	pivot = pivot - truck.origin; //delta
+	pivot = pivot - truck.origin; //delta (forward vec)
 	local float truck_dist = vlen(pivot);
 	avec.z = (axel_yaw - truck_yaw) * 10; //ideal
+	vector lateral = avec.z * truck_dist * normalize(axel);
 
 	//rear wheels
 	self = truck.wheel3;
@@ -74,8 +84,39 @@ void() truck_physics =
 	local float my4 = vec4.z * truck.wheel4.view_ofs.x;
 	avec.y = avec.y + my1 + my2 + my3 + my4;
 
-	//slide
+	//grip
+	local vector grip1, grip2, grip3, grip4;
+	pivot = normalize(pivot);
+	grip1 = svec1.z * dir; //mu*m*svec1.z^2
+	grip2 = svec2.z * dir;
+	grip3 = svec3.z * pivot;
+	grip4 = svec4.z * pivot;
 
+	//work --only front wheels do work in ideal direction
+	local vector work1 = dir * dist * 10;
+	grip1 = grip1 + svec;
+	if (vlen(grip1) < vlen(work1))
+		work1 = grip1;
+
+	local vector work2 = dir * dist * 10;
+	grip2 = grip2 + svec;
+	if (vlen(grip2) < vlen(work2))
+		work2 = grip2;
+
+	local vector work3 = lateral;
+	grip3 = grip3 + svec;
+	if (vlen(grip3) < vlen(work3))
+		work3 = grip3;
+
+	local vector work4 = lateral;
+	grip4 = grip4 + svec;
+	if (vlen(grip4) < vlen(work4))
+		work4 = grip4;
+
+	//overall
+
+
+	//slip angle
 
 	//animate
 	self = truck;
