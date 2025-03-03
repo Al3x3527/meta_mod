@@ -846,17 +846,17 @@ void() cpywalk =
 	local float dist, yaw;
 	delta = self.owner.origin + self.owner.velocity * 0.1 - self.origin;
 	if (self.flags & FL_ONGROUND) {
-		yaw = vectoyw(delta);
+		yaw = vectoyaw(delta);
 		makevectors(self.owner.angles);
 		dist = v_forward * delta;
 		subwalkmove(yaw, dist);
 		}
 	else {
-		traceline(self, delta);
-		if (trace_frac) {
+		traceline(self.origin, delta, TRUE, self);
+		if (trace_fraction) {
 			self.velocity = delta * 10;
-			delta = delta * trace_frac;
-			self.nextthink = time + 10 * trace_frac;
+			delta = delta * trace_fraction;
+			self.nextthink = time + 10 * trace_fraction;
 			}
 		else self.velocity = '0 0 0';
 	}
