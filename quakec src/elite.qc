@@ -59,7 +59,7 @@ void() elite_die1 = [$stand1, elite_die1] {
 
 void() elite_die =
 {
-
+	drop_weapon(self.weapon1);
 	if (self.health < -35)
 	{
 		sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);

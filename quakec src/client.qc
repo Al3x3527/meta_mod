@@ -66,7 +66,7 @@ void() SetNewParms =
 	{
 		parm1 = IT_AXE | IT_SHOTGUN;  // self.items
 		parm4 = 25;                   // self.ammo_shells
-		parm8 = IT_SHOTGUN;           // self.weapon
+		parm8 = IT_BATTLERIFLE;           // self.weapon
 	}
 };
 
@@ -786,9 +786,6 @@ void() PlayerPreThink =
 {
 	local float do_ladder_physics;
 
-//	dprint(vtos(self.velocity));
-//	dprint(" pre think velocity\n");
-
 	if (intermission_running)
 	{
 		IntermissionThink ();	// otherwise a button could be missed between
@@ -1109,8 +1106,7 @@ if (self.movetype != MOVETYPE_NOCLIP)
 {
 	self.flags = not(self.flags, FL_FLY);
 }
-//dprint(vtos(self.velocity));
-//dprint(" post think velocity\n");
+
 };
 
 
