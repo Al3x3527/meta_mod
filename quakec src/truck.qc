@@ -27,10 +27,13 @@ void() truck_physics =
 	local float dist = 10; //temp
 	local vector dir = aim(self.owner.driver, 1000);
 	dir.z = 0; // steer in xy plane
-	local float steer_yaw = vectoyaw(dir);
 	dir = normalize(dir);
 	//clamp steer yaw to +- 85 degrees from current yaw
-
+	local float fakedist = vlen(fakevelocity - svec);\
+	makevectors(truck.angles); //starting angles
+	if ((dir * v_forward) < 0)
+		dir = v_right;
+	local float steer_yaw = vectoyaw(dir);
 
 	//=================================================================
 	//front wheels work against momentum
@@ -42,9 +45,6 @@ void() truck_physics =
 	local vector fakevelocity = dist * 10 * dir;
 
 	//ideal work against momentum
-	local float fakedist = vlen(fakevelocity - svec);\
-	makevectors(truck.angles); //starting angles
-
 	//front wheels
 	self = truck.wheel1; //virtual
 	local vector view = self.view_ofs;
@@ -204,7 +204,10 @@ void() move_truck =
 //decorative item
 void() vehicle_truck =
 {
-
+	precache_model("progs/e_mdls/e_truck.mdl");
+	if (SUB_Inhibit())
+		return;
+	spawn_vehicle_truck();
 };
 
 //physics wheels
@@ -242,7 +245,9 @@ void() spawn_vehicle_truck =
 {
 	//body with wheels model
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	self.movetype = MOVETYPE_BOUNCE;
+	body_model("progs/e_mdls/e_truck.mdl");
+	setsize(self, '-112 - 40 0', '112 40 80');
 
 	//wheels -- not the visible model
 	local float i = 0;
