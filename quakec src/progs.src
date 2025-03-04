@@ -70,4 +70,5 @@ mobot.qc // Using "bot" creation code for func_monster_spawner
 
 human.qc //Alex monster_human
 elite.qc //Lemurian
+truck.qc //truck
 

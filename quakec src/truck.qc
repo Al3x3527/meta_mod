@@ -28,6 +28,11 @@ void() truck_physics =
 	local vector dir = aim(self.owner.driver, 1000);
 	dir.z = 0; // steer in xy plane
 	dir = normalize(dir);
+
+	//truck vectors - velocity from wheels vs gravity, est grip
+	local vector svec = truck.velocity;
+	local vector avec = truck.avelocity;
+	local vector fakevelocity = dist * 10 * dir;
 	//clamp steer yaw to +- 85 degrees from current yaw
 	local float fakedist = vlen(fakevelocity - svec);\
 	makevectors(truck.angles); //starting angles
@@ -38,12 +43,7 @@ void() truck_physics =
 	//=================================================================
 	//front wheels work against momentum
 	//=================================================================
-
-	//truck vectors - velocity from wheels vs gravity, est grip
-	local vector svec = truck.velocity;
-	local vector avec = truck.avelocity;
-	local vector fakevelocity = dist * 10 * dir;
-
+	   
 	//ideal work against momentum
 	//front wheels
 	self = truck.wheel1; //virtual
@@ -87,7 +87,7 @@ void() truck_physics =
 	view = self.view_ofs;
 	view = v_forward * view.y + v_right * view.x + v_up * view.z + truck.origin;
 	setorigin(self, view);
-	subwalkmove(chassis_yaw, truck_dist)
+	subwalkmove(chassis_yaw, truck_dist);
 	vec3 = self.origin - view; //movestep delta
 	vec3 = 10 * vec3;
 	vec3.z = .6 * vec3.z;
@@ -139,18 +139,18 @@ void() truck_physics =
 
 	//grip
 	local vector grip1, grip2, grip3, grip4;
-	if !(truck.wheel1.flags & ON_GROUND)
+	if !(truck.wheel1.flags & FL_ONGROUND)
 		grip1 = '0 0 0';
-	else grip1 = -svec1.z * dir; //mu*m*svec1.z^2
-	if !(truck.wheel2.flags & ON_GROUND)
+	else grip1 = -vec1.z * dir; //mu*m*svec1.z^2
+	if !(truck.wheel2.flags & FL_ONGROUND)
 		grip2 = '0 0 0';
-	else grip2 = -svec2.z * dir;
-	if !(truck.wheel3.flags & ON_GROUND)
+	else grip2 = -vec2.z * dir;
+	if !(truck.wheel3.flags & FL_ONGROUND)
 		grip3 = '0 0 0';
-	else grip3 = -svec3.z * newangles;
-	if !(truck.wheel4.flags & ON_GROUND)
+	else grip3 = -vec3.z * newangles;
+	if !(truck.wheel4.flags & FL_ONGROUND)
 		grip4 = '0 0 0';
-	else grip4 = -svec4.z * newangles;
+	else grip4 = -vec4.z * newangles;
 
 	//work -- vector from momentum to ideal
 	//only front wheels do work in ideal direction
@@ -164,9 +164,9 @@ void() truck_physics =
 	if (vlen(grip2) < vlen(work2))
 		work2 = grip2;
 
-	work3 = grip3;
+	local vector work3 = grip3;
 
-	work4 = grip4;
+	local vector work4 = grip4;
 
 	//actual travel
 	local vector xvec = svec;
@@ -214,8 +214,10 @@ void() vehicle_truck =
 void(float i) spawn_truck_wheel =
 {
 	local entity truck = self;
-	self = entity wheel = spawn();
-	self.movetype = movetype_step;
+	
+	local entity wheel = spawn();
+	self = wheel;
+	self.movetype = MOVETYPE_STEP;
 	self.think = cpywalk;
 	self.owner = truck;
 	if !(i) {
@@ -236,8 +238,6 @@ void(float i) spawn_truck_wheel =
 	}
 	else dprint("too many wheels spawned!\n");
 
-	self.think = wheel_think;
-
 	self = truck;
 }
 
@@ -247,7 +247,7 @@ void() spawn_vehicle_truck =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_BOUNCE;
 	body_model("progs/e_mdls/e_truck.mdl");
-	setsize(self, '-112 - 40 0', '112 40 80');
+	setsize(self, '-112 -40 0', '112 40 80');
 
 	//wheels -- not the visible model
 	local float i = 0;
@@ -260,7 +260,8 @@ void() spawn_vehicle_truck =
 
 void() func_spawn_truck_use =
 {
-	self = entity truck = spawn();
+	local entity truck = spawn();
+	self = truck;
 	spawn_vehicle_truck();
 };
 

@@ -1100,6 +1100,12 @@ float IT_PLASMARIFLE = 512;
 
 float FL_VEHICLE = 131072; //not implemented yet
 
+.entity driver;
+.entity passenger;
+.entity turret;
+
+.entity wheel1, wheel2, wheel3, wheel4;
+
 .vector flyhack; //negate engine clamping
 
 //entity spawning
