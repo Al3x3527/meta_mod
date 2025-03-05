@@ -785,7 +785,7 @@ while (child) {
 		vec = v_forward * step * 10; //buttery
 		child.velocity = self.velocity + vec;
 	}
-	//if (child.nextthink <= time)
+	if (child.movetype != MOVETYPE_WALK)
 		child.nextthink = time + 0.1; // default monster upadates 10 per second
 	self = child;
 	child = self.nextchild;

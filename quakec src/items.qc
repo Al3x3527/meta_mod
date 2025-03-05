@@ -914,7 +914,7 @@ if (!(playerstuff & new)) {
 	self.count = time + .02; 
 
 	if (other.impulse == 16) {
-	self.impulse = 0;
+	other.impulse = 0;
 		dprint("impulse 16\n");
 		if !(other.weapon1) {
 			get_weapon(0);

@@ -14,7 +14,7 @@ $frame right1 right2
 $frame left1 left2
 
 //calculate vehicle_truck velocity and avelocity from wheels post engine physics
-void() truck_physics =
+void(float dist) truck_physics =
 {
 	local vector vec1, vec2, vec3, vec4;
 	local entity truck = self;
@@ -24,8 +24,12 @@ void() truck_physics =
 	//=================================================================
 
 	//get input vectors
-	local float dist = 10; //temp
-	local vector dir = aim(self.owner.driver, 1000);
+	//local float dist = 10; //temp
+	local vector dir;
+	if (self.driver)
+	dir = aim(self.owner.driver, 1000);
+	else dir = '0 1 0';
+	dir.y = -dir.y;
 	dir.z = 0; // steer in xy plane
 	dir = normalize(dir);
 
@@ -37,7 +41,9 @@ void() truck_physics =
 	local float fakedist = vlen(fakevelocity - svec);\
 	makevectors(truck.angles); //starting angles
 	if ((dir * v_forward) < 0)
-		dir = v_right;
+		dir = v_right * (v_right * dir);
+		dprint(vtos(dir));
+		dprint("\n");
 	local float steer_yaw = vectoyaw(dir);
 
 	//=================================================================
@@ -48,7 +54,7 @@ void() truck_physics =
 	//front wheels
 	self = truck.wheel1; //virtual
 	local vector view = self.view_ofs;
-	view = v_forward * view.y + v_right * view.x + v_up * view.z + truck.origin; //start from the resting position
+	view = v_forward * view.x + v_right * view.y + v_up * view.z + truck.origin; //start from the resting position
 	setorigin (self, view); 
 	subwalkmove(steer_yaw, fakedist); //movetype_step physics
 	vec1 = self.view_ofs - (self.owner.origin - self.origin); //ideal distance traveled after walk physics
@@ -57,7 +63,7 @@ void() truck_physics =
 
 	self = truck.wheel2;
 	view = self.view_ofs;
-	view = v_forward * view.y + v_right * view.x + v_up * view.z + truck.origin;
+	view = v_forward * view.x + v_right * view.y + v_up * view.z + truck.origin;
 	setorigin(self, view);
 	subwalkmove(steer_yaw, fakedist);
 	vec2 = self.view_ofs - (self.owner.origin - self.origin);
@@ -75,17 +81,17 @@ void() truck_physics =
 	local float truck_yaw = vectoyaw(truck.angles); //original truck yaw
 
 	local vector pivot = (truck.wheel1.origin + truck.wheel2.origin) * 0.5;
-	pivot = pivot - truck.origin + (v_forward * view.y); //delta (forward vec)
+	pivot = pivot - truck.origin; //delta (forward vec)
 	local float chassis_yaw = vectoyaw(pivot); //new truck yaw
 
 	local float truck_dist = vlen(pivot);
-	avec.z = (axel_yaw - truck_yaw) * 10; //ideal
-	vector lateral = avec.z * truck_dist * normalize(axel);
+	truck_yaw = (axel_yaw - truck_yaw) * 10; //ideal
+	vector lateral = truck_yaw * truck_dist * normalize(axel);
 
 	//rear wheels
 	self = truck.wheel3;
 	view = self.view_ofs;
-	view = v_forward * view.y + v_right * view.x + v_up * view.z + truck.origin;
+	view = v_forward * view.x + v_right * view.y + v_up * view.z + truck.origin;
 	setorigin(self, view);
 	subwalkmove(chassis_yaw, truck_dist);
 	vec3 = self.origin - view; //movestep delta
@@ -94,7 +100,7 @@ void() truck_physics =
 
 	self = truck.wheel4;
 	view = self.view_ofs;
-	view = v_forward * view.y + v_right * view.x + v_up * view.z + truck.origin;
+	view = v_forward * view.x + v_right * view.y + v_up * view.z + truck.origin;
 	setorigin(self, view);
 	subwalkmove(chassis_yaw, truck_dist);
 	vec4 = self.origin - view;
@@ -109,33 +115,33 @@ void() truck_physics =
 	local vector newangles = normalize(pivot);
 
 	//lift
-	svec.z = svec.z + vec1.z + vec2.z + vec3.z + vec4.z;
+	svec.z = svec.z + (vec1.z + vec2.z + vec3.z + vec4.z) * 0.1 - 10;
 
 	//roll from z --double check directions
 	local float mx1 = vec1.z * truck.wheel1.view_ofs.y;
 	local float mx2 = vec2.z * truck.wheel2.view_ofs.y;
 	local float mx3 = vec3.z * truck.wheel3.view_ofs.y;
 	local float mx4 = vec4.z * truck.wheel4.view_ofs.y;
-	avec.x = avec.x + mx1 + mx2 + mx3 + mx4;
+	avec.z = avec.z + mx1 + mx2 + mx3 + mx4;
 	//roll from y
 	mx1 = vec1.y * truck.wheel1.view_ofs.z;
 	mx2 = vec2.y * truck.wheel2.view_ofs.z;
 	mx3 = vec3.y * truck.wheel3.view_ofs.z;
 	mx4 = vec4.y * truck.wheel4.view_ofs.z;
-	avec.x = avec.x + mx1 + mx2 + mx3 + mx4;
+	avec.z = avec.z + mx1 + mx2 + mx3 + mx4;
 
 	//pitch from z
 	local float my1 = vec1.z * truck.wheel1.view_ofs.x;
 	local float my2 = vec2.z * truck.wheel2.view_ofs.x;
 	local float my3 = vec3.z * truck.wheel3.view_ofs.x;
 	local float my4 = vec4.z * truck.wheel4.view_ofs.x;
-	avec.y = avec.y + my1 + my2 + my3 + my4;
+	avec.x = avec.x + my1 + my2 + my3 + my4;
 	//pitch from x
 	my1 = vec1.x * truck.wheel1.view_ofs.z;
 	my2 = vec2.x * truck.wheel2.view_ofs.z;
 	my3 = vec3.x * truck.wheel3.view_ofs.z;
 	my4 = vec4.x * truck.wheel4.view_ofs.z;
-	avec.y = avec.y + my1 + my2 + my3 + my4;
+	avec.x = avec.x + my1 + my2 + my3 + my4;
 
 	//grip
 	local vector grip1, grip2, grip3, grip4;
@@ -173,12 +179,26 @@ void() truck_physics =
 	xvec.z = 0;
 	svec = svec + work1 + work2 + work3 + work4;
 
+	//yaw from work in x
+	local float mz1 = work1.x * truck.wheel1.view_ofs.y;
+	local float mz2 = work2.x * truck.wheel2.view_ofs.y;
+	local float mz3 = work3.x * truck.wheel3.view_ofs.y;
+	local float mz4 = work4.x * truck.wheel4.view_ofs.y;
+	avec.y = avec.y + mz1 + mz2 + mz3 + mz4;
+	//yaw from work in y
+	mz1 = work1.y * truck.wheel1.view_ofs.x;
+	mz2 = work2.y * truck.wheel2.view_ofs.x;
+	mz3 = work3.y * truck.wheel3.view_ofs.x;
+	mz4 = work4.y * truck.wheel4.view_ofs.x;
+	avec.y = avec.y + mz1 + mz2 + mz3 + mz4;
+
 	//=================================================================
 	//vehicle velocity, avelocity
 	//=================================================================
 
 	//suspension, move chassis
-	truck.avelocity = avec; //from equalibrium
+	truck.avelocity = '0 0 0'; //from equalibrium
+	truck.avelocity.y = avec.y;
 	truck.velocity = svec;
 
 	//passengers after return
@@ -188,27 +208,38 @@ void() truck_physics =
 void() move_truck =
 {
 	//movestep
-	local float dist;
-
+	local float dist = 0;
+	if (self.driver) {
+		dist = 1;
 	//chassis physics / prethink
-	truck_physics();
+	truck_physics(dist); }
 
 	//child physics
-	cpyall(self.driver, dist);
-	cpyall(self.passenger, dist);
-	cpyall(self.turret, dist);
+	//if (self.driver)
+		//cpyall(self.driver, dist);
+	//cpyall(self.passenger, dist);
+	//cpyall(self.turret, dist);
 
 	//animate
+	self.nextthink = time + 0.1;
 };
 
-//decorative item
-void() vehicle_truck =
+void() truck_touch =
 {
-	precache_model("progs/e_mdls/e_truck.mdl");
-	if (SUB_Inhibit())
+	if (!CheckValidTouch()) return;// from Copper -- dumptruck_ds
+
+	if (!(other.flags & FL_CLIENT))
 		return;
-	spawn_vehicle_truck();
-};
+	if (self.driver == other) return;
+	if (self.count < time) {
+		sprint(other, "Press E to drive Truck\n");
+		}
+	self.count = time + 0.02;
+	if (other.impulse == 16) {
+		other.impulse = 0;
+		self.driver = other;
+		}
+}
 
 //physics wheels
 void(float i) spawn_truck_wheel =
@@ -218,44 +249,61 @@ void(float i) spawn_truck_wheel =
 	local entity wheel = spawn();
 	self = wheel;
 	self.movetype = MOVETYPE_STEP;
-	self.think = cpywalk;
+	//self.think = cpywalk;
 	self.owner = truck;
+	self.solid = SOLID_SLIDEBOX;
+	//self.flags = self.flags + FL_ONGROUND;
+	self.classname = "wheel";
+	setsize(self, '-8 -8 -8', '8 8 8');
 	if !(i) {
 	truck.wheel1 = self;
-	self.origin = truck.origin + '70 30 7'; //placeholder
+	self.view_ofs = '70 35 7'; //placeholder
 	}
 	else if (i == 1) {
 	truck.wheel2 = self;
-	self.origin = truck.origin + '70 -30 7';
+	self.view_ofs = '70 -35 7';
 	}
 	else if (i == 2) {
 	truck.wheel3 = self;
-	self.origin = truck.origin + '-70 30 7';
+	self.view_ofs = '-70 35 7';
 	}
 	else if (i == 3) {
 	truck.wheel4 = self;
-	self.origin = truck.origin + '-70 -30 7';
+	self.view_ofs = '-70 -35 7';
 	}
 	else dprint("too many wheels spawned!\n");
-
+	setorigin(self, truck.origin + self.view_ofs);
 	self = truck;
 }
 
 void() spawn_vehicle_truck =
 {
 	//body with wheels model
-	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_BOUNCE;
+	self.solid = SOLID_TRIGGER;
+	self.movetype = MOVETYPE_FLY;
 	body_model("progs/e_mdls/e_truck.mdl");
 	setsize(self, '-112 -40 0', '112 40 80');
 
 	//wheels -- not the visible model
+	
 	local float i = 0;
-	while (i < 4) i++;
+	while (i < 4)
 	{
 		spawn_truck_wheel(i);
+		i++;
 	}
+	self.touch = truck_touch;
+	self.think = move_truck;
+	self.nextthink = time + 0.1;
+};
 
+//Vanilla Spawning
+void() vehicle_truck =
+{
+	precache_model("progs/e_mdls/e_truck.mdl");
+	if (SUB_Inhibit())
+		return;
+	spawn_vehicle_truck();
 };
 
 void() func_spawn_truck_use =
