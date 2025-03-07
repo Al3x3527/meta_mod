@@ -29,23 +29,24 @@ void(float dist) truck_physics =
 	if (self.driver)
 	dir = aim(self.owner.driver, 1000);
 	else dir = '0 1 0';
-	dir.y = -dir.y;
+	//dir.y = -dir.y;
 	dir.z = 0; // steer in xy plane
 	dir = normalize(dir);
 
 	//truck vectors - velocity from wheels vs gravity, est grip
 	local vector svec = truck.velocity;
 	local vector avec = truck.avelocity;
-	local vector fakevelocity = dist * 2.5 * dir; //10/4
+	local vector fakevelocity = dist * 10 * dir;
 	//clamp steer yaw to +- 85 degrees from current yaw
 	local float fakedist = vlen(fakevelocity); //was - svec
 	makevectors(truck.angles); //starting angles
-	if ((dir * v_forward) < 0)
-		dir = v_right * (v_right * dir);
+
+
 		//dprint(vtos(dir));
 		//dprint("\n");
 	local float steer_yaw = vectoyaw(dir);
 	local vector oldpivot = (truck.wheel1.origin + truck.wheel2.origin) * 0.5;
+	if ((dir * v_right) > 0) dprint("right\n");
 
 	//=================================================================
 	//front wheels work against momentum
@@ -55,25 +56,23 @@ void(float dist) truck_physics =
 	//front wheels
 	self = truck.wheel1; //virtual
 	if ((self.velocity.z == 0) && !(self.flags & FL_ONGROUND)) self.flags = self.flags + FL_ONGROUND;
-	//if (self.flags & FL_ONGROUND) {
 	local vector view = self.view_ofs;
 	view = v_forward * view.x + v_right * view.y + v_up * view.z + truck.origin; //start from the resting position
 	vec1 = self.origin - view; //ideal distance traveled after walk physics (gravity?)
-	dprint(vtos(vec1));
-	dprint("vec1\n");
+	//dprint(vtos(vec1));
+	//dprint("vec1\n");
 	vec1 = 10 * vec1; //as velocity
 	vec1.z = .6 * vec1.z; //damped spring ratio
 	setorigin (self, view);  //make reset after finding delta
 	subwalkmove(steer_yaw, fakedist); //movetype_step physics
-	//}
-	self.velocity.z = vec1.z = self.velocity.z - 10;
+	local vector xvec1 = vec1; xvec1.z = 0;
+	self.velocity.z = vec1.z = vec1.z - 10;
 
 	//dprint(vtos(self.velocity));
 	//dprint("wheel 1 velocity\n");
 
 	self = truck.wheel2;
 	if ((self.velocity.z == 0) && !(self.flags & FL_ONGROUND)) self.flags = self.flags + FL_ONGROUND;
-	//if (self.flags & FL_ONGROUND) {
 	view = self.view_ofs;
 	view = v_forward * view.x + v_right * view.y + v_up * view.z + truck.origin;
 	vec2 = self.origin - view;
@@ -81,8 +80,8 @@ void(float dist) truck_physics =
 	vec2.z = .6 * vec2.z;
 	setorigin(self, view);
 	subwalkmove(steer_yaw, fakedist);
-	//}
-	self.velocity.z = vec2.z = self.velocity.z - 10;
+	local vector xvec2 = vec1; xvec2.z = 0;
+	self.velocity.z = vec2.z = vec2.z - 10;
 	
 	//=================================================================
 	//change in rear wheels velocity
@@ -98,7 +97,7 @@ void(float dist) truck_physics =
 	local float chassis_yaw = vectoyaw(chassis_vec); //new truck yaw
 	pivot = pivot - oldpivot;
 
-	local float truck_dist = pivot * chassis_vec;
+	//local float truck_dist = pivot * chassis_vec;
 	//truck_yaw = (axel_yaw - truck_yaw) * 10; //ideal
 	//local vector lateral = truck_yaw * truck_dist * normalize(axel);
 
@@ -112,9 +111,10 @@ void(float dist) truck_physics =
 	vec3 = 10 * vec3;
 	vec3.z = .6 * vec3.z;
 	setorigin(self, view);
-	subwalkmove(chassis_yaw, truck_dist);
+	local vector xvec3 = vec3;	xvec3.z = 0;
+	subwalkmove(chassis_yaw, dist);
 	//} 
-	self.velocity.z = vec3.z = self.velocity.z - 10;
+	self.velocity.z = vec3.z = vec3.z - 10;
 
 	self = truck.wheel4;
 	if ((self.velocity.z == 0) && !(self.flags & FL_ONGROUND)) self.flags = self.flags + FL_ONGROUND;
@@ -125,9 +125,10 @@ void(float dist) truck_physics =
 	vec4 = 10 * vec4;
 	vec4.z = .6 * vec4.z;
 	setorigin(self, view);
-	subwalkmove(chassis_yaw, truck_dist);
+	local vector xvec4 = vec4;	xvec4.z = 0;
+	subwalkmove(chassis_yaw, dist);
 	//} 
-	self.velocity.z = vec4.z = self.velocity.z - 10;
+	self.velocity.z = vec4.z = vec4.z - 10;
 
 	//=================================================================
 	//vehicle forces, moments
@@ -168,25 +169,25 @@ void(float dist) truck_physics =
 	if !(truck.wheel1.flags & FL_ONGROUND)
 		grip1 = '0 0 0';
 	else { vec1.z = vec1.z - 10;
-		grip1 = -vec1.z * dir; //mu*m*svec1.z^2
+		grip1 = -vec1.z * dir * 10; //mu*m*svec1.z^2
 		truck.wheel1.velocity.z = 0;
 		}
 	if !(truck.wheel2.flags & FL_ONGROUND)
 		grip2 = '0 0 0';
 	else { vec2.z = vec2.z - 10;
-		grip2 = -vec2.z * dir;
+		grip2 = -vec2.z * dir * 10;
 		truck.wheel2.velocity.z = 0;
 		}
 	if !(truck.wheel3.flags & FL_ONGROUND)
 		grip3 = '0 0 0';
 	else { vec3.z = vec3.z - 10;
-		grip3 = -vec3.z * chassis_vec;
+		grip3 = -vec3.z * chassis_vec * 10;
 		truck.wheel3.velocity.z = 0;
 		}
 	if !(truck.wheel4.flags & FL_ONGROUND)
 		grip4 = '0 0 0';
 	else { vec4.z = vec4.z - 10;
-		grip4 = -vec4.z * chassis_vec;
+		grip4 = -vec4.z * chassis_vec * 10;
 		truck.wheel4.velocity.z = 0;
 		}
 
@@ -197,7 +198,7 @@ void(float dist) truck_physics =
 	if (vlen(grip1) < vlen(work1))
 		work1 = grip1; //limit work to grip
 	if (vlen(work1) < vlen(svec))
-		work1 = vlen(grip1) * normalize(grip1 - svec);
+		work1 = vlen(grip1) * normalize(grip1 - xvec1);
 	work1.z = vec1.z;
 
 	local vector work2 = vec2 - svec;
@@ -205,16 +206,16 @@ void(float dist) truck_physics =
 	if (vlen(grip2) < vlen(work2))
 		work2 = grip2;
 	if (vlen(work2) < vlen(svec))
-		work2 = vlen(grip2) * normalize(grip2 - svec);
+		work2 = vlen(grip2) * normalize(grip2 - xvec2);
 	work2.z = vec2.z;
 
 	local vector work3 = grip3;
 	if (vlen(work3) < vlen(svec))
-		work3 = vlen(grip3) * normalize(grip3-svec); //grip against momentum
+		work3 = vlen(grip3) * normalize(grip3-xvec3); //grip against momentum
 	work3.z = vec3.z;
 	local vector work4 = grip4;
 	if (vlen(work4) < vlen(svec))
-		work4 = vlen(grip4) * normalize(grip4-svec);
+		work4 = vlen(grip4) * normalize(grip4-xvec4);
 	work4.z = vec4.z;
 	//actual travel
 	//local vector xvec = svec;
@@ -245,16 +246,22 @@ void(float dist) truck_physics =
 
 	//suspension, move chassis
 	truck.avelocity = '0 0 0'; //from equalibrium
-	truck.avelocity.y = avec.y; //only yaw for now
+	avec.x = 0;
+	avec.z = 0;
+	truck.avelocity.y = avec.y * 1; //only yaw for now
 	truck.velocity = svec;
 	if ((truck.velocity.z < 0) && (truck.flags & FL_ONGROUND)) { //fix stuck
 		truck.velocity.z = 0;
 		truck.flags = truck.flags - FL_ONGROUND;
 		}
-	dprint(vtos(truck.velocity));
-	dprint("truck velocity\n");
+	avec = truck.angles + (avec * 10);
+	truck.ideal_yaw = vectoyaw(avec);
+	//dprint(vtos(truck.velocity));
+	//dprint("truck velocity\n");
 	//passengers after return
 	self = truck;
+	subChangeYaw(); //stops things  from breaking
+	//truck.avelocity.y = avec.y * 0.25; //to actually turn
 };
 
 void() move_truck =
