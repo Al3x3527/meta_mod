@@ -169,25 +169,25 @@ void(float dist) truck_physics =
 	if !(truck.wheel1.flags & FL_ONGROUND)
 		grip1 = '0 0 0';
 	else { vec1.z = vec1.z - 10;
-		grip1 = -vec1.z * dir * 10; //mu*m*svec1.z^2
+		grip1 = -vec1.z * dir * 3; //mu*m*svec1.z^2
 		truck.wheel1.velocity.z = 0;
 		}
 	if !(truck.wheel2.flags & FL_ONGROUND)
 		grip2 = '0 0 0';
 	else { vec2.z = vec2.z - 10;
-		grip2 = -vec2.z * dir * 10;
+		grip2 = -vec2.z * dir * 3;
 		truck.wheel2.velocity.z = 0;
 		}
 	if !(truck.wheel3.flags & FL_ONGROUND)
 		grip3 = '0 0 0';
 	else { vec3.z = vec3.z - 10;
-		grip3 = -vec3.z * chassis_vec * 10;
+		grip3 = -vec3.z * chassis_vec * 3;
 		truck.wheel3.velocity.z = 0;
 		}
 	if !(truck.wheel4.flags & FL_ONGROUND)
 		grip4 = '0 0 0';
 	else { vec4.z = vec4.z - 10;
-		grip4 = -vec4.z * chassis_vec * 10;
+		grip4 = -vec4.z * chassis_vec * 3;
 		truck.wheel4.velocity.z = 0;
 		}
 
@@ -230,14 +230,28 @@ void(float dist) truck_physics =
 	local float mz2 = work2.x / truck.wheel2.view_ofs.y;
 	local float mz3 = work3.x / truck.wheel3.view_ofs.y;
 	local float mz4 = work4.x / truck.wheel4.view_ofs.y;
-	avec.y = avec.y + mz1 + mz2 + mz3 + mz4;
+	//avec.y = avec.y + mz1 + mz2 + mz3 + mz4;
 
 	//yaw from work in y
 	mz1 = work1.y / truck.wheel1.view_ofs.x;
 	mz2 = work2.y / truck.wheel2.view_ofs.x;
 	mz3 = work3.y / truck.wheel3.view_ofs.x;
 	mz4 = work4.y / truck.wheel4.view_ofs.x;
-	avec.y = avec.y + mz1 + mz2 + mz3 + mz4;
+	//avec.y = avec.y + mz1 + mz2 + mz3 + mz4;
+	local float dang = (chassis_yaw - truck.angles.y);
+	if (dang > 180) dang = -360 + dang;
+	else if (dang < -180) dang = 360 + dang;
+	avec.y = ((dang) * 10);
+	dprint(ftos(chassis_yaw));
+	dprint(" chassis yaw\n");
+	//dprint(ftos(truck.ideal_yaw));
+	//dprint(" ideal yaw\n");
+	dprint(ftos(dang));
+	dprint(" dang\n");
+	dprint(ftos(steer_yaw));
+	dprint(" steer yaw\n");
+	dprint(ftos(truck.angles.y));
+	dprint(" start yaw\n");
 	dprint(vtos(avec));
 	dprint(" avec\n");
 	//=================================================================
@@ -254,8 +268,8 @@ void(float dist) truck_physics =
 		truck.velocity.z = 0;
 		truck.flags = truck.flags - FL_ONGROUND;
 		}
-	avec = truck.angles + (avec * 10);
-	truck.ideal_yaw = vectoyaw(avec);
+	//avec = truck.angles + (avec * .1);
+	truck.ideal_yaw = chassis_yaw;
 	//dprint(vtos(truck.velocity));
 	//dprint("truck velocity\n");
 	//passengers after return
@@ -269,8 +283,9 @@ void() move_truck =
 	//movestep
 	local float dist = 0;
 	if (self.driver) {
-		dist = 1;
+		dist = 10;
 	//chassis physics / prethink
+	//self.ideal_yaw = vectoyaw(self.angles);
 	truck_physics(dist); }
 
 	//child physics
