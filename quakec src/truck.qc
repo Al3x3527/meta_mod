@@ -244,9 +244,13 @@ void(float dist) truck_physics =
 	//=================================================================
 
 	//suspension, move chassis
-	//truck.avelocity = '0 0 0'; //from equalibrium
-	truck.avelocity = avec;
+	truck.avelocity = '0 0 0'; //from equalibrium
+	truck.avelocity.y = avec.y; //only yaw for now
 	truck.velocity = svec;
+	if ((truck.velocity.z < 0) && (truck.flags & FL_ONGROUND)) { //fix stuck
+		truck.velocity.z = 0;
+		truck.flags = truck.flags - FL_ONGROUND;
+		}
 	dprint(vtos(truck.velocity));
 	dprint("truck velocity\n");
 	//passengers after return
