@@ -95,6 +95,7 @@ void(float dist) truck_physics =
 	//local float truck_yaw = vectoyaw(truck.angles); //original truck yaw
 
 	local vector pivot = (truck.wheel1.origin + truck.wheel2.origin) * 0.5;
+	pivot.z = pivot.z - truck.wheel1.view_ofs.z; //level with vehicle
 	local vector chassis_vec = pivot - truck.origin; //delta (forward vec)
 	local float chassis_yaw = vectoyaw(chassis_vec); //new truck yaw
 	pivot = pivot - oldpivot;
@@ -165,6 +166,8 @@ void(float dist) truck_physics =
 		truck.wheel4.velocity.z = vec4.z = 0;
 		}
 
+	local float dang;
+
 	//roll from z --double check directions
 	local float mx1 = vec1.z * truck.wheel1.view_ofs.y;
 	local float mx2 = vec2.z * truck.wheel2.view_ofs.y;
@@ -190,9 +193,13 @@ void(float dist) truck_physics =
 	my3 = vec3.x / truck.wheel3.view_ofs.z;
 	my4 = vec4.x / truck.wheel4.view_ofs.z;
 	avec.x = (avec.x + my1 + my2 + my3 + my4) * 1;
+
 	local vector chassis_angs = vectoangles(chassis_vec);
-	avec.x = avec.x + ((chassis_angs.x - truck.angles.x) * 10);
-	
+	//chassis_angs.x = -chassis_angs.x;
+	dang = chassis_angs.x - truck.angles.x;
+	if (dang > 180) dang = -360 + dang;
+	else if (dang < -180) dang = 360 + dang;
+	avec.x = ((dang) * 10);
 
 	//work -- vector from momentum to ideal
 	//only front wheels do work in ideal direction
@@ -243,7 +250,7 @@ void(float dist) truck_physics =
 	mz3 = work3.y / truck.wheel3.view_ofs.x;
 	mz4 = work4.y / truck.wheel4.view_ofs.x;
 	avec.y = avec.y + mz1 + mz2 + mz3 + mz4;
-	local float dang = (chassis_yaw - truck.angles.y);
+	dang = (chassis_yaw - truck.angles.y);
 	if (dang > 180) dang = -360 + dang;
 	else if (dang < -180) dang = 360 + dang;
 	avec.y = ((dang) * 10) + avec.y;
