@@ -861,3 +861,34 @@ void() cpywalk =
 		else self.velocity = '0 0 0';
 	}
 };
+
+//linear limit
+vector (vector given, vector limit) vlimit =
+{
+	if (limit != '0 0 0') {
+		if (vlen(limit) < vlen(given))
+			return limit;
+		return given;
+		}
+	else return '0 0 0';
+}
+
+//vector control x,y
+vector (vector set, vector sys) vcontrol =
+{
+	if !(set)
+		return set;
+	if !(sys)
+		return set;
+	local float fset = vlen(set);
+	local float fsys = vlen(sys);
+	if (fset < fsys) {
+		if (set.x < (sys.x - set.x))
+			set.x = -set.x;
+		else set.x = set.x - sys.x;
+		if (set.y < (sys.y - set.y))
+			set.y = -set.y;
+		else set.y = set.y - sys.y;
+	}
+	return set;
+}
