@@ -862,33 +862,83 @@ void() cpywalk =
 	}
 };
 
-//linear limit
-vector (vector given, vector limit) vlimit =
+//limit x,y
+vector (vector given, vector limit) xylimit =
 {
-	if (limit != '0 0 0') {
-		if (vlen(limit) < vlen(given))
-			return limit;
+	if !(limit) 
+		return limit;
+	if !(given)
 		return given;
-		}
-	else return '0 0 0';
+	if (limit.x < given.x)
+		given.x = limit.x;
+	if (limit.y < given.y)
+		given.y = limit.y;
+	return given;
 }
 
 //vector control x,y
-vector (vector set, vector sys) vcontrol =
+vector (vector set, vector sys, float k) xycontrol =
 {
+	set.z = 0;
 	if !(set)
 		return set;
 	if !(sys)
 		return set;
-	local float fset = vlen(set);
-	local float fsys = vlen(sys);
-	if (fset < fsys) {
-		if (set.x < (sys.x - set.x))
-			set.x = -set.x;
-		else set.x = set.x - sys.x;
-		if (set.y < (sys.y - set.y))
-			set.y = -set.y;
-		else set.y = set.y - sys.y;
+
+	if (set.x > 0) {
+		if (set.x < sys.x) {
+			if (set.x < (sys.x - set.x))
+				set.x = ((set.x - sys.x) * k) - set.x;
+			else set.x = ((sys.x - set.x) - sys.x) * k + (set.x - sys.x);
+			//dprint("vcontrol x\n");
+		}
+	}
+	else {
+		if (set.x > sys.x) {
+			if (set.x > (sys.x - set.x))
+				set.x = ((set.x - sys.x) * k) - set.x;
+			else set.x = ((sys.x - set.x) - sys.x) * k + (set.x - sys.x);
+			//dprint("vcontrol -x\n");
+		}
+	}
+	if (set.y > 0){
+		if (set.y < sys.y) {
+			if (set.y < (sys.y - set.y))
+				set.y = ((set.y - sys.y) * k) - set.y;
+			else set.y = ((sys.y - set.y) - sys.y) * k + (set.y - sys.y);
+			//dprint("vcontrol y\n");
+		}
+	}
+	else {
+		if (set.y > sys.y) {
+			if (set.y > (sys.y - set.y))
+				set.y = ((set.y - sys.y) * k) - set.y;
+			else set.y = ((sys.y - set.y) - sys.y) * k + (set.y - sys.y);
+			//dprint("vcontrol -y\n");
+		}
 	}
 	return set;
+}
+
+//set: full extension, sys: actual deflection, c: damping ratio
+float (float sys, float set, float c) zcontrol =
+{
+
+	if !(sys)
+		return sys;
+
+	if (sys > 0) { //deflect up
+		if (sys > set)  //full deflection
+			sys = sys - (sys - set) * c;
+		else //partial deflection
+			sys = sys * c;
+	}
+	else {
+		if (sys < -set) //full
+			sys = sys + (sys + set) * c;
+		else
+			sys = sys * c;
+	}
+	sys = sys * 0.1;
+	return sys;
 }

@@ -58,7 +58,7 @@ void(float dist) truck_physics =
 	subwalkmove(steer_yaw, dist); //movetype_step physics
 	vec1 = self.origin - view; //get to current position from start position
 	vec1.z = self.flyhack.z;
-	vec1.z = .6 * vec1.z + (self.velocity.z * 0.1); //damped spring ratio
+	vec1.z = zcontrol(vec1.z, 7, 0.6); //damped spring ratio
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec1.z - 10; //for next think
 
@@ -71,9 +71,7 @@ void(float dist) truck_physics =
 	subwalkmove(steer_yaw, dist);
 	vec2 = self.origin - view;
 	vec2.z = self.flyhack.z;
-	vec2.z = .6 * vec2.z + (self.velocity.z * 0.1);
-	
-	//local vector xvec2 = vec1; xvec2.z = 0;
+	vec2.z = zcontrol(vec2.z, 7, 0.6);
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec2.z - 10;
 	
@@ -96,7 +94,7 @@ void(float dist) truck_physics =
 	subwalkmove(chassis_yaw, dist); //move from view
 	vec3 = self.origin - view; //movestep delta
 	vec3.z = self.flyhack.z;
-	vec3.z = .6 * vec3.z + (self.velocity.z * 0.1);
+	vec3.z = zcontrol(vec3.z, 7, 0.6);
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec3.z - 10;
 
@@ -109,7 +107,7 @@ void(float dist) truck_physics =
 	subwalkmove(chassis_yaw, dist);
 	vec4 = self.origin - view;
 	vec4.z = self.flyhack.z;
-	vec4.z = .6 * vec4.z + (self.velocity.z * 0.1);
+	vec4.z = zcontrol(vec4.z, 7, 0.06);
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec4.z - 10;
 
@@ -118,7 +116,8 @@ void(float dist) truck_physics =
 	//=================================================================
 	//all fake wheels are in ideal locations and ideal velocities have been calculated for each wheel
 
-	local vector tvec = svec * 0.25;
+	//svec = '0 0 0';
+	local vector tvec = svec * 0.025;
 
 	//grip
 	chassis_vec = normalize(chassis_vec);
@@ -131,69 +130,83 @@ void(float dist) truck_physics =
 	if (vec1.z < 0)
 		grip1 = '0 0 0';
 	else {
-		grip1 = (10 - vec1.z) * grip1; //mu*m*svec1.z^2
-		//vec1.z = vec1.z - tvec.z;
+		grip1 = (1 - vec1.z) * grip1; //mu*m*svec1.z^2
+		vec1.z = vec1.z - tvec.z;
 		}
 	if (vec2.z < 0)
 		grip2 = '0 0 0';
 	else {
-		grip2 = (10 - vec2.z) * grip2;
-		//vec2.z = vec2.z - tvec.z;
+		grip2 = (1 - vec2.z) * grip2;
+		vec2.z = vec2.z - tvec.z;
 		}
 	if (vec3.z < 0)
 		grip3 = '0 0 0';
 	else {
-		grip3 = (10 - vec3.z) * grip3;
-		//vec3.z = vec3.z - tvec.z;
+		grip3 = (1 - vec3.z) * grip3;
+		vec3.z = vec3.z - tvec.z;
 		}
 	if (vec4.z < 0)
 		grip4 = '0 0 0';
 	else {
-		grip4 = (10 - vec4.z) * grip4;
-		//vec4.z = vec4.z - tvec.z;
+		grip4 = (1 - vec4.z) * grip4;
+		vec4.z = vec4.z - tvec.z;
 		}
-		
+	
+	//tvec = tvec * 0.1;
+
 	local vector work1 = vec1;	work1.z = 0;
-	work1 = vlimit(work1, grip1);
-	//work1 = vcontrol(work1, tvec);
+	work1 = xylimit(work1, grip1);
+	local vector control1 = xycontrol(work1, tvec, 0.8);
 	work1.z = vec1.z;
 	truck.wheel1.flyhack = work1;
+	control1 = control1 + work1;
 
 	local vector work2 = vec2;	work2.z = 0;
-	work2 = vlimit(work2, grip2);
-	//work2 = vcontrol(work2, tvec);
+	work2 = xylimit(work2, grip2);
+	local vector control2 = xycontrol(work2, tvec, 0.8);
 	work2.z = vec2.z;
 	truck.wheel2.flyhack = work2;
+	control2 = control2 + work2;
 
 	local vector work3 = vec3;	work3.z = 0;
-	work3 = vlimit(work3, grip3);
-	//work3 = vcontrol(work3, tvec);
+	work3 = xylimit(work3, grip3);
+	local vector control3 = xycontrol(work3, tvec, 0.8);
 	work3.z = vec3.z;
 	truck.wheel3.flyhack = work3;
+	control3 = control3 + work3;
 
 	local vector work4 = vec4;	work4.z = 0;
-	work4 = vlimit(work4, grip4);
-	//work4 = vcontrol(work4, tvec);
+	work4 = xylimit(work4, grip4);
+	local vector control4 = xycontrol(work4, tvec, 0.8);
 	work4.z = vec4.z;
 	truck.wheel4.flyhack = work4;
+	control4 = control4 + work4;
 
 	//actual travel
-	//svec = (svec + (work1 + work2 + work3 + work4) * 1);
-	svec = work1 + work2 + work3 + work4;
+	svec = (svec + ((control1 + control2 + control3 + control4) * 10));
+	//svec = work1 + work2 + work3 + work4;
 
 	local float dang;
-	local vector final_vec = v_forward + work1 + work2 - work3 - work4;
+	//work1.z = work1.z * (truck.wheel1.view_ofs * v_forward);
+	//work2.z = work2.z * (truck.wheel2.view_ofs * v_forward);
+	//work3.z = work3.z * (truck.wheel3.view_ofs * v_forward);
+	//work4.z = work4.z * (truck.wheel4.view_ofs * v_forward);
+	local vector final_vec = v_forward + (work1 + work2 - work3 - work4) * 1;
 	local vector final_angs = vectoangles(final_vec);
-	//chassis_angs.x = -chassis_angs.x;
-	dang = final_angs.x + truck.angles.x; //to flip
+
+	dang = final_angs.x - truck.angles.x;
+	dprint(ftos(dang));
+	dprint(" raw dang x\n");
 	if (dang > 180) dang = -360 + dang;
 	else if (dang < -180) dang = 360 + dang;
-	avec.x = ((dang) * 0.9);
+	avec.x = ((dang) * 1);
+	dprint(ftos(dang));
+	dprint(" dang x\n");
 
 	dang = (final_angs.y - truck.angles.y);
 	if (dang > 180) dang = -360 + dang;
 	else if (dang < -180) dang = 360 + dang;
-	avec.y = ((dang) * 0.9);
+	avec.y = ((dang) * 1);
 	local float final_yaw = vectoyaw(final_vec);
 
 	dprint("\n");
@@ -201,8 +214,8 @@ void(float dist) truck_physics =
 	//dprint(" dir\n");
 	//dprint(vtos(chassis_vec));
 	//dprint(" chassis vec\n");
-	dprint(vtos(final_angs));
-	dprint(" final angs\n");
+	//dprint(vtos(final_angs));
+	//dprint(" final angs\n");
 	//dprint(ftos(final_yaw));
 	//dprint(" final yaw\n");
 	//dprint(ftos(dang));
@@ -211,8 +224,8 @@ void(float dist) truck_physics =
 	//dprint(" steer yaw\n");
 	//dprint(ftos(vectoyaw(truck.angles)));
 	//dprint(" start yaw\n");
-	dprint(vtos(truck.angles));
-	dprint(" start angles\n");
+	//dprint(vtos(truck.angles));
+	//dprint(" start angles\n");
 	//dprint(vtos(avec));
 	//dprint(" avec\n");
 
@@ -261,7 +274,7 @@ void() move_truck =
 	//movestep
 	local float dist = 0;
 	if (self.driver) {
-		dist = 15;
+		dist = 4;
 	//chassis physics / prethink
 	truck_physics(dist); }
 
