@@ -120,13 +120,14 @@ void(float dist) truck_physics =
 	local vector tvec = svec * 0.025;
 
 	//grip
-	local float grip = 1;
+	local float fgrip = dist;
+	local float rgrip = 0.6;
 	chassis_vec = normalize(chassis_vec);
 	local vector grip1, grip2, grip3, grip4;
-	grip1 = normalize(vec1) * grip;
-	grip2 = normalize(vec2) * grip;
-	grip3 = normalize(vec3) * grip;
-	grip4 = normalize(vec4) * grip;
+	grip1 = normalize(vec1) * fgrip + v_right * rgrip;
+	grip2 = normalize(vec2) * fgrip + v_right * rgrip;
+	grip3 = v_forward * fgrip + v_right * rgrip;
+	grip4 = v_forward * fgrip + v_right * rgrip;
 	//if !(truck.wheel1.flags & FL_ONGROUND) does not work
 	if (vec1.z < -1)
 		grip1 = '0 0 0';
@@ -276,7 +277,7 @@ void() move_truck =
 	//movestep
 	local float dist = 0;
 	if (self.driver) {
-		dist = 14;
+		dist = 4;
 	//chassis physics / prethink
 	truck_physics(dist); }
 
