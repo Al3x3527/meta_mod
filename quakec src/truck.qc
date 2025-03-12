@@ -64,7 +64,7 @@ void(float dist) truck_physics =
 	//vec1 = 10 * vec1; //as velocity
 	vec1.z = .6 * vec1.z + (self.velocity.z * 0.1); //damped spring ratio
 	//local vector xvec1 = vec1; xvec1.z = 0;
-	self.flags = self.flags - FL_ONGROUND;
+	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec1.z - 10; //for next think
 
 	self = truck.wheel2;
@@ -80,7 +80,7 @@ void(float dist) truck_physics =
 	vec2.z = .6 * vec2.z + (self.velocity.z * 0.1);
 	
 	//local vector xvec2 = vec1; xvec2.z = 0;
-	self.flags = self.flags - FL_ONGROUND;
+	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec2.z - 10;
 	
 	//=================================================================
@@ -105,7 +105,7 @@ void(float dist) truck_physics =
 	vec3.z = self.flyhack.z;
 	vec3.z = .6 * vec3.z + (self.velocity.z * 0.1);
 	//local vector xvec3 = vec3;	xvec3.z = 0;
-	self.flags = self.flags - FL_ONGROUND;
+	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec3.z - 10;
 
 	self = truck.wheel4;
@@ -120,7 +120,7 @@ void(float dist) truck_physics =
 	vec4.z = self.flyhack.z;
 	vec4.z = .6 * vec4.z + (self.velocity.z * 0.1);
 	//local vector xvec4 = vec4;	xvec4.z = 0;
-	self.flags = self.flags - FL_ONGROUND;
+	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec4.z - 10;
 
 	//=================================================================
@@ -189,23 +189,23 @@ void(float dist) truck_physics =
 	//actual travel
 	//svec = (svec + (work1 + work2 + work3 + work4) * 10);
 	svec = work1 + work2 + work3 + work4;
-	//svec.x = 0;
-	//svec.y = 0;
-
+	//svec.x = svec.x * 10;
+	//svec.y = svec.y * 10;
+	//work1.z = 0.1 * work1.z; work2.z = 0.1 * work2.z;
+	//work3.z = -0.1 * work3.z; work4.z = -0.1 * work4.z;
 	local float dang;
 	local vector final_vec = v_forward + work1 + work2 - work3 - work4;
-	//final_vec.z = 0;
 	local vector final_angs = vectoangles(final_vec);
 	//chassis_angs.x = -chassis_angs.x;
-	dang = final_angs.x - truck.angles.x;
+	dang = final_angs.x + truck.angles.x; //to flip
 	if (dang > 180) dang = -360 + dang;
 	else if (dang < -180) dang = 360 + dang;
-	avec.x = ((dang) * 10);
+	avec.x = ((dang) * 0.9);
 
 	dang = (final_angs.y - truck.angles.y);
 	if (dang > 180) dang = -360 + dang;
 	else if (dang < -180) dang = 360 + dang;
-	avec.y = ((dang) * 1);
+	avec.y = ((dang) * 0.9);
 	local float final_yaw = vectoyaw(final_vec);
 	
 	//makevectors(final_angs);
@@ -245,18 +245,18 @@ void(float dist) truck_physics =
 	//dprint(" dir\n");
 	//dprint(vtos(chassis_vec));
 	//dprint(" chassis vec\n");
-	//dprint(vtos(final_angs));
-	//dprint(" final angs\n");
-	dprint(ftos(final_yaw));
-	dprint(" final yaw\n");
-	dprint(ftos(dang));
-	dprint(" dang\n");
-	dprint(ftos(steer_yaw));
-	dprint(" steer yaw\n");
-	dprint(ftos(vectoyaw(truck.angles)));
-	dprint(" start yaw\n");
-	//dprint(vtos(truck.angles));
-	//dprint(" start angles\n");
+	dprint(vtos(final_angs));
+	dprint(" final angs\n");
+	//dprint(ftos(final_yaw));
+	//dprint(" final yaw\n");
+	//dprint(ftos(dang));
+	//dprint(" dang\n");
+	//dprint(ftos(steer_yaw));
+	//dprint(" steer yaw\n");
+	//dprint(ftos(vectoyaw(truck.angles)));
+	//dprint(" start yaw\n");
+	dprint(vtos(truck.angles));
+	dprint(" start angles\n");
 	//dprint(vtos(avec));
 	//dprint(" avec\n");
 	//=================================================================
@@ -268,7 +268,7 @@ void(float dist) truck_physics =
 	//avec.x = 0;
 	//avec.z = 0;
 	truck.avelocity.y = avec.y * 1; //only yaw for now
-	//truck.avelocity.x = avec.x * 0.2; //pitch
+	truck.avelocity.x = avec.x * 1; //pitch
 	truck.velocity = svec;
 	//truck.velocity.x = 0;
 	//truck.velocity.y = 0;
@@ -292,8 +292,8 @@ void(float dist) truck_physics =
 	truck.flyhack = truck.velocity;
 
 	truck.ideal_yaw = final_yaw;
-	dprint(vtos(truck.velocity));
-	dprint("truck velocity\n");
+	//dprint(vtos(truck.velocity));
+	//dprint("truck velocity\n");
 	//passengers after return
 	self = truck;
 	subChangeYaw(); //stops things  from breaking
@@ -305,7 +305,7 @@ void() move_truck =
 	//movestep
 	local float dist = 0;
 	if (self.driver) {
-		dist = 10;
+		dist = 15;
 	//chassis physics / prethink
 	truck_physics(dist); }
 
