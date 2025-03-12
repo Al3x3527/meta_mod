@@ -187,7 +187,8 @@ void(float dist) truck_physics =
 	truck.wheel4.flyhack = work4;
 
 	//actual travel
-	svec = (svec + (work1 + work2 + work3 + work4) * 10);
+	//svec = (svec + (work1 + work2 + work3 + work4) * 10);
+	svec = work1 + work2 + work3 + work4;
 	//svec.x = 0;
 	//svec.y = 0;
 
@@ -204,7 +205,7 @@ void(float dist) truck_physics =
 	dang = (final_angs.y - truck.angles.y);
 	if (dang > 180) dang = -360 + dang;
 	else if (dang < -180) dang = 360 + dang;
-	avec.y = ((dang) * 10);
+	avec.y = ((dang) * 1);
 	local float final_yaw = vectoyaw(final_vec);
 	
 	//makevectors(final_angs);
@@ -266,11 +267,11 @@ void(float dist) truck_physics =
 	truck.avelocity = '0 0 0'; //from equalibrium
 	//avec.x = 0;
 	//avec.z = 0;
-	truck.avelocity.y = avec.y * 0.01; //only yaw for now
+	truck.avelocity.y = avec.y * 1; //only yaw for now
 	//truck.avelocity.x = avec.x * 0.2; //pitch
 	truck.velocity = svec;
-	truck.velocity.x = 0;
-	truck.velocity.y = 0;
+	//truck.velocity.x = 0;
+	//truck.velocity.y = 0;
 
 	//fix stuck
 	
@@ -291,8 +292,8 @@ void(float dist) truck_physics =
 	truck.flyhack = truck.velocity;
 
 	truck.ideal_yaw = final_yaw;
-	//dprint(vtos(truck.velocity));
-	//dprint("truck velocity\n");
+	dprint(vtos(truck.velocity));
+	dprint("truck velocity\n");
 	//passengers after return
 	self = truck;
 	subChangeYaw(); //stops things  from breaking
@@ -315,7 +316,7 @@ void() move_truck =
 	//cpyall(self.turret, dist);
 
 	//animate
-	self.nextthink = time + 1;
+	self.nextthink = time + .1;
 };
 
 void() truck_touch =
