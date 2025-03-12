@@ -14,7 +14,7 @@ $frame right1 right2
 $frame left1 left2
 
 //calculate vehicle_truck velocity and avelocity from wheels post engine physics
-void(float dist) truck_physics =
+void(float dist, vector dir) truck_physics =
 {
 	local vector vec1, vec2, vec3, vec4;
 	local entity truck = self;
@@ -25,10 +25,10 @@ void(float dist) truck_physics =
 
 	//get input vectors
 	//local float dist = 10; //temp
-	local vector dir;
-	if (self.driver)
-	dir = aim(self.owner.driver, 1000);
-	else dir = '0 1 0';
+	//local vector dir;
+	//if (self.driver)
+	//dir = aim(self.owner.driver, 1000);
+	//else dir = '0 1 0';
 
 	//truck vectors - velocity from wheels vs gravity, est grip
 	local vector svec = truck.velocity;
@@ -281,23 +281,72 @@ void(float dist) truck_physics =
 	subChangeYaw(); //stops things  from breaking
 };
 
+vector () truck_pilot =
+{
+	local entity truck = self;
+	self = other;
+
+	self.modelindex = 0;
+	self.weaponmodel = string_null;
+	self.movetype = MOVETYPE_FLY;
+
+	local vector dir = aim(world, 1000);
+	local vector target = truck.origin - dir * 200;
+	target.z = target.z + 60;
+	local vector delta = target - self.origin;
+	delta = delta * 10;
+	self.velocity = (self.velocity * 2 + delta) * 0.5;
+
+	if (self.impulse == 16) {
+		self.impulse = 0;
+		setmodel(self, self.model);
+		self.movetype = MOVETYPE_WALK;
+		setorigin(self, truck.origin);
+		self.velocity = truck.velocity;
+		sprint(self, "Truck dismounted\n");
+		truck.driver = world;
+	}
+	
+	self = truck;
+	return (dir);
+}
+
 void() move_truck =
 {
 	//movestep
 	local float dist = 0;
 	if (self.driver) {
+		other = self.driver;
 		dist = 4;
 	//chassis physics / prethink
-	truck_physics(dist); }
+	local vector dir = truck_pilot();
+	}
+	truck_physics(dist, dir); 
+	
 
 	//child physics
 	//if (self.driver)
 		//cpyall(self.driver, dist);
 	//cpyall(self.passenger, dist);
 	//cpyall(self.turret, dist);
+	//self.nextthink = time + .1;
+};
 
-	//animate
-	self.nextthink = time + .1;
+void() truck_drive = [ $forward1, truck_drive ]
+{
+	if (self.walkframe > 1)
+		self.walkframe = 0;
+	if (self.avelocity.y > 1)
+	{
+		self.frame = $left1 + self.walkframe;
+	} else if (self.avelocity.y < -1) {
+		self.frame = $right1 + self.walkframe;
+	}
+	else {
+		self.frame = $forward1 + self.walkframe;
+	}
+	self.walkframe = self.walkframe + 1;
+	move_truck();
 };
 
 void() truck_touch =
@@ -314,6 +363,7 @@ void() truck_touch =
 	if (other.impulse == 16) {
 		other.impulse = 0;
 		self.driver = other;
+		self.nextthink = time + 0.1;
 		}
 }
 
@@ -368,8 +418,8 @@ void() spawn_vehicle_truck =
 		i++;
 	}
 	self.touch = truck_touch;
-	self.think = move_truck;
-	self.nextthink = time + 0.1;
+	self.think = truck_drive;
+	//self.nextthink = time + 0.1;
 };
 
 //Vanilla Spawning
