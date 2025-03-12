@@ -869,10 +869,19 @@ vector (vector given, vector limit) xylimit =
 		return limit;
 	if !(given)
 		return given;
-	if (limit.x < given.x)
-		given.x = limit.x;
-	if (limit.y < given.y)
-		given.y = limit.y;
+
+	if (limit.x > 0) {
+		if (limit.x < given.x)
+			given.x = limit.x;}
+	else if (limit.x > given.x)
+			given.x = limit.x;
+	
+	if (limit.y > 0) {
+		if (limit.y < given.y)
+			given.y = limit.y;}
+	else if (limit.y > given.y)
+			given.y = limit.y;
+	
 	return given;
 }
 

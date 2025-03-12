@@ -120,12 +120,13 @@ void(float dist) truck_physics =
 	local vector tvec = svec * 0.025;
 
 	//grip
+	local float grip = 1;
 	chassis_vec = normalize(chassis_vec);
 	local vector grip1, grip2, grip3, grip4;
-	grip1 = normalize(vec1) * 3;
-	grip2 = normalize(vec2) * 3;
-	grip3 = normalize(vec3) * 3;
-	grip4 = normalize(vec4) * 3;
+	grip1 = normalize(vec1) * grip;
+	grip2 = normalize(vec2) * grip;
+	grip3 = normalize(vec3) * grip;
+	grip4 = normalize(vec4) * grip;
 	//if !(truck.wheel1.flags & FL_ONGROUND) does not work
 	if (vec1.z < 0)
 		grip1 = '0 0 0';
@@ -153,31 +154,32 @@ void(float dist) truck_physics =
 		}
 	
 	//tvec = tvec * 0.1;
+	local float hack = 0.5;
 
 	local vector work1 = vec1;	work1.z = 0;
 	work1 = xylimit(work1, grip1);
-	local vector control1 = xycontrol(work1, tvec, 0.8);
+	local vector control1 = xycontrol(work1, tvec, hack);
 	work1.z = vec1.z;
 	truck.wheel1.flyhack = work1;
 	control1 = control1 + work1;
 
 	local vector work2 = vec2;	work2.z = 0;
 	work2 = xylimit(work2, grip2);
-	local vector control2 = xycontrol(work2, tvec, 0.8);
+	local vector control2 = xycontrol(work2, tvec, hack);
 	work2.z = vec2.z;
 	truck.wheel2.flyhack = work2;
 	control2 = control2 + work2;
 
 	local vector work3 = vec3;	work3.z = 0;
 	work3 = xylimit(work3, grip3);
-	local vector control3 = xycontrol(work3, tvec, 0.8);
+	local vector control3 = xycontrol(work3, tvec, hack);
 	work3.z = vec3.z;
 	truck.wheel3.flyhack = work3;
 	control3 = control3 + work3;
 
 	local vector work4 = vec4;	work4.z = 0;
 	work4 = xylimit(work4, grip4);
-	local vector control4 = xycontrol(work4, tvec, 0.8);
+	local vector control4 = xycontrol(work4, tvec, hack);
 	work4.z = vec4.z;
 	truck.wheel4.flyhack = work4;
 	control4 = control4 + work4;
@@ -274,7 +276,7 @@ void() move_truck =
 	//movestep
 	local float dist = 0;
 	if (self.driver) {
-		dist = 4;
+		dist = 14;
 	//chassis physics / prethink
 	truck_physics(dist); }
 
