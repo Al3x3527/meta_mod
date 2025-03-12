@@ -865,6 +865,10 @@ void() cpywalk =
 //limit x,y
 vector (vector given, vector limit) xylimit =
 {
+//dprint("xy limit\n");
+//dprint(vtos(given));
+//dprint(" given in\n");
+
 	if !(limit) 
 		return limit;
 	if !(given)
@@ -872,16 +876,26 @@ vector (vector given, vector limit) xylimit =
 
 	if (limit.x > 0) {
 		if (limit.x < given.x)
-			given.x = limit.x;}
-	else if (limit.x > given.x)
 			given.x = limit.x;
+		else if (given.x < -limit.x)
+			given.x = -limit.x;
+			}
+	else if (limit.x > given.x)
+		given.x = limit.x;
+	else if (limit.x > -given.x)
+		given.x = -limit.x;
 	
 	if (limit.y > 0) {
 		if (limit.y < given.y)
-			given.y = limit.y;}
-	else if (limit.y > given.y)
 			given.y = limit.y;
-	
+		else if (given.y < -limit.y)
+			given.y = -limit.y;
+	} else if (limit.y > given.y)
+			given.y = limit.y;
+	else if (limit.y > -given.y)
+		given.y = -limit.y;
+//dprint(vtos(given));
+//dprint(" return\n");
 	return given;
 }
 

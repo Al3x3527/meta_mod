@@ -41,6 +41,8 @@ void(float dist) truck_physics =
 	makevectors(fakeangles); //starting angles
 
 	local float steer_yaw = vectoyaw(dir);
+	local float deflection = 3;
+	local float damping = 0.6;
 	//if ((dir * v_right) > 0) dprint("right\n");
 
 	//=================================================================
@@ -58,7 +60,10 @@ void(float dist) truck_physics =
 	subwalkmove(steer_yaw, dist); //movetype_step physics
 	vec1 = self.origin - view; //get to current position from start position
 	vec1.z = self.flyhack.z;
-	vec1.z = zcontrol(vec1.z, 7, 0.6); //damped spring ratio
+	if (vlen(vec1) < (0.9 * dist)){ 
+	dprint("short step\n");
+	vec1 = self.flyhack;}//probably accomplishing nothing.
+	vec1.z = zcontrol(vec1.z, deflection, damping); //damped spring ratio
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec1.z - 10; //for next think
 
@@ -71,7 +76,11 @@ void(float dist) truck_physics =
 	subwalkmove(steer_yaw, dist);
 	vec2 = self.origin - view;
 	vec2.z = self.flyhack.z;
-	vec2.z = zcontrol(vec2.z, 7, 0.6);
+	if (vlen(vec2) < (0.9 * dist)) {
+		dprint("short step\n");
+		vec2 = self.flyhack;
+	}
+	vec2.z = zcontrol(vec2.z, deflection, damping);
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec2.z - 10;
 	
@@ -94,7 +103,7 @@ void(float dist) truck_physics =
 	subwalkmove(chassis_yaw, dist); //move from view
 	vec3 = self.origin - view; //movestep delta
 	vec3.z = self.flyhack.z;
-	vec3.z = zcontrol(vec3.z, 7, 0.6);
+	vec3.z = zcontrol(vec3.z, deflection, damping);
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec3.z - 10;
 
@@ -107,7 +116,7 @@ void(float dist) truck_physics =
 	subwalkmove(chassis_yaw, dist);
 	vec4 = self.origin - view;
 	vec4.z = self.flyhack.z;
-	vec4.z = zcontrol(vec4.z, 7, 0.06);
+	vec4.z = zcontrol(vec4.z, deflection, damping);
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec4.z - 10;
 
@@ -122,6 +131,7 @@ void(float dist) truck_physics =
 	//grip
 	local float fgrip = dist;
 	local float rgrip = 0.6;
+	
 	chassis_vec = normalize(chassis_vec);
 	local vector grip1, grip2, grip3, grip4;
 	grip1 = normalize(vec1) * fgrip + v_right * rgrip;
@@ -190,21 +200,13 @@ void(float dist) truck_physics =
 	//svec = work1 + work2 + work3 + work4;
 
 	local float dang;
-	//work1.z = work1.z * (truck.wheel1.view_ofs * v_forward);
-	//work2.z = work2.z * (truck.wheel2.view_ofs * v_forward);
-	//work3.z = work3.z * (truck.wheel3.view_ofs * v_forward);
-	//work4.z = work4.z * (truck.wheel4.view_ofs * v_forward);
 	local vector final_vec = v_forward + (work1 + work2 - work3 - work4) * 1;
 	local vector final_angs = vectoangles(final_vec);
 
 	dang = final_angs.x - truck.angles.x;
-	dprint(ftos(dang));
-	dprint(" raw dang x\n");
 	if (dang > 180) dang = -360 + dang;
 	else if (dang < -180) dang = 360 + dang;
 	avec.x = ((dang) * 1);
-	dprint(ftos(dang));
-	dprint(" dang x\n");
 
 	dang = (final_angs.y - truck.angles.y);
 	if (dang > 180) dang = -360 + dang;
@@ -212,13 +214,21 @@ void(float dist) truck_physics =
 	avec.y = ((dang) * 1);
 	local float final_yaw = vectoyaw(final_vec);
 
+	final_vec = v_right + (-work1 - work3 + work2 + work4);
+	final_angs = vectoangles(final_vec);
+
+	dang = (final_angs.x - truck.angles.z);
+	if (dang > 180) dang = -360 + dang;
+	else if (dang < -180) dang = 360 + dang;
+	avec.z = ((dang) * 1);
+
 	dprint("\n");
 	//dprint(vtos(dir));
 	//dprint(" dir\n");
 	//dprint(vtos(chassis_vec));
 	//dprint(" chassis vec\n");
-	//dprint(vtos(final_angs));
-	//dprint(" final angs\n");
+	dprint(vtos(final_angs));
+	dprint(" final angs\n");
 	//dprint(ftos(final_yaw));
 	//dprint(" final yaw\n");
 	//dprint(ftos(dang));
@@ -227,8 +237,8 @@ void(float dist) truck_physics =
 	//dprint(" steer yaw\n");
 	//dprint(ftos(vectoyaw(truck.angles)));
 	//dprint(" start yaw\n");
-	//dprint(vtos(truck.angles));
-	//dprint(" start angles\n");
+	dprint(vtos(truck.angles));
+	dprint(" start angles\n");
 	//dprint(vtos(avec));
 	//dprint(" avec\n");
 
@@ -237,11 +247,10 @@ void(float dist) truck_physics =
 	//=================================================================
 
 	//suspension, move chassis
-	truck.avelocity = '0 0 0'; //from equalibrium
-	//avec.x = 0;
-	//avec.z = 0;
-	truck.avelocity.y = avec.y * 1; //only yaw for now
-	truck.avelocity.x = avec.x * 1; //pitch
+
+	//truck.avelocity.y = avec.y * 1; //only yaw for now
+	//truck.avelocity.x = avec.x * 1; //pitch
+	truck.avelocity = avec;
 	truck.velocity = svec;
 	//truck.velocity.x = 0;
 	//truck.velocity.y = 0;
