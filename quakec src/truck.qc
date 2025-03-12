@@ -29,16 +29,13 @@ void(float dist) truck_physics =
 	if (self.driver)
 	dir = aim(self.owner.driver, 1000);
 	else dir = '0 1 0';
-	//dir.z = 0; // steer in xy plane
-	//dir.x = 0;
-	//dir = normalize(dir);
 
 	//truck vectors - velocity from wheels vs gravity, est grip
 	local vector svec = truck.velocity;
 	local vector avec = truck.avelocity;
-	//local vector fakevelocity = dist * 10 * dir;
+
 	//clamp steer yaw to +- 85 degrees from current yaw
-	//local float fakedist = vlen(fakevelocity); //was - svec
+
 	local vector fakeangles = truck.angles;
 	fakeangles.x = -fakeangles.x;
 	makevectors(fakeangles); //starting angles
@@ -61,9 +58,7 @@ void(float dist) truck_physics =
 	subwalkmove(steer_yaw, dist); //movetype_step physics
 	vec1 = self.origin - view; //get to current position from start position
 	vec1.z = self.flyhack.z;
-	//vec1 = 10 * vec1; //as velocity
 	vec1.z = .6 * vec1.z + (self.velocity.z * 0.1); //damped spring ratio
-	//local vector xvec1 = vec1; xvec1.z = 0;
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec1.z - 10; //for next think
 
@@ -75,7 +70,6 @@ void(float dist) truck_physics =
 	setorigin(self, view);
 	subwalkmove(steer_yaw, dist);
 	vec2 = self.origin - view;
-	//vec2 = 10 * vec2;
 	vec2.z = self.flyhack.z;
 	vec2.z = .6 * vec2.z + (self.velocity.z * 0.1);
 	
@@ -101,10 +95,8 @@ void(float dist) truck_physics =
 	setorigin(self, view);
 	subwalkmove(chassis_yaw, dist); //move from view
 	vec3 = self.origin - view; //movestep delta
-	//vec3 = 10 * vec3;
 	vec3.z = self.flyhack.z;
 	vec3.z = .6 * vec3.z + (self.velocity.z * 0.1);
-	//local vector xvec3 = vec3;	xvec3.z = 0;
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec3.z - 10;
 
@@ -116,19 +108,18 @@ void(float dist) truck_physics =
 	setorigin(self, view);
 	subwalkmove(chassis_yaw, dist);
 	vec4 = self.origin - view;
-	//vec4 = 10 * vec4;
 	vec4.z = self.flyhack.z;
 	vec4.z = .6 * vec4.z + (self.velocity.z * 0.1);
-	//local vector xvec4 = vec4;	xvec4.z = 0;
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
 	self.velocity.z = vec4.z - 10;
 
 	//=================================================================
-	//vehicle forces, moments
+	//vehicle forces, target vector
 	//=================================================================
 	//all fake wheels are in ideal locations and ideal velocities have been calculated for each wheel
 
-	/*
+	local vector tvec = svec * 0.25;
+
 	//grip
 	chassis_vec = normalize(chassis_vec);
 	local vector grip1, grip2, grip3, grip4;
@@ -141,58 +132,55 @@ void(float dist) truck_physics =
 		grip1 = '0 0 0';
 	else {
 		grip1 = (10 - vec1.z) * grip1; //mu*m*svec1.z^2
-	//	vec1.z = 0;
+		//vec1.z = vec1.z - tvec.z;
 		}
 	if (vec2.z < 0)
 		grip2 = '0 0 0';
 	else {
 		grip2 = (10 - vec2.z) * grip2;
-	//	vec2.z = 0;
+		//vec2.z = vec2.z - tvec.z;
 		}
 	if (vec3.z < 0)
 		grip3 = '0 0 0';
 	else {
 		grip3 = (10 - vec3.z) * grip3;
-	//	vec3.z = 0;
+		//vec3.z = vec3.z - tvec.z;
 		}
 	if (vec4.z < 0)
 		grip4 = '0 0 0';
 	else {
 		grip4 = (10 - vec4.z) * grip4;
-	//	vec4.z = 0;
+		//vec4.z = vec4.z - tvec.z;
 		}
-		*/
-	local vector tvec = svec * 0.025;
-
+		
 	local vector work1 = vec1;	work1.z = 0;
-	//work1 = vlimit(work1, grip1);
+	work1 = vlimit(work1, grip1);
 	//work1 = vcontrol(work1, tvec);
 	work1.z = vec1.z;
 	truck.wheel1.flyhack = work1;
 
 	local vector work2 = vec2;	work2.z = 0;
-	//work2 = vlimit(work2, grip2);
+	work2 = vlimit(work2, grip2);
 	//work2 = vcontrol(work2, tvec);
 	work2.z = vec2.z;
 	truck.wheel2.flyhack = work2;
 
 	local vector work3 = vec3;	work3.z = 0;
+	work3 = vlimit(work3, grip3);
 	//work3 = vcontrol(work3, tvec);
 	work3.z = vec3.z;
 	truck.wheel3.flyhack = work3;
 
 	local vector work4 = vec4;	work4.z = 0;
+	work4 = vlimit(work4, grip4);
 	//work4 = vcontrol(work4, tvec);
 	work4.z = vec4.z;
 	truck.wheel4.flyhack = work4;
 
 	//actual travel
-	//svec = (svec + (work1 + work2 + work3 + work4) * 10);
+	//svec = (svec + (work1 + work2 + work3 + work4) * 1);
 	svec = work1 + work2 + work3 + work4;
-	//svec.x = svec.x * 10;
-	//svec.y = svec.y * 10;
-	//work1.z = 0.1 * work1.z; work2.z = 0.1 * work2.z;
-	//work3.z = -0.1 * work3.z; work4.z = -0.1 * work4.z;
+
 	local float dang;
 	local vector final_vec = v_forward + work1 + work2 - work3 - work4;
 	local vector final_angs = vectoangles(final_vec);
@@ -207,38 +195,6 @@ void(float dist) truck_physics =
 	else if (dang < -180) dang = 360 + dang;
 	avec.y = ((dang) * 0.9);
 	local float final_yaw = vectoyaw(final_vec);
-	
-	//makevectors(final_angs);
-	//local float final_dist = (svec * v_forward * 0.1);
-	/*
-	self = truck.wheel1;
-	view = self.view_ofs;
-	view = v_forward * view.x + v_right * view.y + v_up * view.z + truck.origin;
-	setorigin(self, view);
-	if !(self.flags & FL_ONGROUND) self.flags = self.flags + FL_ONGROUND;
-	subwalkmove(final_yaw, final_dist);
-
-	self = truck.wheel2;
-	view = self.view_ofs;
-	view = v_forward * view.x + v_right * view.y + v_up * view.z + truck.origin;
-	setorigin(self, view);
-	if !(self.flags & FL_ONGROUND) self.flags = self.flags + FL_ONGROUND;
-	subwalkmove(final_yaw, final_dist);
-
-	self = truck.wheel3;
-	view = self.view_ofs;
-	view = v_forward * view.x + v_right * view.y + v_up * view.z + truck.origin;
-	setorigin(self, view);
-	if !(self.flags & FL_ONGROUND) self.flags = self.flags + FL_ONGROUND;
-	subwalkmove(final_yaw, final_dist);
-
-	self = truck.wheel4;
-	view = self.view_ofs;
-	view = v_forward * view.x + v_right * view.y + v_up * view.z + truck.origin;
-	setorigin(self, view);
-	if !(self.flags & FL_ONGROUND) self.flags = self.flags + FL_ONGROUND;
-	subwalkmove(final_yaw, final_dist);
-	*/
 
 	dprint("\n");
 	//dprint(vtos(dir));
@@ -259,6 +215,7 @@ void(float dist) truck_physics =
 	dprint(" start angles\n");
 	//dprint(vtos(avec));
 	//dprint(" avec\n");
+
 	//=================================================================
 	//vehicle velocity, avelocity
 	//=================================================================
@@ -297,7 +254,6 @@ void(float dist) truck_physics =
 	//passengers after return
 	self = truck;
 	subChangeYaw(); //stops things  from breaking
-	//truck.angles.y = final_angs.y;
 };
 
 void() move_truck =
