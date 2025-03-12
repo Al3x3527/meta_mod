@@ -128,25 +128,25 @@ void(float dist) truck_physics =
 	grip3 = normalize(vec3) * grip;
 	grip4 = normalize(vec4) * grip;
 	//if !(truck.wheel1.flags & FL_ONGROUND) does not work
-	if (vec1.z < 0)
+	if (vec1.z < -1)
 		grip1 = '0 0 0';
 	else {
 		grip1 = (1 - vec1.z) * grip1; //mu*m*svec1.z^2
 		vec1.z = vec1.z - tvec.z;
 		}
-	if (vec2.z < 0)
+	if (vec2.z < -1)
 		grip2 = '0 0 0';
 	else {
 		grip2 = (1 - vec2.z) * grip2;
 		vec2.z = vec2.z - tvec.z;
 		}
-	if (vec3.z < 0)
+	if (vec3.z < -1)
 		grip3 = '0 0 0';
 	else {
 		grip3 = (1 - vec3.z) * grip3;
 		vec3.z = vec3.z - tvec.z;
 		}
-	if (vec4.z < 0)
+	if (vec4.z < -1)
 		grip4 = '0 0 0';
 	else {
 		grip4 = (1 - vec4.z) * grip4;
