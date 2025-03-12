@@ -158,19 +158,23 @@ void(float dist) truck_physics =
 	//work1 = vlimit(work1, grip1);
 	//work1 = vcontrol(work1, tvec);
 	work1.z = vec1.z;
+	truck.wheel1.flyhack = work1;
 
 	local vector work2 = vec2;	work2.z = 0;
 	//work2 = vlimit(work2, grip2);
 	//work2 = vcontrol(work2, tvec);
 	work2.z = vec2.z;
+	truck.wheel2.flyhack = work2;
 
 	local vector work3 = vec3;	work3.z = 0;
 	//work3 = vcontrol(work3, tvec);
 	work3.z = vec3.z;
+	truck.wheel3.flyhack = work3;
 
 	local vector work4 = vec4;	work4.z = 0;
 	//work4 = vcontrol(work4, tvec);
 	work4.z = vec4.z;
+	truck.wheel4.flyhack = work4;
 
 	//actual travel
 	svec = (svec + (work1 + work2 + work3 + work4) * 10);
@@ -178,8 +182,8 @@ void(float dist) truck_physics =
 	//svec.y = 0;
 
 	local float dang;
-	local vector final_vec = chassis_vec + work1 + work2 - work3 - work4;
-	final_vec.z = 0;
+	local vector final_vec = v_forward + work1 + work2 - work3 - work4;
+	//final_vec.z = 0;
 	local vector final_angs = vectoangles(final_vec);
 	//chassis_angs.x = -chassis_angs.x;
 	dang = final_angs.x - truck.angles.x;
@@ -192,9 +196,9 @@ void(float dist) truck_physics =
 	else if (dang < -180) dang = 360 + dang;
 	avec.y = ((dang) * 10);
 	local float final_yaw = vectoyaw(final_angs);
-	makevectors(final_angs);
-	local float final_dist = (svec * v_forward * 0.1);
 	
+	//makevectors(final_angs);
+	//local float final_dist = (svec * v_forward * 0.1);
 	/*
 	self = truck.wheel1;
 	view = self.view_ofs;
@@ -245,8 +249,8 @@ void(float dist) truck_physics =
 	//truck.avelocity = '0 0 0'; //from equalibrium
 	//avec.x = 0;
 	//avec.z = 0;
-	truck.avelocity.y = avec.y * 0.2; //only yaw for now
-	//truck.avelocity.x = avec.x * 0.2; //pitch
+	truck.avelocity.y = avec.y * 0.1; //only yaw for now
+	truck.avelocity.x = avec.x * 0.2; //pitch
 	truck.velocity = svec;
 	truck.velocity.x = 0;
 	truck.velocity.y = 0;
@@ -254,19 +258,20 @@ void(float dist) truck_physics =
 	//fix stuck
 	
 	//if ((!(truck.velocity.z > 0) && (truck.flags & FL_ONGROUND))
-	if ((truck.flags & FL_ONGROUND) && (truck.origin.z < (truck.flyhack.z + (truck.velocity.z * 0.025))))
+	if ((truck.flags & FL_ONGROUND) && (truck.origin.z < (truck.height + (truck.velocity.z * 0.025))))
 	{ 
 		truck.velocity.z = 0;
 		setorigin(truck, truck.origin + '0 0 18');
-		setorigin(truck.wheel1, truck.wheel1.origin + '0 0 18');
-		setorigin(truck.wheel2, truck.wheel2.origin + '0 0 18');
-		setorigin(truck.wheel3, truck.wheel3.origin + '0 0 18');
-		setorigin(truck.wheel4, truck.wheel4.origin + '0 0 18');
+		setorigin(truck.wheel1, truck.wheel1.origin + '0 0 16');
+		setorigin(truck.wheel2, truck.wheel2.origin + '0 0 16');
+		setorigin(truck.wheel3, truck.wheel3.origin + '0 0 16');
+		setorigin(truck.wheel4, truck.wheel4.origin + '0 0 16');
 		truck.flags = truck.flags - FL_ONGROUND;
 		dprint("truck stuck fix\n");
 		}
 	
-	truck.flyhack = truck.origin;
+	truck.height = truck.origin.z;
+	truck.flyhack = truck.velocity;
 
 	truck.ideal_yaw = final_yaw;
 	//dprint(vtos(truck.velocity));
@@ -292,7 +297,7 @@ void() move_truck =
 	//cpyall(self.turret, dist);
 
 	//animate
-	self.nextthink = time + 0.1;
+	self.nextthink = time + 1.0;
 };
 
 void() truck_touch =
@@ -323,7 +328,7 @@ void(float i) spawn_truck_wheel =
 	self.owner = truck;
 	self.solid = SOLID_TRIGGER;
 	self.classname = "wheel";
-	setsize(self, '-8 -8 -8', '8 8 8');
+	setsize(self, '-7 -7 -7', '7 7 7');
 	if !(i) {
 	truck.wheel1 = self;
 	self.view_ofs = '70 35 7'; //placeholder
