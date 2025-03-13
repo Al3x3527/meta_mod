@@ -1426,10 +1426,10 @@ void() W_Attack =
 */
 void(entity wp) switch_weapon =
 {
-//update ammo counts
-if (self.nextchild)
-	self.nextchild.ammo = self.currentammo;
-//check for weapon - do not cycle or infinite loop
+	//update ammo counts
+	if (self.nextchild)
+		self.nextchild.ammo = self.currentammo;
+	//check for weapon - do not cycle or infinite loop
 	if !(wp.wp_switch) {
 		//dprint("no weapon\n");
 		return;
@@ -1438,16 +1438,20 @@ if (self.nextchild)
 	self.currentammo = wp.ammo; //ammo type quantity
 	//dprint("switch weapon\n");
 	wp.wp_switch(); //just model and animation data
-	if (self.flags & FL_CLIENT)
-		wp.modelindex = 0;
-	else
-		setmodel(wp, self.weaponmodel);
 	self.weapon = wp.items;
 	self.wp_atk = wp.wp_atk;
 	if (wp.wp_melee)
 	self.wp_melee = wp.wp_melee;
 	else
 	self.wp_melee = melee_axe;
+
+	if (wp.flags & FL_VEHICLE)
+		return;
+
+	if (self.flags & FL_CLIENT)
+		wp.modelindex = 0;
+	else
+		setmodel(wp, self.weaponmodel);
 }
 
 // johnfitz new items   -- dumptruck_ds from RRP and rubicon2

@@ -13,7 +13,28 @@ $frame right1 right2
 //left
 $frame left1 left2
 
-//calculate vehicle_truck velocity and avelocity from wheels post engine physics
+void() truck_switch =
+{
+	self.nextchild = world;
+}
+
+void() truck_atk =
+{
+	local vector	dir;
+	local entity gunner = self.owner.turret;
+	sound(self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
+	self.attack_finished = time + 0.2;
+	//self.currentammo = self.ammo_nails = self.ammo_nails - 2;
+	//self.currentammo = self.currentammo - 1;
+	dir = aim(self, 1000);
+	launch_spike(gunner.origin + '0 0 30', dir);
+	newmis.touch = superspike_touch;
+	setmodel(newmis, "progs/laser.mdl");
+	setsize(newmis, VEC_ORIGIN, VEC_ORIGIN);
+	self.punchangle_x = -2;
+}
+
+//calculate vehicle_truck velocity and avelocity from wheels
 float (float dist, vector dir) truck_physics =
 {
 	local vector vec1, vec2, vec3, vec4;
@@ -22,13 +43,6 @@ float (float dist, vector dir) truck_physics =
 	//=================================================================
 	//steer and throttle inputs 
 	//=================================================================
-
-	//get input vectors
-	//local float dist = 10; //temp
-	//local vector dir;
-	//if (self.driver)
-	//dir = aim(self.owner.driver, 1000);
-	//else dir = '0 1 0';
 	
 	//truck vectors - velocity from wheels vs gravity, est grip
 	local vector svec = truck.velocity;
@@ -40,7 +54,6 @@ float (float dist, vector dir) truck_physics =
 		throttle = -1;
 		fakedist = vlen(tvec)/4;
 		}
-	//clamp steer yaw to +- 85 degrees from current yaw
 
 	local vector fakeangles = truck.angles;
 	fakeangles.x = -fakeangles.x;
@@ -66,7 +79,7 @@ float (float dist, vector dir) truck_physics =
 	vec1 = self.origin - view; //get to current position from start position
 	vec1.z = self.flyhack.z;
 	if (vlen(vec1) < (0.9 * fakedist)){ 
-	dprint("short step\n");
+	//dprint("short step\n");
 	vec1 = self.flyhack;}//probably accomplishing nothing.
 	vec1.z = zcontrol(vec1.z, deflection, damping); //damped spring ratio
 	if (self.flags & FL_ONGROUND) self.flags = self.flags - FL_ONGROUND;
@@ -82,7 +95,7 @@ float (float dist, vector dir) truck_physics =
 	vec2 = self.origin - view;
 	vec2.z = self.flyhack.z;
 	if (vlen(vec2) < (0.9 * fakedist)) {
-		dprint("short step\n");
+		//dprint("short step\n");
 		vec2 = self.flyhack;
 	}
 	vec2.z = zcontrol(vec2.z, deflection, damping);
@@ -139,11 +152,11 @@ float (float dist, vector dir) truck_physics =
 	//=================================================================
 	//all fake wheels are in ideal locations and ideal velocities have been calculated for each wheel
 
-	//svec = '0 0 0';
-
 	//grip
 	local float fgrip;
 	local float rgrip = 0.6;
+	local float sgrip = 0.5;
+
 	if (dist)
 		fgrip = dist;
 	else fgrip = rgrip;
@@ -154,7 +167,7 @@ float (float dist, vector dir) truck_physics =
 	grip2 = normalize(vec2) * fgrip + v_right * rgrip;
 	grip3 = v_forward * fgrip + v_right * rgrip;
 	grip4 = v_forward * fgrip + v_right * rgrip;
-	//if !(truck.wheel1.flags & FL_ONGROUND) does not work
+
 	if (vec1.z < -1)
 		grip1 = '0 0 0';
 	else {
@@ -180,12 +193,9 @@ float (float dist, vector dir) truck_physics =
 		vec4.z = vec4.z - tvec.z;
 		}
 	
-	//tvec = tvec * 0.1;
-	local float hack = 0.5;
-
 	local vector work1 = vec1;	work1.z = 0;
 	work1 = xylimit(work1, grip1) * throttle;
-	local vector control1 = xycontrol(work1, tvec, hack);
+	local vector control1 = xycontrol(work1, tvec, sgrip);
 	work1.z = vec1.z;
 	truck.wheel1.flyhack = work1;
 	control1 = control1 + work1;
@@ -193,7 +203,7 @@ float (float dist, vector dir) truck_physics =
 
 	local vector work2 = vec2;	work2.z = 0;
 	work2 = xylimit(work2, grip2) * throttle;
-	local vector control2 = xycontrol(work2, tvec, hack);
+	local vector control2 = xycontrol(work2, tvec, sgrip);
 	work2.z = vec2.z;
 	truck.wheel2.flyhack = work2;
 	control2 = control2 + work2;
@@ -201,7 +211,7 @@ float (float dist, vector dir) truck_physics =
 
 	local vector work3 = vec3;	work3.z = 0;
 	work3 = xylimit(work3, grip3) * throttle;
-	local vector control3 = xycontrol(work3, tvec, hack);
+	local vector control3 = xycontrol(work3, tvec, sgrip);
 	work3.z = vec3.z;
 	truck.wheel3.flyhack = work3;
 	control3 = control3 + work3;
@@ -209,7 +219,7 @@ float (float dist, vector dir) truck_physics =
 
 	local vector work4 = vec4;	work4.z = 0;
 	work4 = xylimit(work4, grip4) * throttle;
-	local vector control4 = xycontrol(work4, tvec, hack);
+	local vector control4 = xycontrol(work4, tvec, sgrip);
 	work4.z = vec4.z;
 	truck.wheel4.flyhack = work4;
 	control4 = control4 + work4;
@@ -217,7 +227,6 @@ float (float dist, vector dir) truck_physics =
 
 	//actual travel
 	svec = (svec + ((control1 + control2 + control3 + control4) * 10));
-	//svec = work1 + work2 + work3 + work4;
 
 	local vector final_vec = v_forward + (work1 + work2 - work3 - work4) * throttle;
 	local vector final_angs = vectoangles(final_vec);
@@ -242,13 +251,13 @@ float (float dist, vector dir) truck_physics =
 	avec.z = ((dang) * 1);
 
 	local float start_yaw = truck.angles.y;
-	dprint("\n");
+	//dprint("\n");
 	//dprint(vtos(dir));
 	//dprint(" dir\n");
 	//dprint(vtos(chassis_vec));
 	//dprint(" chassis vec\n");
-	dprint(vtos(final_angs));
-	dprint(" final angs\n");
+	//dprint(vtos(final_angs));
+	//dprint(" final angs\n");
 	//dprint(ftos(final_yaw));
 	//dprint(" final yaw\n");
 	//dprint(ftos(dang));
@@ -257,8 +266,8 @@ float (float dist, vector dir) truck_physics =
 	//dprint(" steer yaw\n");
 	//dprint(ftos(start_yaw);
 	//dprint(" start yaw\n");
-	dprint(vtos(truck.angles));
-	dprint(" start angles\n");
+	//dprint(vtos(truck.angles));
+	//dprint(" start angles\n");
 	//dprint(vtos(avec));
 	//dprint(" avec\n");
 
@@ -266,18 +275,11 @@ float (float dist, vector dir) truck_physics =
 	//vehicle velocity, avelocity
 	//=================================================================
 
-	//suspension, move chassis
-
-	//truck.avelocity.y = avec.y * 1; //only yaw for now
-	//truck.avelocity.x = avec.x * 1; //pitch
+	//move chassis
 	truck.avelocity = avec;
 	truck.velocity = svec;
-	//truck.velocity.x = 0;
-	//truck.velocity.y = 0;
 
 	//fix stuck
-	
-	//if ((!(truck.velocity.z > 0) && (truck.flags & FL_ONGROUND))
 	if ((truck.flags & FL_ONGROUND) && (truck.origin.z < (truck.height + (truck.velocity.z * 0.025))))
 	{ 
 		truck.velocity.z = 0;
@@ -296,10 +298,11 @@ float (float dist, vector dir) truck_physics =
 	truck.ideal_yaw = final_yaw;
 	//dprint(vtos(truck.velocity));
 	//dprint("truck velocity\n");
-	//passengers after return
-	self = truck;
-	subChangeYaw(); //stops things  from breaking
 
+	self = truck;
+	subChangeYaw();
+
+	//animate
 	local float direction;
 	dang = -steer_yaw + start_yaw;
 	if (dang > 180) dang = -360 + dang;
@@ -313,6 +316,24 @@ float (float dist, vector dir) truck_physics =
 	return direction;
 };
 
+void(entity truck) spawn_truck_driver =
+{
+	local entity player = self;
+	local entity pilot = spawn();
+	self = pilot;
+
+	player.driver = pilot;
+	pilot.owner = truck;
+	body_model("progs/player.mdl");
+	setsize(self, '-10 -10 0', '10 10 60');
+	self.view_ofs = '10 -15 40';
+	self.solid = SOLID_TRIGGER;
+	self.movetype = MOVETYPE_FLY;
+
+	setorigin(self, truck.origin); //fix next truck think
+	self = player;
+}
+
 vector () truck_pilot =
 {
 	local entity truck = self;
@@ -321,7 +342,10 @@ vector () truck_pilot =
 	self.modelindex = 0;
 	self.weaponmodel = string_null;
 	self.movetype = MOVETYPE_FLY;
-
+	self.owner = truck;
+	if !(self.driver)
+		spawn_truck_driver(truck);
+	switch_weapon(truck);
 	local vector dir = aim(world, 1000);
 	local vector target = truck.origin - dir * 200;
 	target.z = target.z + 60;
@@ -338,6 +362,7 @@ vector () truck_pilot =
 		self.flags = self.flags - FL_VEHICLE;
 		sprint(self, "Truck dismounted\n");
 		truck.driver = world;
+		self.owner = world;
 	}
 	
 	self = truck;
@@ -351,9 +376,8 @@ void() truck_drive = [ $forward1, truck_drive ]
 		other = self.driver;
 		if (other.button2)
 			dist = 4;
-		//chassis physics / prethink
 		local vector dir = truck_pilot();
-	}
+	}	//chassis physics / prethink
 	local float direction = truck_physics(dist, dir);
 
 	if (self.walkframe > 1)
@@ -366,7 +390,15 @@ void() truck_drive = [ $forward1, truck_drive ]
 		self.frame = $left1 + self.walkframe;
 	if (dist)
 		self.walkframe = self.walkframe + 1;
-	
+	local entity truck = self;
+	self = self.turret;
+	cpywalk();
+	self = truck.passenger;
+	cpywalk();
+	if (other) {
+		self = other.driver;
+		cpywalk();
+	}
 };
 
 void() truck_touch =
@@ -388,11 +420,60 @@ void() truck_touch =
 		}
 }
 
+void() gunner_turret_atk1 = [0, gunner_turret_atk1]
+{
+	local entity player = self.owner.driver;
+	if !(self.enemy)
+		self.ideal_yaw = player.v_angle.y;
+	self.v_angle.y = self.ideal_yaw - self.owner.angles.y;
+	subChangeYaw();
+};
+
+
+//demo gunner
+void() spawn_truck_gunner =
+{
+	local entity truck = self;
+	local entity gunner = spawn();
+	self = gunner;
+
+	truck.turret = gunner;
+	gunner.owner = truck;
+	body_model("progs/player.mdl");
+	setsize(self, '-10 -10 0', '10 10 60');
+	self.view_ofs = '-70 0 50';
+	self.solid = SOLID_TRIGGER;
+	self.movetype = MOVETYPE_FLY;
+	
+	setorigin(self, truck.origin); //fix next truck think
+	self.th_turret = gunner_turret_atk1;
+	self.think = self.th_turret;
+	self.nextthink = time + 0.1;
+	self = truck;
+}
+
+void() spawn_truck_passenger =
+{
+	local entity truck = self;
+	local entity shotgun = spawn();
+	self = shotgun;
+
+	truck.passenger = shotgun;
+	shotgun.owner = truck;
+	body_model("progs/player.mdl");
+	setsize(self, '-10 -10 0', '10 10 60');
+	self.view_ofs = '10 15 40';
+	self.solid = SOLID_TRIGGER;
+	self.movetype = MOVETYPE_FLY;
+
+	setorigin(self, truck.origin); //fix next truck think
+	self = truck;
+}
+
 //physics wheels
 void(float i) spawn_truck_wheel =
 {
 	local entity truck = self;
-	
 	local entity wheel = spawn();
 	self = wheel;
 	self.movetype = MOVETYPE_STEP;
@@ -402,7 +483,7 @@ void(float i) spawn_truck_wheel =
 	setsize(self, '-7 -7 -7', '7 7 7');
 	if !(i) {
 	truck.wheel1 = self;
-	self.view_ofs = '70 35 7'; //placeholder
+	self.view_ofs = '70 35 7';
 	}
 	else if (i == 1) {
 	truck.wheel2 = self;
@@ -431,7 +512,6 @@ void() spawn_vehicle_truck =
 	setsize(self, '-112 -40 18', '112 40 80');
 
 	//wheels -- not the visible model
-	
 	local float i = 0;
 	while (i < 4)
 	{
@@ -440,7 +520,15 @@ void() spawn_vehicle_truck =
 	}
 	self.touch = truck_touch;
 	self.think = truck_drive;
-	//self.nextthink = time + 0.1;
+
+	//gunner
+	if (self.spawnflags & I_AM_TURRET) {
+		spawn_truck_gunner();
+		spawn_truck_passenger();
+		}
+
+	self.wp_switch = truck_switch;
+	self.wp_atk = truck_atk;
 };
 
 //Vanilla Spawning

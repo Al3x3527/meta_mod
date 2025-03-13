@@ -842,24 +842,50 @@ float(float yaw, float dist) walkmove =
 //try to walkmove if on ground, call traceline if flying
 void() cpywalk =
 {
-	local vector delta;
+	local vector delta, deltay, deltax1, deltax2, deltaz;
 	local float dist, yaw;
-	delta = self.owner.origin + self.owner.velocity * 0.1 - self.origin;
-	if (self.flags & FL_ONGROUND) {
+	local vector avec = self.owner.avelocity;
+	local vector fakeangles = self.owner.angles;
+	fakeangles.x = -fakeangles.x;
+	makevectors(fakeangles);
+	local vector view = self.view_ofs + self.owner.view_ofs;
+	view = view.x * v_forward + view.y * v_right + view.z * v_up + self.owner.origin;
+	//from origin
+	local vector del = self.owner.origin - self.origin;
+	//from angular
+	deltay = avec.y * 0.1 * (6.28/360) * ((del * v_forward) * v_right + (del * v_right) * v_forward);
+	deltax1 = -avec.x * 0.628/360 * (del * v_forward) * v_up;
+	deltax2 = -avec.x * 0.628 / 360 * (del * v_up) * v_forward;
+	deltaz = -avec.z * 0.628 / 360 * ((del * v_right) * v_up + (del * v_up) * v_right);
+	//from velocity
+	delta = deltay + deltax1 + deltax2 + deltaz + self.owner.velocity * 0.1;
+	//actual delta
+	delta = delta + view - self.origin;
+	dist = vlen(delta);
+
+	local vector dang = self.owner.angles + self.v_angle - self.angles;
+	if (dang.y > 180) dang.y = -360 + dang.y;
+	else if (dang.y < -180) dang.y = 360 + dang.y;
+	self.avelocity = dang * 10;
+
+	if (dist > 100) {
+		dprint("cpywalk setorigin\n");
+		setorigin(self, view);
+		self.velocity = self.owner.velocity;
+		return;
+	}
+	if ((self.movetype == MOVETYPE_STEP) && (self.flags & FL_ONGROUND)) {
 		yaw = vectoyaw(delta);
-		makevectors(self.owner.angles);
-		dist = v_forward * delta;
 		subwalkmove(yaw, dist);
 		}
-	else {
+	else if (self.solid == SOLID_BBOX){
 		traceline(self.origin, delta, TRUE, self);
 		if (trace_fraction) {
-			self.velocity = delta * 10;
 			delta = delta * trace_fraction;
-			self.nextthink = time + 10 * trace_fraction;
 			}
-		else self.velocity = '0 0 0';
+		else delta = '0 0 0';
 	}
+	self.velocity = delta * 10;
 };
 
 //limit x,y
