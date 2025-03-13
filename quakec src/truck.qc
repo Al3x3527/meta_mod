@@ -98,6 +98,15 @@ float (float dist, vector dir) truck_physics =
 	local vector chassis_vec = pivot - truck.origin; //delta (forward vec)
 	local float chassis_yaw = vectoyaw(chassis_vec); //new truck yaw
 
+	local float dang;
+	local float reverse = -1;
+	dang = steer_yaw - chassis_yaw;
+	if (dang > 180) dang = -360 + dang;
+	else if (dang < -180) dang = 360 + dang;
+	if ((dang > 90) || (dang < -90)) {
+		chassis_yaw = chassis_yaw - 180;
+		reverse = 1;}
+
 	//rear wheels
 	self = truck.wheel3;
 	if ((self.velocity.z == 0) && !(self.flags & FL_ONGROUND)) self.flags = self.flags + FL_ONGROUND;
@@ -210,7 +219,6 @@ float (float dist, vector dir) truck_physics =
 	svec = (svec + ((control1 + control2 + control3 + control4) * 10));
 	//svec = work1 + work2 + work3 + work4;
 
-	local float dang;
 	local vector final_vec = v_forward + (work1 + work2 - work3 - work4) * throttle;
 	local vector final_angs = vectoangles(final_vec);
 
@@ -233,7 +241,7 @@ float (float dist, vector dir) truck_physics =
 	else if (dang < -180) dang = 360 + dang;
 	avec.z = ((dang) * 1);
 
-	local float start_yaw = vectoyaw(truck.angles);
+	local float start_yaw = truck.angles.y;
 	dprint("\n");
 	//dprint(vtos(dir));
 	//dprint(" dir\n");
@@ -293,12 +301,15 @@ float (float dist, vector dir) truck_physics =
 	subChangeYaw(); //stops things  from breaking
 
 	local float direction;
-	dang = steer_yaw - start_yaw;
-	if (dang > 15)
+	dang = -steer_yaw + start_yaw;
+	if (dang > 180) dang = -360 + dang;
+	else if (dang < -180) dang = 360 + dang;
+	if ((dang > 15) && (dang < 165))
 		direction = 1; //right
-	else if (dang < -15)
+	else if ((dang < -15) && (dang > -165))
 		direction = -1; //left
 	//else 0;
+	direction = direction * -reverse;
 	return direction;
 };
 
@@ -316,7 +327,7 @@ vector () truck_pilot =
 	target.z = target.z + 60;
 	local vector delta = target - self.origin;
 	delta = delta * 10;
-	self.velocity = (self.velocity * 2 + delta) * 0.5;
+	self.velocity = (self.velocity * 2 + delta) * 0.45;
 
 	if (self.impulse == 16) {
 		self.impulse = 0;
