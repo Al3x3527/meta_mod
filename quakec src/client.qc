@@ -864,16 +864,17 @@ if (do_ladder_physics)
 }
 else
 {
-	if !(self.flags & FL_ONGROUND) {
-		self.velocity_x = self.flyhack_x;
-		self.velocity_y = self.flyhack_y;
-		}
-	if (self.button2)
-		PlayerJump ();
-	else
-		self.flags = self.flags | FL_JUMPRELEASED;
-} //johnfitz
-
+	if !(self.flags & FL_VEHICLE) {
+		if !(self.flags & FL_ONGROUND) {
+			self.velocity_x = self.flyhack_x;
+			self.velocity_y = self.flyhack_y;
+			}
+		if (self.button2)
+			PlayerJump ();
+		else
+			self.flags = self.flags | FL_JUMPRELEASED;
+	} //johnfitz
+}
 // teleporters can force a non-moving pause time
 	if (time < self.pausetime) {
 		self.velocity = '0 0 0';
