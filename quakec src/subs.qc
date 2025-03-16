@@ -888,6 +888,47 @@ void() cpywalk =
 	self.velocity = delta * 10;
 };
 
+//orbital camera
+void(vector dir, vector offset) camera_orbit =
+{
+	local vector delta, deltay, deltax1, deltax2, deltaz;
+	local float dist, yaw;
+	local vector avec = self.owner.avelocity;
+	local vector fakeangles = self.owner.angles;
+	fakeangles.x = -fakeangles.x;
+	makevectors(fakeangles);
+	//local vector view = self.view_ofs + self.owner.view_ofs;
+	local vector view = dir * offset.x;
+	view.z = view.z + offset.z;
+	view = view.x * v_forward + view.y * v_right + view.z * v_up + self.owner.origin;
+	//from origin
+	local vector del = self.owner.origin - self.origin;
+	//from angular
+	deltay = avec.y * 0.1 * (6.28 / 360) * ((del * v_forward) * v_right + (del * v_right) * v_forward);
+	deltax1 = -avec.x * 0.628 / 360 * (del * v_forward) * v_up;
+	deltax2 = -avec.x * 0.628 / 360 * (del * v_up) * v_forward;
+	deltaz = -avec.z * 0.628 / 360 * ((del * v_right) * v_up + (del * v_up) * v_right);
+	//from velocity
+	delta = deltay + deltax1 + deltax2 + deltaz + self.owner.velocity * 0.1;
+	//actual delta
+	delta = delta + view - self.origin;
+	dist = vlen(delta);
+
+	local vector dang = self.owner.angles + self.v_angle - self.angles;
+	if (dang.y > 180) dang.y = -360 + dang.y;
+	else if (dang.y < -180) dang.y = 360 + dang.y;
+	self.avelocity = dang * 10;
+
+	if (dist > 100) {
+		dprint("cpywalk setorigin\n");
+		setorigin(self, view);
+		self.velocity = self.owner.velocity;
+		return;
+	}
+
+	self.velocity = delta * 10;
+}
+
 //limit x,y
 vector (vector given, vector limit) xylimit =
 {

@@ -347,11 +347,13 @@ vector () truck_pilot =
 		spawn_truck_driver(truck);
 	switch_weapon(truck);
 	local vector dir = aim(world, 1000);
-	local vector target = truck.origin - dir * 200;
-	target.z = target.z + 60;
-	local vector delta = target - self.origin;
-	delta = delta * 10;
-	self.velocity = (self.velocity * 2 + delta) * 0.45;
+	local vector offset = '-200 0 60';
+	camera_orbit(dir, offset);
+	//local vector target = truck.origin - dir * 200;
+	//target.z = target.z + 60;
+	//local vector delta = target - self.origin;
+	//delta = delta * 10;
+	//self.velocity = (self.velocity * 2 + delta) * 0.45;
 
 	if (self.impulse == 16) {
 		self.impulse = 0;
