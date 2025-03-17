@@ -343,6 +343,8 @@ vector () truck_pilot =
 	self.weaponmodel = string_null;
 	self.movetype = MOVETYPE_FLY;
 	self.owner = truck;
+	cvar_set("cl_bob", "0");
+	cvar_set("cl_rollangle", "0");
 	if !(self.driver)
 		spawn_truck_driver(truck);
 	switch_weapon(truck);
