@@ -2012,8 +2012,8 @@ void() ImpulseCommands =
 	// dprint ("Armortype is");
 	// dprint (ftos(self.armortype));
 	// dprint ("\n");
-
-	self.impulse = 0;
+	if (self.impulse != 16)
+		self.impulse = 0;
 };
 
 /*

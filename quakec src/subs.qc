@@ -888,42 +888,6 @@ void() cpywalk =
 	self.velocity = delta * 10;
 };
 
-//orbital camera
-void(vector dir, vector offset) camera_orbit =
-{
-	local vector delta;
-	local float dist;
-	local vector avec = self.owner.avelocity;
-	local vector fakeangles = self.owner.angles;
-	fakeangles.x = -fakeangles.x;
-	makevectors(fakeangles);
-	local vector view = dir * offset.x;
-	view.z = view.z + offset.z;
-	local vector newangles = vectoangles(view);
-	view = view + self.owner.origin;
-	//from origin
-	local vector del = self.owner.origin - self.origin;
-	//from velocity of focus
-	delta = self.owner.velocity * 0.1;
-	//actual delta
-	delta = delta + view;
-	delta = delta - self.origin;
-	dist = vlen(delta);
-	
-	local vector dang = newangles - self.angles;
-	if (dang.y > 180) dang.y = -360 + dang.y;
-	else if (dang.y < -180) dang.y = 360 + dang.y;
-	self.avelocity = (dang * 10 * 4 + self.avelocity)/5;
-
-	if (dist > 200) {
-		//dprint("cpywalk setorigin\n");
-		setorigin(self, view);
-		self.velocity = self.owner.velocity;
-		return;
-	}
-	self.velocity = (delta * 10 * 4 + self.velocity)/5;
-}
-
 //limit x,y
 vector (vector given, vector limit) xylimit =
 {

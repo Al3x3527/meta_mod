@@ -329,9 +329,66 @@ void(entity truck) spawn_truck_driver =
 	self.view_ofs = '10 -15 40';
 	self.solid = SOLID_TRIGGER;
 	self.movetype = MOVETYPE_FLY;
+	self.health = 1;
 
 	setorigin(self, truck.origin); //fix next truck think
 	self = player;
+}
+
+//orbital camera
+void(vector dir, vector offset) camera_orbit =
+{
+	local vector delta;
+	local float dist;
+	local entity truck = self.owner;
+	local vector avec = truck.avelocity;
+	local vector fakeangles = truck.angles;
+	fakeangles.x = -fakeangles.x;
+	makevectors(fakeangles);
+	local vector view = dir * offset.x;
+	view.z = view.z + offset.z;
+	local vector newangles = vectoangles(view);
+	view = view + truck.origin;
+	//from origin
+	local vector del = truck.origin - self.origin;
+	//from velocity of focus
+	delta = truck.velocity * 0.1;
+	//actual delta
+	delta = delta + view;
+	delta = delta - self.origin;
+	dist = vlen(delta);
+
+	local vector dang = newangles - self.angles;
+	if (dang.y > 180) dang.y = -360 + dang.y;
+	else if (dang.y < -180) dang.y = 360 + dang.y;
+	self.avelocity = (dang * 10 * 4 + self.avelocity) / 5;
+
+	if (dist > 200) {
+		//dprint("cpywalk setorigin\n");
+		setorigin(self, view);
+		self.velocity = truck.velocity;
+		return;
+	}
+	self.velocity = (delta * 10 * 4 + self.velocity) / 5;
+
+	//dismount here because we have angles
+	if (self.impulse == 16) {
+		self.impulse = 0;
+		setmodel(self, self.model);
+		self.movetype = MOVETYPE_WALK;
+		view = v_forward * 10 - v_right * 50 + v_up * 40;
+		setorigin(self, truck.origin + view);
+		self.velocity = truck.velocity;
+		self.flags = self.flags - FL_VEHICLE;
+		sprint(self, "Truck dismounted\n");
+		truck.driver = world;
+		self.owner = world;
+		cvar_set("cl_bob", "0.02");
+		cvar_set("cl_rollangle", "2");
+		self.driver.health = 0;
+		remove(self.driver);
+		switch_weapon(self.weapon1);
+	}
 }
 
 vector () truck_pilot =
@@ -339,36 +396,20 @@ vector () truck_pilot =
 	local entity truck = self;
 	self = other;
 
+if !(self.driver.health) {
 	self.modelindex = 0;
 	self.weaponmodel = string_null;
 	self.movetype = MOVETYPE_FLY;
 	self.owner = truck;
 	cvar_set("cl_bob", "0");
 	cvar_set("cl_rollangle", "0");
-	if !(self.driver)
-		spawn_truck_driver(truck);
+	spawn_truck_driver(truck);
 	switch_weapon(truck);
+	}
 	local vector dir = aim(world, 1000);
 	local vector offset = '-200 0 60';
 	camera_orbit(dir, offset);
-	//local vector target = truck.origin - dir * 200;
-	//target.z = target.z + 60;
-	//local vector delta = target - self.origin;
-	//delta = delta * 10;
-	//self.velocity = (self.velocity * 2 + delta) * 0.45;
 
-	if (self.impulse == 16) {
-		self.impulse = 0;
-		setmodel(self, self.model);
-		self.movetype = MOVETYPE_WALK;
-		setorigin(self, truck.origin);
-		self.velocity = truck.velocity;
-		self.flags = self.flags - FL_VEHICLE;
-		sprint(self, "Truck dismounted\n");
-		truck.driver = world;
-		self.owner = world;
-	}
-	
 	self = truck;
 	return (dir);
 }
